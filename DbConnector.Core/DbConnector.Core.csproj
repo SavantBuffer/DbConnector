@@ -2,12 +2,32 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>SavantBuffer's DbConnector: A performance-driven and ADO.NET data provider-agnostic ORM library for .NET</Description>
+    <PackageId>SavantBuffer.DbConnector</PackageId>
+    <Authors>Robert Orama</Authors>
+    <Company>Orama Technologies Inc.</Company>
+    <Product>SavantBuffer.DbConnector</Product>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://www.savantbuffer.com/</PackageProjectUrl>
+    <PackageIconUrl>https://www.savantbuffer.com/DbConnector/Content/Images/sb.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/SavantBuffer/DbConnector</RepositoryUrl>
+    <RepositoryType />
+    <PackageTags>DbConnector, ORM, ADO.NET, ADO.NET ORM, .NET ORM, .NET CORE, .NET Framework, data-provider, data provider-agnostic, SavantBuffer, Object-Relational Mapping, Object Relational Mapper</PackageTags>
+    <PackageReleaseNotes>Please visit https://www.savantbuffer.com for documentation!</PackageReleaseNotes>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
