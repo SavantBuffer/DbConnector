@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://www.savantbuffer.com/</PackageProjectUrl>
     <PackageIconUrl>https://www.savantbuffer.com/DbConnector/Content/Images/sb.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SavantBuffer/DbConnector</RepositoryUrl>
-    <RepositoryType />
+    <RepositoryType>git</RepositoryType>
     <PackageTags>DbConnector, ORM, ADO.NET, ADO.NET ORM, .NET ORM, .NET CORE, .NET Framework, data-provider, data provider-agnostic, SavantBuffer, Object-Relational Mapping, Object Relational Mapper</PackageTags>
     <PackageReleaseNotes>Please visit https://www.savantbuffer.com for documentation!</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
