@@ -73,6 +73,68 @@ namespace DbConnector.Core
         IDbJob<T> ReadFirstOrDefault<T>(Action<IDbJobCommand> onInit);
 
         /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<T> ReadFirstOrDefault<T>(
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text,
+            ColumnMapSetting mapSettings = null,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param>
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<T> ReadFirstOrDefault<T>(string sql, object param);
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>         
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<T> ReadFirstOrDefault<T>(string sql);
+
+        /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>

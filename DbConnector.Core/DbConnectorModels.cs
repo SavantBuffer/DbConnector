@@ -143,6 +143,14 @@ namespace DbConnector.Core
             this.MapSettings = new ColumnMapSetting();
         }
 
+        public DbJobCommand(DbCommand dbCommand, ColumnMapSetting mapSettings)
+        {
+            //Init param list
+            this._dbCommand = dbCommand;
+            this.Parameters = new DbJobParameterCollection(dbCommand);
+            this.MapSettings = mapSettings ?? new ColumnMapSetting();
+        }
+
         /// <summary>
         /// Use to set the command type and override the default Text CommandType.
         /// </summary>
@@ -173,6 +181,12 @@ namespace DbConnector.Core
 
         public DbJobCommand(DbCommand dbCommand, TStateParam stateParam)
             : base(dbCommand)
+        {
+            StateParam = stateParam;
+        }
+
+        public DbJobCommand(DbCommand dbCommand, TStateParam stateParam, ColumnMapSetting mapSettings)
+            : base(dbCommand, mapSettings)
         {
             StateParam = stateParam;
         }
@@ -292,37 +306,67 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        /// Add parameters using the properties of the <paramref name="obj"/>. These default to <see cref="ParameterDirection.Input"/>.
+        /// Add parameters using the properties of the <paramref name="param"/> object. These default to <see cref="ParameterDirection.Input"/>.
         /// <para>Valid <typeparamref name="T"/> types: anonymous, or any struct or class that is not a .NET built-in type and is not assignable from <see cref="IEnumerable"/> or <see cref="IListSource"/>.</para>
         /// <para><see cref="System.Enum"/> properties, including <see cref="System.Enum"/> arrays, will be changed to the applicable underlying type.</para>
         /// </summary>
         /// <typeparam name="T">The type of the object</typeparam>
-        /// <param name="obj">The object whose properties will be mapped.</param>
+        /// <param name="param">The object whose properties will be mapped.</param>
         /// <param name="isUseColumnAttribute">Set to false to not use the <see cref="System.ComponentModel.DataAnnotations.Schema.ColumnAttribute"/> for names. (Optional)</param>
         /// <param name="paramsPrefix">The prefix to use for all column names. (Optional)</param>
         /// <param name="paramsSuffix">The suffix to use for all column names. (Optional)</param>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is .NET built-in type.</exception>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="IEnumerable"/>.</exception>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="IListSource"/>.</exception>
-        public void AddFor<T>(T obj, bool isUseColumnAttribute = true, string paramsPrefix = null, string paramsSuffix = null)
+        public void AddFor<T>(T param, bool isUseColumnAttribute = true, string paramsPrefix = null, string paramsSuffix = null)
         {
-            if (obj != null)
+            if (param != null)
             {
                 ParameterCacheModel cacheModel = new ParameterCacheModel(typeof(T), isUseColumnAttribute, paramsPrefix, paramsSuffix);
 
                 if (!DbConnectorCache.ParameterCache.TryGetValue(cacheModel, out Action<DbJobParameterCollection, object> onAddFor))
                 {
-                    onAddFor = DynamicParameterBuilder.CreateBuilderAction(obj, typeof(T), this, isUseColumnAttribute, paramsPrefix, paramsSuffix);
+                    onAddFor = DynamicParameterBuilder.CreateBuilderAction(param, typeof(T), this, isUseColumnAttribute, paramsPrefix, paramsSuffix);
 
                     DbConnectorCache.ParameterCache.TryAdd(cacheModel, onAddFor);
                 }
                 else
                 {
-                    onAddFor(this, obj);
+                    onAddFor(this, param);
                 }
             }
         }
 
+        /// <summary>
+        /// Add parameters using the properties of the <paramref name="param"/> object. These default to <see cref="ParameterDirection.Input"/>.
+        /// <para>Valid object types: anonymous, or any struct or class that is not a .NET built-in type and is not assignable from <see cref="IEnumerable"/> or <see cref="IListSource"/>.</para>
+        /// <para><see cref="System.Enum"/> properties, including <see cref="System.Enum"/> arrays, will be changed to the applicable underlying type.</para>
+        /// </summary>
+        /// <param name="param">The object whose properties will be mapped.</param>
+        /// <param name="isUseColumnAttribute">Set to false to not use the <see cref="System.ComponentModel.DataAnnotations.Schema.ColumnAttribute"/> for names. (Optional)</param>
+        /// <param name="paramsPrefix">The prefix to use for all column names. (Optional)</param>
+        /// <param name="paramsSuffix">The suffix to use for all column names. (Optional)</param>
+        /// <exception cref="System.InvalidCastException">Thrown when object type is .NET built-in type.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when object type is assignable from <see cref="IEnumerable"/>.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when object type is assignable from <see cref="IListSource"/>.</exception>
+        public void AddFor(object param, bool isUseColumnAttribute = true, string paramsPrefix = null, string paramsSuffix = null)
+        {
+            if (param != null)
+            {
+                ParameterCacheModel cacheModel = new ParameterCacheModel(param.GetType(), isUseColumnAttribute, paramsPrefix, paramsSuffix);
+
+                if (!DbConnectorCache.ParameterCache.TryGetValue(cacheModel, out Action<DbJobParameterCollection, object> onAddFor))
+                {
+                    onAddFor = DynamicParameterBuilder.CreateBuilderAction(param, param.GetType(), this, isUseColumnAttribute, paramsPrefix, paramsSuffix);
+
+                    DbConnectorCache.ParameterCache.TryAdd(cacheModel, onAddFor);
+                }
+                else
+                {
+                    onAddFor(this, param);
+                }
+            }
+        }
 
         //
         // Summary:
@@ -1518,7 +1562,37 @@ namespace DbConnector.Core
         {
             return new DbJobCommand(cmd);
         }
+
+        public virtual IDbJobCommand CreateDbJobCommand(DbCommand cmd, ColumnMapSetting mapSettings)
+        {
+            return new DbJobCommand(cmd, mapSettings);
+        }
     }
+
+
+    internal class DbConnectorSimpleState : DbConnectorStateBase
+    {
+        public override IDbJobState<TStateParamValue> Clone<TStateParamValue>(TStateParamValue value)
+        {
+            return new DbConnectorSimpleState<TStateParamValue> { Flags = Flags, StateParam = value };
+        }
+    }
+
+    internal class DbConnectorSimpleState<TStateParam> : DbConnectorSimpleState, IDbJobState<TStateParam>
+    {
+        public TStateParam StateParam { get; set; }
+
+        public override IDbJobCommand CreateDbJobCommand(DbCommand cmd)
+        {
+            return new DbJobCommand<TStateParam>(cmd, StateParam);
+        }
+
+        public override IDbJobCommand CreateDbJobCommand(DbCommand cmd, ColumnMapSetting mapSettings)
+        {
+            return new DbJobCommand<TStateParam>(cmd, StateParam, mapSettings);
+        }
+    }
+
 
     internal class DbConnectorState : DbConnectorStateBase, IDbConnectorState<Action<IDbJobCommand>>
     {
