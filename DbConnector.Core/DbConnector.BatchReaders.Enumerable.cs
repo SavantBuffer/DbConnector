@@ -47,7 +47,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -83,7 +82,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>()));
         }
 
         /// <summary>
@@ -109,7 +108,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -148,7 +146,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>()));
         }
 
         /// <summary>
@@ -174,7 +172,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -217,7 +214,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>()));
         }
 
         /// <summary>
@@ -243,7 +240,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -290,7 +286,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>()));
         }
 
         /// <summary>
@@ -316,7 +312,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -367,7 +362,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>()));
         }
 
         /// <summary>
@@ -393,7 +388,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -448,7 +442,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>()));
         }
 
         /// <summary>
@@ -474,7 +468,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>(), Enumerable.Empty<T8>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -533,7 +526,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>(), Enumerable.Empty<T8>()));
         }
     }
 }

@@ -39,7 +39,29 @@ namespace DbConnector.Core
 
         private readonly DbJobSetting _jobSetting;
         private readonly CalculatedDbConnectorFlags _flags;
-        private static readonly CommandBehavior _commandBehaviorSingleResultOrSingleRow = CommandBehavior.SingleResult | CommandBehavior.SingleRow;
+        private static readonly CommandBehavior _commandBehaviorSingleResultOrSingleRow;
+        private static readonly MethodInfo[] _multiReaderMethods;
+        private static readonly MethodInfo[] _multiReaderMethodsByState;
+
+        /// <summary>
+        /// Static constructor
+        /// </summary>
+        static DbConnector()
+        {
+            //Cache default CommandBehavior
+            _commandBehaviorSingleResultOrSingleRow = CommandBehavior.SingleResult | CommandBehavior.SingleRow;
+
+            //Cache MethodInfos for "multi reader" use.
+            Type dcType = typeof(DbConnector<TDbConnection>);
+
+            _multiReaderMethods = dcType
+                                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                                .Where(m => m.GetGenericArguments().Length == 1 && m.GetParameters().Length == 1).ToArray();
+
+            _multiReaderMethodsByState = dcType
+                                        .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
+                                        .Where(m => m.Name.EndsWith("ByState")).ToArray();
+        }
 
         /// <summary>
         /// A generic database connector and lightweight ORM.
@@ -154,12 +176,30 @@ namespace DbConnector.Core
         }
 
         private static IDbJobCommand[] BuildJobCommandForSimpleState(
+           DbConnection conn,
+           IDbJobState state,
+           string commandText,
+           object param = null,
+           CommandType commandType = CommandType.Text)
+        {
+            var currentState = (state as DbConnectorSimpleState);
+            var cmd = currentState.CreateDbJobCommand(conn.CreateCommand());
+
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
+
+            cmd.Parameters.AddFor(param);
+
+            return new IDbJobCommand[1] { cmd };
+        }
+
+        private static IDbJobCommand[] BuildJobCommandForSimpleState(
             DbConnection conn,
             IDbJobState state,
             string commandText,
+            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
-            ColumnMapSetting mapSettings = null,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
             DbJobCommandFlags flags = DbJobCommandFlags.None)
@@ -177,34 +217,6 @@ namespace DbConnector.Core
             }
 
             cmd.Flags = flags;
-            cmd.Parameters.AddFor(param);
-
-            return new IDbJobCommand[1] { cmd };
-        }
-
-        private static IDbJobCommand[] BuildJobCommandForSimpleState(
-            DbConnection conn,
-            IDbJobState state,
-            string commandText)
-        {
-            var currentState = (state as DbConnectorSimpleState);
-            var cmd = currentState.CreateDbJobCommand(conn.CreateCommand());
-
-            cmd.CommandText = commandText;
-
-            return new IDbJobCommand[1] { cmd };
-        }
-
-        private static IDbJobCommand[] BuildJobCommandForSimpleState(
-            DbConnection conn,
-            IDbJobState state,
-            string commandText,
-            object param)
-        {
-            var currentState = (state as DbConnectorSimpleState);
-            var cmd = currentState.CreateDbJobCommand(conn.CreateCommand());
-
-            cmd.CommandText = commandText;
             cmd.Parameters.AddFor(param);
 
             return new IDbJobCommand[1] { cmd };
@@ -451,12 +463,12 @@ namespace DbConnector.Core
                     MethodInfo mi;
                     if (!isWithStateParam)
                     {
-                        mi = dcType.GetMethods(BindingFlags.Public | BindingFlags.Instance).First(m => m.Name == methodName && m.GetGenericArguments().Count() == 1);
+                        mi = _multiReaderMethods.First(m => m.Name == methodName);
                     }
                     else
                     {
                         methodName += "ByState";
-                        mi = dcType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).First(m => m.Name == methodName);
+                        mi = _multiReaderMethodsByState.First(m => m.Name == methodName);
                     }
 
 
@@ -511,10 +523,7 @@ namespace DbConnector.Core
 
                         //Pass the old values
                         jobItem
-                            .WithBuffering(p.IsBuffered)
-                            .WithLogging(j._isLoggingEnabled)
-                            .WithIsolationLevel(j._isolationLevel)
-                            .WithCache(j._isCacheEnabled);
+                            .SetBranchedProperties(p.IsBuffered, j._isLoggingEnabled, j._isCacheEnabled, j._isolationLevel);
 
                         //Execute the job
                         if (p.IsDisposable)
@@ -556,10 +565,7 @@ namespace DbConnector.Core
 
                         //Pass the old values
                         jobItem
-                            .WithBuffering(p.IsBuffered)
-                            .WithLogging(j._isLoggingEnabled)
-                            .WithIsolationLevel(j._isolationLevel)
-                            .WithCache(j._isCacheEnabled);
+                            .SetBranchedProperties(p.IsBuffered, j._isLoggingEnabled, j._isCacheEnabled, j._isolationLevel);
 
                         //Execute the job
                         if (p.IsDisposable)
@@ -672,100 +678,7 @@ namespace DbConnector.Core
             }
         }
 
-        #endregion
-
-        #region OnExecutes
-
-        private static IEnumerable<T> OnExecuteRead<T>(IEnumerable<T> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return p.IsBuffered ? odr.ToList<T>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T>(p.Token, p.JobCommand);
-        }
-
-        private static T OnExecuteReadFirst<T>(T d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-            p.DeferDisposable(odr);
-
-            return odr.First<T>(p.Token, p.JobCommand);
-        }
-
-        private static T OnExecuteReadFirstOrDefault<T>(T d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-            p.DeferDisposable(odr);
-
-            return odr.FirstOrDefault<T>(p.Token, p.JobCommand);
-        }
-
-        private static T OnExecuteReadSingle<T>(T d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.Single<T>(p.Token, p.JobCommand);
-        }
-
-        private static T OnExecuteReadSingleOrDefault<T>(T d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.SingleOrDefault<T>(p.Token, p.JobCommand);
-        }
-
-        private static List<T> OnExecuteReadToList<T>(List<T> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.ToList<T>(p.Token, p.JobCommand);
-        }
-
-        private static DataTable OnExecuteReadToDataTable(DataTable d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.ToDataTable(false, p.Token, p.JobCommand.MapSettings);
-        }
-
-        private static IEnumerable<List<KeyValuePair<string, object>>> OnExecuteReadToKeyValuePairs(IEnumerable<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return p.IsBuffered ? odr.ToKeyValuePairs(false, p.Token, p.JobCommand) : odr.ToEnumerableKeyValuePairs(false, p.Token, p.JobCommand);
-        }
-
-        private static IEnumerable<Dictionary<string, object>> OnExecuteReadToDictionaries(IEnumerable<Dictionary<string, object>> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return p.IsBuffered ? odr.ToDictionaries(false, p.Token, p.JobCommand) : odr.ToEnumerableDictionaries(false, p.Token, p.JobCommand);
-        }
-
-        private static List<List<KeyValuePair<string, object>>> OnExecuteReadToListOfKeyValuePairs(List<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.ToKeyValuePairs(false, p.Token, p.JobCommand);
-        }
-
-        private static List<Dictionary<string, object>> OnExecuteReadToListOfDictionaries(List<Dictionary<string, object>> d, IDbExecutionModel p)
-        {
-            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-            p.DeferDisposable(odr);
-
-            return odr.ToDictionaries(false, p.Token, p.JobCommand);
-        }
-
-        #endregion
+        #endregion        
 
         #region Implementation
 
@@ -793,10 +706,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => Enumerable.Empty<T>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state), //https://github.com/dotnet/roslyn/issues/5835
                     onExecute: (d, p) => OnExecuteRead(d, p)
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<T>());
         }
 
         protected internal IDbJob<IEnumerable<T>> ReadByState<T, TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
@@ -810,10 +722,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState<TStateParam> { Flags = _flags, OnInit = onInit, StateParam = stateParam },
-                    onInit: () => Enumerable.Empty<T>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state), //https://github.com/dotnet/roslyn/issues/5835
                     onExecute: (d, p) => OnExecuteRead(d, p)
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<T>());
         }
 
         /// <summary>
@@ -1028,10 +939,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => new List<T>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToList(d, p)
-                );
+                ).SetOnError((d, e) => new List<T>());
         }
 
         protected internal IDbJob<List<T>> ReadToListByState<T, TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
@@ -1045,10 +955,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState<TStateParam> { Flags = _flags, OnInit = onInit, StateParam = stateParam },
-                    onInit: () => new List<T>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToList(d, p)
-                );
+                ).SetOnError((d, e) => new List<T>());
         }
 
         /// <summary>
@@ -1119,13 +1028,7 @@ namespace DbConnector.Core
                     state: new DbConnectorQueuedState { Flags = _flags, OnInit = jobCommandActions },
                     onInit: () => new DataSet(),
                     onCommands: (conn, state) => BuildJobCommands(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        return odr.ToDataSet(false, p.Token, p.JobCommand.MapSettings, d);
-                    }
+                    onExecute: (d, p) => OnExecuteReadToDataSet(d, p)
                 )
                 .WithIsolatedConnections(jobCommandActions.Count > 1 ? (_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false) : false)
                 .OnBranch((d, p, job) =>
@@ -1160,10 +1063,7 @@ namespace DbConnector.Core
                             }
 
                             jobItem
-                                .WithBuffering(p.IsBuffered)
-                                .WithLogging(j._isLoggingEnabled)
-                                .WithIsolationLevel(j._isolationLevel)
-                                .WithCache(j._isCacheEnabled);
+                                .SetBranchedProperties(p.IsBuffered, j._isLoggingEnabled, j._isCacheEnabled, j._isolationLevel);
 
                             if (p.IsDisposable)
                             {
@@ -1224,10 +1124,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => Enumerable.Empty<List<KeyValuePair<string, object>>>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToKeyValuePairs(d, p)
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<List<KeyValuePair<string, object>>>());
         }
 
         /// <summary>
@@ -1253,10 +1152,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => Enumerable.Empty<Dictionary<string, object>>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToDictionaries(d, p)
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<Dictionary<string, object>>());
         }
 
         /// <summary>
@@ -1282,10 +1180,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => new List<List<KeyValuePair<string, object>>>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToListOfKeyValuePairs(d, p)
-                );
+                ).SetOnError((d, e) => new List<List<KeyValuePair<string, object>>>());
         }
 
         /// <summary>
@@ -1311,10 +1208,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => new List<Dictionary<string, object>>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToListOfDictionaries(d, p)
-                );
+                ).SetOnError((d, e) => new List<Dictionary<string, object>>());
         }
 
         public IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionariesByState<TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
@@ -1328,10 +1224,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState<TStateParam> { Flags = _flags, OnInit = onInit, StateParam = stateParam },
-                    onInit: () => new List<Dictionary<string, object>>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadToListOfDictionaries(d, p)
-                );
+                ).SetOnError((d, e) => new List<Dictionary<string, object>>());
         }
 
         /// <summary>
@@ -1360,25 +1255,7 @@ namespace DbConnector.Core
                     state: new DbConnectorQueuedState { Flags = _flags, OnInit = jobCommandActions },
                     onInit: () => new DbCollectionSet(),
                     onCommands: (conn, state) => BuildJobCommands(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-
-                        while ((hasNext && odr.HasRows) || odr.NextResult())
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                break;
-
-                            d.Items.Add(odr.ToDictionaries(false, p.Token, p.JobCommand));
-
-                            hasNext = odr.NextResult();
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToDbCollectionSet(d, p)
                 )
                 .WithIsolatedConnections(jobCommandActions.Count > 1 ? (_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false) : false)
                 .OnBranch((d, p, job) =>
@@ -1413,10 +1290,7 @@ namespace DbConnector.Core
                             }
 
                             jobItem
-                                .WithBuffering(p.IsBuffered)
-                                .WithLogging(j._isLoggingEnabled)
-                                .WithIsolationLevel(j._isolationLevel)
-                                .WithCache(j._isCacheEnabled);
+                                .SetBranchedProperties(p.IsBuffered, j._isLoggingEnabled, j._isCacheEnabled, j._isolationLevel);
 
                             if (p.IsDisposable)
                             {
@@ -1494,154 +1368,12 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
-        ///  <para> The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
-        ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
-        /// </summary>
-        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>        
-        /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<int?> NonQuery(Action<IDbJobCommand> onInit)
-        {
-            if (onInit == null)
-            {
-                throw new ArgumentNullException("onInit cannot be null!");
-            }
-
-            return new DbJob<int?, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        int numberOfRowsAffected = p.Command.ExecuteNonQuery();
-
-                        p.NumberOfRowsAffected = numberOfRowsAffected;
-
-                        return numberOfRowsAffected;
-                    }
-                )
-                .OnError((d, ex) => null)
-                .WithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
-
-        /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
-        ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
-        /// </summary>
-        /// <typeparam name="T">The element type to use for the result.</typeparam>
-        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<T> NonQuery<T>(Action<IDbJobCommand> onInit)
-        {
-            if (onInit == null)
-            {
-                throw new ArgumentNullException("onInit cannot be null!");
-            }
-
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        int numberOfRowsAffected = p.Command.ExecuteNonQuery();
-
-                        p.NumberOfRowsAffected = numberOfRowsAffected;
-
-                        return d;
-                    }
-                )
-                .WithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
-
-        /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
-        ///  <para>The result will be null if a non-query fails. Otherwise, the result will be the number of rows affected if all non-queries ran successfully.</para>
-        ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
-        /// </summary>
-        /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<int?> NonQueries(Action<Queue<Action<IDbJobCommand>>> onInit)
-        {
-            if (onInit == null)
-            {
-                throw new ArgumentNullException("onInit cannot be null!");
-            }
-
-            return new DbJob<int?, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorActionQueuedState { Flags = _flags, OnInit = onInit },
-                    onCommands: (conn, state) => BuildJobActionCommands(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        int numberOfRowsAffected = p.Command.ExecuteNonQuery();
-
-                        if (!p.NumberOfRowsAffected.HasValue)
-                        {
-                            p.NumberOfRowsAffected = 0;
-                        }
-
-                        p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
-
-                        return p.NumberOfRowsAffected;
-                    }
-                ).OnError((d, ex) => null)
-                .WithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
-
-        /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
-        ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
-        /// </summary>
-        /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<T> NonQueries<T>(Action<Queue<Action<IDbJobCommand>>> onInit)
-        {
-            if (onInit == null)
-            {
-                throw new ArgumentNullException("onInit cannot be null!");
-            }
-
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorActionQueuedState { Flags = _flags, OnInit = onInit },
-                    onCommands: (conn, state) => BuildJobActionCommands(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        int numberOfRowsAffected = p.Command.ExecuteNonQuery();
-
-                        if (!p.NumberOfRowsAffected.HasValue)
-                        {
-                            p.NumberOfRowsAffected = 0;
-                        }
-
-                        p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
-
-                        return d;
-                    }
-                )
-                .WithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
-
-        /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
         ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="IEnumerable"/> or <see cref="IListSource"/>.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
-        /// </summary>d
+        /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
@@ -1670,22 +1402,112 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        object scalar = p.Command.ExecuteScalar();
-
-                        if (scalar != DBNull.Value)
-                        {
-                            Type tTypeS = typeof(T);
-
-                            return (T)(DbConnectorUtilities.ThrowIfFailedToMatchColumnType(tTypeS, (Nullable.GetUnderlyingType(tTypeS) ?? tTypeS), scalar));
-                        }
-                        else
-                        {
-                            return default;
-                        }
-                    }
+                    onExecute: (d, p) => OnExecuteScalar(d, p)
                 );
+        }
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  <para> The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
+        /// </summary>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>        
+        /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<int?> NonQuery(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException("onInit cannot be null!");
+            }
+
+            return new DbJob<int?, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
+                )
+                .SetOnError((d, ex) => null)
+                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
+        }
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<T> NonQuery<T>(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException("onInit cannot be null!");
+            }
+
+            return new DbJob<T, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
+                )
+                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
+        }
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  <para>The result will be null if a non-query fails. Otherwise, the result will be the number of rows affected if all non-queries ran successfully.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
+        /// </summary>
+        /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<int?> NonQueries(Action<Queue<Action<IDbJobCommand>>> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException("onInit cannot be null!");
+            }
+
+            return new DbJob<int?, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorActionQueuedState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobActionCommands(conn, state),
+                    onExecute: (d, p) => OnExecuteNonQueries(d, p)
+                ).SetOnError((d, ex) => null)
+                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
+        }
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
+        /// </summary>
+        /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<T> NonQueries<T>(Action<Queue<Action<IDbJobCommand>>> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException("onInit cannot be null!");
+            }
+
+            return new DbJob<T, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorActionQueuedState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobActionCommands(conn, state),
+                    onExecute: (d, p) => OnExecuteNonQueries(d, p)
+                )
+                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
         }
 
         /// <summary>
@@ -1737,6 +1559,189 @@ namespace DbConnector.Core
                         return true;
                     }
                 );
+        }
+
+        #endregion
+
+        #region Executions
+
+        private static IEnumerable<T> OnExecuteRead<T>(IEnumerable<T> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return p.IsBuffered ? odr.ToList<T>(p.Token, p.JobCommand)
+                                : odr.ToEnumerable<T>(p.Token, p.JobCommand);
+        }
+
+        private static T OnExecuteReadFirst<T>(T d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.First<T>(p.Token, p.JobCommand);
+        }
+
+        private static T OnExecuteReadFirstOrDefault<T>(T d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.FirstOrDefault<T>(p.Token, p.JobCommand);
+        }
+
+        private static T OnExecuteReadSingle<T>(T d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.Single<T>(p.Token, p.JobCommand);
+        }
+
+        private static T OnExecuteReadSingleOrDefault<T>(T d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.SingleOrDefault<T>(p.Token, p.JobCommand);
+        }
+
+        private static List<T> OnExecuteReadToList<T>(List<T> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToList<T>(p.Token, p.JobCommand);
+        }
+
+        private static DataTable OnExecuteReadToDataTable(DataTable d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToDataTable(false, p.Token, p.JobCommand.MapSettings);
+        }
+
+        private static IEnumerable<List<KeyValuePair<string, object>>> OnExecuteReadToKeyValuePairs(IEnumerable<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return p.IsBuffered ? odr.ToKeyValuePairs(false, p.Token, p.JobCommand) : odr.ToEnumerableKeyValuePairs(false, p.Token, p.JobCommand);
+        }
+
+        private static IEnumerable<Dictionary<string, object>> OnExecuteReadToDictionaries(IEnumerable<Dictionary<string, object>> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return p.IsBuffered ? odr.ToDictionaries(false, p.Token, p.JobCommand) : odr.ToEnumerableDictionaries(false, p.Token, p.JobCommand);
+        }
+
+        private static List<List<KeyValuePair<string, object>>> OnExecuteReadToListOfKeyValuePairs(List<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToKeyValuePairs(false, p.Token, p.JobCommand);
+        }
+
+        private static List<Dictionary<string, object>> OnExecuteReadToListOfDictionaries(List<Dictionary<string, object>> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToDictionaries(false, p.Token, p.JobCommand);
+        }
+
+        private static DataSet OnExecuteReadToDataSet(DataSet d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            return odr.ToDataSet(false, p.Token, p.JobCommand.MapSettings, d);
+        }
+
+        private static IDbCollectionSet OnExecuteReadToDbCollectionSet(IDbCollectionSet d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+
+            while ((hasNext && odr.HasRows) || odr.NextResult())
+            {
+                if (p.Token.IsCancellationRequested)
+                    break;
+
+                d.Items.Add(odr.ToDictionaries(false, p.Token, p.JobCommand));
+
+                hasNext = odr.NextResult();
+            }
+
+            return d;
+        }
+
+        private static int? OnExecuteNonQuery(int? d, IDbExecutionModel p)
+        {
+            int numberOfRowsAffected = p.Command.ExecuteNonQuery();
+
+            p.NumberOfRowsAffected = numberOfRowsAffected;
+
+            return numberOfRowsAffected;
+        }
+
+        private static T OnExecuteNonQuery<T>(T d, IDbExecutionModel p)
+        {
+            int numberOfRowsAffected = p.Command.ExecuteNonQuery();
+
+            p.NumberOfRowsAffected = numberOfRowsAffected;
+
+            return d;
+        }
+
+        private static int? OnExecuteNonQueries(int? d, IDbExecutionModel p)
+        {
+            int numberOfRowsAffected = p.Command.ExecuteNonQuery();
+
+            if (!p.NumberOfRowsAffected.HasValue)
+            {
+                p.NumberOfRowsAffected = 0;
+            }
+
+            p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
+
+            return p.NumberOfRowsAffected;
+        }
+
+        private static T OnExecuteNonQueries<T>(T d, IDbExecutionModel p)
+        {
+            int numberOfRowsAffected = p.Command.ExecuteNonQuery();
+
+            if (!p.NumberOfRowsAffected.HasValue)
+            {
+                p.NumberOfRowsAffected = 0;
+            }
+
+            p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
+
+            return d;
+        }
+
+        private static T OnExecuteScalar<T>(T d, IDbExecutionModel p)
+        {
+            object scalar = p.Command.ExecuteScalar();
+
+            if (scalar != DBNull.Value)
+            {
+                Type tTypeS = typeof(T);
+
+                return (T)(DbConnectorUtilities.ThrowIfFailedToMatchColumnType(tTypeS, (Nullable.GetUnderlyingType(tTypeS) ?? tTypeS), scalar));
+            }
+            else
+            {
+                return default;
+            }
         }
 
         #endregion

@@ -119,5 +119,16 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{List{object}}"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         IDbJob<List<object>> ReadToList(Type type, Action<IDbJobCommand> onInit);
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  set returned by the query. All other columns and rows are ignored.</para>        
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteScalar"/>
+        /// </summary>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<object> Scalar(Action<IDbJobCommand> onInit);
     }
 }

@@ -47,7 +47,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -80,7 +79,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>()));
         }
 
         /// <summary>
@@ -106,7 +105,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -142,7 +140,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>()));
         }
 
         /// <summary>
@@ -168,7 +166,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -207,7 +204,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>()));
         }
 
         /// <summary>
@@ -233,7 +230,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -275,7 +271,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>()));
         }
 
         /// <summary>
@@ -301,7 +297,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -346,7 +341,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>()));
         }
 
         /// <summary>
@@ -372,7 +367,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -420,7 +414,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>()));
         }
 
         /// <summary>
@@ -446,7 +440,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>(), new List<T8>()),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -497,7 +490,7 @@ namespace DbConnector.Core
 
                         return d;
                     }
-                );
+                ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>(), new List<T8>()));
         }
     }
 }

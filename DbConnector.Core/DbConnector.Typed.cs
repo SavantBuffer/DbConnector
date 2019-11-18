@@ -14,7 +14,9 @@
 
 using DbConnector.Core.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -53,7 +55,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => Enumerable.Empty<object>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -63,7 +64,7 @@ namespace DbConnector.Core
                         return p.IsBuffered ? odr.ToList(type, p.Token, p.JobCommand)
                                             : odr.ToEnumerable(type, p.Token, p.JobCommand);
                     }
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<object>());
         }
 
         /// <summary>
@@ -307,7 +308,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => new List<object>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -315,6 +315,43 @@ namespace DbConnector.Core
                         p.DeferDisposable(odr);
 
                         return odr.ToList(type, p.Token, p.JobCommand);
+                    }
+                ).SetOnError((d, e) => new List<object>());
+        }
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  set returned by the query. All other columns and rows are ignored.</para>        
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteScalar"/>
+        /// </summary>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<object> Scalar(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException("onInit cannot be null!");
+            }
+
+            return new DbJob<object, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) =>
+                    {
+                        object scalar = p.Command.ExecuteScalar();
+
+                        if (scalar != DBNull.Value)
+                        {
+                            return scalar;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 );
         }

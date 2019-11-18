@@ -13,16 +13,13 @@
 //limitations under the License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 
 namespace DbConnector.Core
 {
-    public partial class DbConnector<TDbConnection> : IDbConnector<TDbConnection>
+    public partial interface IDbConnector<TDbConnection>
        where TDbConnection : DbConnection
     {
         /// <summary>
@@ -43,23 +40,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
-        public IDbJob<IEnumerable<T>> Read<T>(
+        IDbJob<IEnumerable<T>> Read<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<IEnumerable<T>, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteRead(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<T>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{T}}"/> able to execute a reader based on the configured parameters.</para>
@@ -75,19 +63,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
-        public IDbJob<IEnumerable<T>> Read<T>(
+        IDbJob<IEnumerable<T>> Read<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<IEnumerable<T>, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteRead(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<T>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -109,23 +88,14 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
-        public IDbJob<T> ReadFirst<T>(
+        IDbJob<T> ReadFirst<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadFirst(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -143,19 +113,10 @@ namespace DbConnector.Core
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
-        public IDbJob<T> ReadFirst<T>(
+        IDbJob<T> ReadFirst<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadFirst(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -176,23 +137,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param>        
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        public IDbJob<T> ReadFirstOrDefault<T>(
+        IDbJob<T> ReadFirstOrDefault<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadFirstOrDefault(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -209,19 +161,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        public IDbJob<T> ReadFirstOrDefault<T>(
+        IDbJob<T> ReadFirstOrDefault<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadFirstOrDefault(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -244,23 +187,14 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
-        public IDbJob<T> ReadSingle<T>(
+        IDbJob<T> ReadSingle<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadSingle(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -279,19 +213,10 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
-        public IDbJob<T> ReadSingle<T>(
+        IDbJob<T> ReadSingle<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadSingle(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -313,23 +238,14 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
-        public IDbJob<T> ReadSingleOrDefault<T>(
+        IDbJob<T> ReadSingleOrDefault<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadSingleOrDefault(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
@@ -347,19 +263,10 @@ namespace DbConnector.Core
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
-        public IDbJob<T> ReadSingleOrDefault<T>(
+        IDbJob<T> ReadSingleOrDefault<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<T, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadSingleOrDefault(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{T}}"/> able to execute a reader based on the configured parameters.</para>
@@ -379,23 +286,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
-        public IDbJob<List<T>> ReadToList<T>(
+        IDbJob<List<T>> ReadToList<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<List<T>, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToList(d, p)
-                ).SetOnError((d, e) => new List<T>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{T}}"/> able to execute a reader based on the configured parameters.</para>
@@ -411,19 +309,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
-        public IDbJob<List<T>> ReadToList<T>(
+        IDbJob<List<T>> ReadToList<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<List<T>, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToList(d, p)
-                ).SetOnError((d, e) => new List<T>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{System.Data.DataTable}"/> able to execute a reader based on the configured parameters.</para>
@@ -441,23 +330,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{System.Data.DataTable}"/>.</returns>
-        public IDbJob<DataTable> ReadToDataTable(
+        IDbJob<DataTable> ReadToDataTable(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<DataTable, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToDataTable(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{System.Data.DataTable}"/> able to execute a reader based on the configured parameters.</para>
@@ -471,19 +351,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{System.Data.DataTable}"/>.</returns>
-        public IDbJob<DataTable> ReadToDataTable(
+        IDbJob<DataTable> ReadToDataTable(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<DataTable, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToDataTable(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{System.Data.DataSet}"/> able to execute a reader based on the configured parameters.</para>
@@ -498,23 +369,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{System.Data.DataSet}"/>.</returns>
-        public IDbJob<DataSet> ReadToDataSet(
+        IDbJob<DataSet> ReadToDataSet(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<DataSet, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToDataSet(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{System.Data.DataSet}"/> able to execute a reader based on the configured parameters.</para>
@@ -525,19 +387,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{System.Data.DataSet}"/>.</returns>
-        public IDbJob<DataSet> ReadToDataSet(
+        IDbJob<DataSet> ReadToDataSet(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<DataSet, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToDataSet(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the configured parameters.</para>
@@ -556,23 +409,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/>.</returns>
-        public IDbJob<IEnumerable<List<KeyValuePair<string, object>>>> ReadToKeyValuePairs(
+        IDbJob<IEnumerable<List<KeyValuePair<string, object>>>> ReadToKeyValuePairs(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<IEnumerable<List<KeyValuePair<string, object>>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToKeyValuePairs(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<List<KeyValuePair<string, object>>>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the configured parameters.</para>
@@ -587,19 +431,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/>.</returns>
-        public IDbJob<IEnumerable<List<KeyValuePair<string, object>>>> ReadToKeyValuePairs(
+        IDbJob<IEnumerable<List<KeyValuePair<string, object>>>> ReadToKeyValuePairs(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<IEnumerable<List<KeyValuePair<string, object>>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToKeyValuePairs(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<List<KeyValuePair<string, object>>>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/> able to execute a reader based on the configured parameters.
@@ -616,23 +451,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/>.</returns>
-        public IDbJob<IEnumerable<Dictionary<string, object>>> ReadToDictionaries(
+        IDbJob<IEnumerable<Dictionary<string, object>>> ReadToDictionaries(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<IEnumerable<Dictionary<string, object>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToDictionaries(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<Dictionary<string, object>>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/> able to execute a reader based on the configured parameters.
@@ -645,19 +471,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/>.</returns>
-        public IDbJob<IEnumerable<Dictionary<string, object>>> ReadToDictionaries(
+        IDbJob<IEnumerable<Dictionary<string, object>>> ReadToDictionaries(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<IEnumerable<Dictionary<string, object>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToDictionaries(d, p)
-                ).SetOnError((d, e) => Enumerable.Empty<Dictionary<string, object>>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the configured parameters.</para>
@@ -676,23 +493,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/>.</returns>
-        public IDbJob<List<List<KeyValuePair<string, object>>>> ReadToListOfKeyValuePairs(
+        IDbJob<List<List<KeyValuePair<string, object>>>> ReadToListOfKeyValuePairs(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<List<List<KeyValuePair<string, object>>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToListOfKeyValuePairs(d, p)
-                ).SetOnError((d, e) => new List<List<KeyValuePair<string, object>>>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the configured parameters.</para>
@@ -707,19 +515,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/>.</returns>
-        public IDbJob<List<List<KeyValuePair<string, object>>>> ReadToListOfKeyValuePairs(
+        IDbJob<List<List<KeyValuePair<string, object>>>> ReadToListOfKeyValuePairs(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<List<List<KeyValuePair<string, object>>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToListOfKeyValuePairs(d, p)
-                ).SetOnError((d, e) => new List<List<KeyValuePair<string, object>>>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{Dictionary{string, object}}}"/> able to execute a reader based on the configured parameters.
@@ -738,23 +537,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{List{Dictionary{string, object}}}"/>.</returns>
-        public IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionaries(
+        IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionaries(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<List<Dictionary<string, object>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToListOfDictionaries(d, p)
-                ).SetOnError((d, e) => new List<Dictionary<string, object>>());
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{Dictionary{string, object}}}"/> able to execute a reader based on the configured parameters.
@@ -769,19 +559,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{List{Dictionary{string, object}}}"/>.</returns>
-        public IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionaries(
+        IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionaries(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<List<Dictionary<string, object>>, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToListOfDictionaries(d, p)
-                ).SetOnError((d, e) => new List<Dictionary<string, object>>());
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IDbCollectionSet}"/> able to execute a reader based on the configured parameters.</para>
@@ -797,24 +578,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IDbCollectionSet}"/>.</returns>
-        public IDbJob<IDbCollectionSet> ReadToDbCollectionSet(
+        IDbJob<IDbCollectionSet> ReadToDbCollectionSet(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<IDbCollectionSet, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => new DbCollectionSet(),
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteReadToDbCollectionSet(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IDbCollectionSet}"/> able to execute a reader based on the configured parameters.</para>
@@ -826,20 +597,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{IDbCollectionSet}"/>.</returns>
-        public IDbJob<IDbCollectionSet> ReadToDbCollectionSet(
+        IDbJob<IDbCollectionSet> ReadToDbCollectionSet(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<IDbCollectionSet, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => new DbCollectionSet(),
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteReadToDbCollectionSet(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
@@ -858,34 +619,14 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
-        public IDbJob<T> Scalar<T>(
+        IDbJob<T> Scalar<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            Type tType = typeof(T);
-
-            if (
-                   !DbConnectorUtilities._directTypeMap.Contains(tType)
-                && !(tType.IsValueType && !(typeof(IEnumerable).IsAssignableFrom(tType) || typeof(IListSource).IsAssignableFrom(tType)))
-                && !tType.IsArray
-             )
-            {
-                throw new InvalidCastException("The type " + tType + " is not supported.");
-            }
-
-            return new DbJob<T, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteScalar(d, p)
-                );
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
@@ -900,30 +641,10 @@ namespace DbConnector.Core
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
-        public IDbJob<T> Scalar<T>(
+        IDbJob<T> Scalar<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            Type tType = typeof(T);
-
-            if (
-                   !DbConnectorUtilities._directTypeMap.Contains(tType)
-                && !(tType.IsValueType && !(typeof(IEnumerable).IsAssignableFrom(tType) || typeof(IListSource).IsAssignableFrom(tType)))
-                && !tType.IsArray
-             )
-            {
-                throw new InvalidCastException("The type " + tType + " is not supported.");
-            }
-
-            return new DbJob<T, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteScalar(d, p)
-                );
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute a non-query based on the configured parameters.</para>
@@ -939,25 +660,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
-        public IDbJob<int?> NonQuery(
+        IDbJob<int?> NonQuery(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<int?, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
-                )
-                .SetOnError((d, e) => null)
-                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute a non-query based on the configured parameters.</para>
@@ -969,21 +679,10 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
-        public IDbJob<int?> NonQuery(
+        IDbJob<int?> NonQuery(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<int?, TDbConnection>
-                (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
-                )
-                .SetOnError((d, e) => null)
-                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
+            CommandType commandType = CommandType.Text);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a non-query based on the configured parameters.</para>
@@ -999,24 +698,14 @@ namespace DbConnector.Core
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        public IDbJob<T> NonQuery<T>(
+        IDbJob<T> NonQuery<T>(
             string sql,
             ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
             int? commandTimeout = null,
-            DbJobCommandFlags flags = DbJobCommandFlags.None)
-        {
-            return new DbJob<T, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
-                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
-                )
-                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a non-query based on the configured parameters.</para>
@@ -1028,19 +717,9 @@ namespace DbConnector.Core
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        public IDbJob<T> NonQuery<T>(
+        IDbJob<T> NonQuery<T>(
             string sql,
             object param = null,
-            CommandType commandType = CommandType.Text)
-        {
-            return new DbJob<T, TDbConnection>
-               (
-                    setting: _jobSetting,
-                    state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
-                    onExecute: (d, p) => OnExecuteNonQuery(d, p)
-                )
-                .SetWithIsolationLevel(IsolationLevel.ReadCommitted);
-        }
+            CommandType commandType = CommandType.Text);
     }
 }

@@ -49,7 +49,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 2 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -73,6 +72,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -115,7 +115,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 3 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -143,6 +142,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -186,7 +186,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 4 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -218,6 +217,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -262,7 +262,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 5 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -298,6 +297,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -343,7 +343,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 6 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -383,6 +382,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -429,7 +429,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 7 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -473,6 +472,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -520,7 +520,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 8 },
-                    onInit: () => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>(), Enumerable.Empty<T8>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -568,6 +567,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>(), Enumerable.Empty<T8>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {

@@ -991,6 +991,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Use this function to set the <see cref="IsolationLevel"/> for this <see cref="IDbJob{T}"/>.
+        /// <para>Note: Should only be called when initiating this <see cref="IDbJob{T}"/>.</para>
+        /// </summary>
+        /// <returns><see cref="IDbJob{T}"/></returns>
+        protected internal virtual DbJobBase<T> SetWithIsolationLevel(IsolationLevel? level)
+        {
+            _isolationLevel = level;
+            return this;
+        }
+
+        /// <summary>
         /// <para>Use this function to disable or enable buffered (non-deferred/non-yielded) execution when reading data (this is enabled by default).</para>
         /// <para>Note: Deferred execution is only possible for <see cref="IEnumerable{}"/> types and useful when dealing with large amounts of data. Consequently, normal execution will be used when encountering non <see cref="IEnumerable{}"/> types.</para> 
         /// Warning: Exceptions may occur while looping deferred <see cref="IEnumerable{}"/> types because of the implicit database connection dependency.
@@ -1024,6 +1035,29 @@ namespace DbConnector.Core
                         _isCacheEnabled = isEnabled;
                     }
                 }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Use this function to set branched properties for this <see cref="IDbJob{T}"/>.
+        /// <para>Note: Should only be called when initiating this <see cref="IDbJob{T}"/>.</para>
+        /// </summary>
+        /// <returns><see cref="IDbJob{T}"/></returns>
+        protected internal virtual IDbJob<T> SetBranchedProperties(
+            bool isBufferingEnabled,
+            bool isLoggingEnabled,
+            bool isCacheEnabled,
+            IsolationLevel? level)
+        {
+            _isolationLevel = level;
+            _isDeferredExecution = (isBufferingEnabled == false);
+            _isLoggingEnabled = isLoggingEnabled;
+
+            if (_settings.IsCacheEnabled)
+            {
+                _isCacheEnabled = isCacheEnabled;
             }
 
             return this;
@@ -1230,6 +1264,18 @@ namespace DbConnector.Core
 
                 return this;
             }
+        }
+
+        /// <summary>
+        /// Use this to set the delegate to call when an error occurs. You can use this to change the <see cref="{T}"/> result based on the event.
+        /// <para>Note: Should only be called when initiating this <see cref="IDbJob{T}"/>.</para>
+        /// </summary>
+        /// <param name="action">The action to invoke.</param>
+        /// <returns><see cref="IDbJob{T}"/></returns>
+        protected internal virtual DbJobBase<T> SetOnError(Func<T, Exception, T> action)
+        {
+            _onError = action;
+            return this;
         }
 
         /// <summary>

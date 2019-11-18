@@ -48,7 +48,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => Enumerable.Empty<dynamic>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -58,7 +57,7 @@ namespace DbConnector.Core
                         return p.IsBuffered ? odr.ToList(p.Token, p.JobCommand)
                                             : odr.ToEnumerable(p.Token, p.JobCommand);
                     }
-                );
+                ).SetOnError((d, e) => Enumerable.Empty<dynamic>());
         }
 
         /// <summary>
@@ -224,7 +223,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => new List<dynamic>(),
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -233,7 +231,7 @@ namespace DbConnector.Core
 
                         return odr.ToList(p.Token, p.JobCommand);
                     }
-                );
+                ).SetOnError((d, e) => new List<dynamic>());
         }
     }
 }

@@ -49,7 +49,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 2 },
-                    onInit: () => (new List<T1>(), new List<T2>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -71,6 +70,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -113,7 +113,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 3 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -138,6 +137,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -181,7 +181,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 4 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -209,6 +208,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -253,7 +253,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 5 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -284,6 +283,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -329,7 +329,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 6 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -363,6 +362,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -409,7 +409,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 7 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -446,6 +445,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
@@ -493,7 +493,6 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 8 },
-                    onInit: () => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>(), new List<T8>()),
                     onCommands: (conn, state) => BuildJobMultiReaderCommands(conn, state),
                     onExecute: (d, p) =>
                     {
@@ -533,6 +532,7 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
+                .SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>(), new List<T8>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
