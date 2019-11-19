@@ -603,6 +603,50 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to load the data based on the <paramref name="onLoad"/> action.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>        
+        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param>        
+        /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
+        /// <param name="onLoad">Function that is used to access the generated <see cref="DbDataReader"/> and transform the <typeparamref name="T"/> result.</param>
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onLoad is null.</exception>
+        IDbJob<T> ReadTo<T>(
+            string sql,
+            ColumnMapSetting mapSettings,
+            object param,
+            Func<T, IDbExecutionModel, DbDataReader, T> onLoad,
+            CommandType commandType = CommandType.Text,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  <para>Creates a <see cref="IDbJob{T}"/> able to load the data based on the <paramref name="onLoad"/> action.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>     
+        /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
+        /// <param name="onLoad">Function that is used to access the generated <see cref="DbDataReader"/> and transform the <typeparamref name="T"/> result.</param>
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onLoad is null.</exception>
+        IDbJob<T> ReadTo<T>(
+            string sql,
+            object param,
+            Func<T, IDbExecutionModel, DbDataReader, T> onLoad,
+            CommandType commandType = CommandType.Text);
+
+        /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
         ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
@@ -720,6 +764,52 @@ namespace DbConnector.Core
         IDbJob<T> NonQuery<T>(
             string sql,
             object param = null,
+            CommandType commandType = CommandType.Text);
+
+        /// <summary>
+        ///  Creates a <see cref="IDbJob{T}"/> which can be controlled 
+        ///  by the <see cref="IDbExecutionModel"/> properties of the <see cref="IDbJob{T}.OnExecuted(Func{T, IDbExecutionModel, T})"/> function.
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>        
+        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param>        
+        /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
+        /// <param name="onExecute">Function that will be invoked for each <see cref="IDbJobCommand"/> and can be used to execute database calls and set the <typeparamref name="T"/> result.</param>
+        /// <param name="isCreateDbCommand">Set this to false to disable the auto creation of a <see cref="DbCommand"/>. (Optional)</param>
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onExecute is null.</exception>
+        IDbJob<T> Build<T>(
+            string sql,
+            ColumnMapSetting mapSettings,
+            object param,
+            Func<T, IDbExecutionModel, T> onExecute,
+            bool isCreateDbCommand = true,
+            CommandType commandType = CommandType.Text,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  Creates a <see cref="IDbJob{T}"/> which can be controlled 
+        ///  by the <see cref="IDbExecutionModel"/> properties of the <see cref="IDbJob{T}.OnExecuted(Func{T, IDbExecutionModel, T})"/> function.
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>   
+        /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
+        /// <param name="onExecute">Function that will be invoked for each <see cref="IDbJobCommand"/> and can be used to execute database calls and set the <typeparamref name="T"/> result.</param>
+        /// <param name="isCreateDbCommand">Set this to false to disable the auto creation of a <see cref="DbCommand"/>. (Optional)</param>
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onExecute is null.</exception>
+        IDbJob<T> Build<T>(
+            string sql,
+            object param,
+            Func<T, IDbExecutionModel, T> onExecute,
+            bool isCreateDbCommand = true,
             CommandType commandType = CommandType.Text);
     }
 }

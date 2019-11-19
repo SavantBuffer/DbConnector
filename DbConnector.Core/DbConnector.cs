@@ -1520,6 +1520,7 @@ namespace DbConnector.Core
         /// <param name="isCreateDbCommand">Set this to false to disable the auto creation of a <see cref="DbCommand"/>. (Optional)</param>
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when onExecute is null.</exception>
         public IDbJob<T> Build<T>(Action<Queue<Action<IDbJobCommand>>> onInit, Func<T, IDbExecutionModel, T> onExecute, bool isCreateDbCommand = true)
         {
             if (onInit == null && isCreateDbCommand)
