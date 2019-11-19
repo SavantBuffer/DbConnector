@@ -143,7 +143,7 @@ namespace DbConnector.Core
             this.MapSettings = new ColumnMapSetting();
         }
 
-        public DbJobCommand(DbCommand dbCommand, ColumnMapSetting mapSettings)
+        public DbJobCommand(DbCommand dbCommand, IColumnMapSetting mapSettings)
         {
             //Init param list
             this._dbCommand = dbCommand;
@@ -185,7 +185,7 @@ namespace DbConnector.Core
             StateParam = stateParam;
         }
 
-        public DbJobCommand(DbCommand dbCommand, TStateParam stateParam, ColumnMapSetting mapSettings)
+        public DbJobCommand(DbCommand dbCommand, TStateParam stateParam, IColumnMapSetting mapSettings)
             : base(dbCommand, mapSettings)
         {
             StateParam = stateParam;
@@ -1563,7 +1563,7 @@ namespace DbConnector.Core
             return new DbJobCommand(cmd);
         }
 
-        public virtual IDbJobCommand CreateDbJobCommand(DbCommand cmd, ColumnMapSetting mapSettings)
+        public virtual IDbJobCommand CreateDbJobCommand(DbCommand cmd, IColumnMapSetting mapSettings)
         {
             return new DbJobCommand(cmd, mapSettings);
         }
@@ -1587,7 +1587,7 @@ namespace DbConnector.Core
             return new DbJobCommand<TStateParam>(cmd, StateParam);
         }
 
-        public override IDbJobCommand CreateDbJobCommand(DbCommand cmd, ColumnMapSetting mapSettings)
+        public override IDbJobCommand CreateDbJobCommand(DbCommand cmd, IColumnMapSetting mapSettings)
         {
             return new DbJobCommand<TStateParam>(cmd, StateParam, mapSettings);
         }

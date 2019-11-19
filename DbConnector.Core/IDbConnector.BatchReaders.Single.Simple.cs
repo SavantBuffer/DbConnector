@@ -34,8 +34,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -45,8 +45,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadSingle<T1, T2, T3, T4, T5, T6, T7, T8>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -84,8 +84,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -95,8 +95,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadSingle<T1, T2, T3, T4, T5, T6, T7>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -134,8 +134,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -145,8 +145,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadSingle<T1, T2, T3, T4, T5, T6>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -184,8 +184,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -195,8 +195,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5)> ReadSingle<T1, T2, T3, T4, T5>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -234,8 +234,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -245,8 +245,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4)> ReadSingle<T1, T2, T3, T4>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -284,8 +284,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -295,8 +295,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3)> ReadSingle<T1, T2, T3>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -334,8 +334,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -345,8 +345,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2)> ReadSingle<T1, T2>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -390,8 +390,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -400,8 +400,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -438,8 +438,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -448,8 +448,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6, T7>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -486,8 +486,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -496,8 +496,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -534,8 +534,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -544,8 +544,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3, T4, T5)> ReadSingleOrDefault<T1, T2, T3, T4, T5>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -582,8 +582,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -592,8 +592,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3, T4)> ReadSingleOrDefault<T1, T2, T3, T4>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -630,8 +630,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -640,8 +640,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2, T3)> ReadSingleOrDefault<T1, T2, T3>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -678,8 +678,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -688,8 +688,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         IDbJob<(T1, T2)> ReadSingleOrDefault<T1, T2>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,

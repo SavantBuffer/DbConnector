@@ -35,8 +35,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -44,8 +44,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
         public IDbJob<IEnumerable<T>> Read<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -100,8 +100,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -110,8 +110,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<T> ReadFirst<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -168,8 +168,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -177,8 +177,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         public IDbJob<T> ReadFirstOrDefault<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -234,8 +234,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -245,8 +245,8 @@ namespace DbConnector.Core
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<T> ReadSingle<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -304,8 +304,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -314,8 +314,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<T> ReadSingleOrDefault<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -371,8 +371,8 @@ namespace DbConnector.Core
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
         /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -380,8 +380,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{T}}"/>.</returns>
         public IDbJob<List<T>> ReadToList<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -433,8 +433,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -442,8 +442,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{System.Data.DataTable}"/>.</returns>
         public IDbJob<DataTable> ReadToDataTable(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -490,8 +490,8 @@ namespace DbConnector.Core
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -499,8 +499,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{System.Data.DataSet}"/>.</returns>
         public IDbJob<DataSet> ReadToDataSet(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -548,8 +548,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -557,8 +557,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/>.</returns>
         public IDbJob<IEnumerable<List<KeyValuePair<string, object>>>> ReadToKeyValuePairs(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -608,8 +608,8 @@ namespace DbConnector.Core
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
         /// <remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -617,8 +617,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/>.</returns>
         public IDbJob<IEnumerable<Dictionary<string, object>>> ReadToDictionaries(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -668,8 +668,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -677,8 +677,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/>.</returns>
         public IDbJob<List<List<KeyValuePair<string, object>>>> ReadToListOfKeyValuePairs(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -730,8 +730,8 @@ namespace DbConnector.Core
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
         /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -739,8 +739,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{List{Dictionary{string, object}}}"/>.</returns>
         public IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionaries(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -789,8 +789,8 @@ namespace DbConnector.Core
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -798,8 +798,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{IDbCollectionSet}"/>.</returns>
         public IDbJob<IDbCollectionSet> ReadToDbCollectionSet(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -847,8 +847,8 @@ namespace DbConnector.Core
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param>        
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param>        
         /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
         /// <param name="onLoad">Function that is used to access the generated <see cref="DbDataReader"/> and transform the <typeparamref name="T"/> result.</param>
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
@@ -858,8 +858,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onLoad is null.</exception>
         public IDbJob<T> ReadTo<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param,
             Func<T, IDbExecutionModel, DbDataReader, T> onLoad,
             CommandType commandType = CommandType.Text,
@@ -933,8 +933,8 @@ namespace DbConnector.Core
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -943,8 +943,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
         public IDbJob<T> Scalar<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -1015,8 +1015,8 @@ namespace DbConnector.Core
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -1024,8 +1024,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{int?}"/>.</returns>
         public IDbJob<int?> NonQuery(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -1075,8 +1075,8 @@ namespace DbConnector.Core
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param> 
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
@@ -1084,8 +1084,8 @@ namespace DbConnector.Core
         /// <param name="flags">The flags to use. (Optional)</param> 
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         public IDbJob<T> NonQuery<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
@@ -1132,8 +1132,8 @@ namespace DbConnector.Core
         ///  by the <see cref="IDbExecutionModel"/> properties of the <see cref="IDbJob{T}.OnExecuted(Func{T, IDbExecutionModel, T})"/> function.
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
         /// <param name="sql">The query text command to run against the data source.</param>        
-        /// <param name="mapSettings">The <see cref="ColumnMapSetting"/> to use.</param>        
         /// <param name="param">The parameter to use (or null for empty). <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply.</param> 
         /// <param name="onExecute">Function that will be invoked for each <see cref="IDbJobCommand"/> and can be used to execute database calls and set the <typeparamref name="T"/> result.</param>
         /// <param name="isCreateDbCommand">Set this to false to disable the auto creation of a <see cref="DbCommand"/>. (Optional)</param>
@@ -1144,8 +1144,8 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onExecute is null.</exception>
         public IDbJob<T> Build<T>(
+            IColumnMapSetting mapSettings,
             string sql,
-            ColumnMapSetting mapSettings,
             object param,
             Func<T, IDbExecutionModel, T> onExecute,
             bool isCreateDbCommand = true,

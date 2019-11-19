@@ -197,7 +197,7 @@ namespace DbConnector.Core
             DbConnection conn,
             IDbJobState state,
             string commandText,
-            ColumnMapSetting mapSettings,
+            IColumnMapSetting mapSettings,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,
