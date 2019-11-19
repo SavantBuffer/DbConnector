@@ -118,7 +118,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<object> ReadFirst(
             Type type,
@@ -159,7 +159,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<object> ReadFirst(
             Type type,
@@ -200,7 +200,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         public IDbJob<object> ReadFirstOrDefault(
             Type type,
             string sql,
@@ -240,7 +240,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         public IDbJob<object> ReadFirstOrDefault(
             Type type,
             string sql,
@@ -280,7 +280,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<object> ReadSingle(
@@ -322,7 +322,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param> 
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<object> ReadSingle(
@@ -364,7 +364,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<object> ReadSingleOrDefault(
             Type type,
@@ -405,7 +405,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<object> ReadSingleOrDefault(
             Type type,
@@ -445,7 +445,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{List{object}}"/>.</returns>
         public IDbJob<List<object>> ReadToList(
             Type type,
             string sql,
@@ -483,7 +483,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{List{object}}"/>.</returns>
         public IDbJob<List<object>> ReadToList(
             Type type,
             string sql,
@@ -517,7 +517,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         public IDbJob<object> Scalar(
             Type type,
             string sql,
@@ -556,7 +556,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{IEnumerable{object}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob{object}"/>.</returns>
         public IDbJob<object> Scalar(
             Type type,
             string sql,

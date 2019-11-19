@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Dynamic;
 using System.Linq;
 
 namespace DbConnector.Core
@@ -25,6 +24,59 @@ namespace DbConnector.Core
     public partial class DbConnector<TDbConnection> : IDbConnector<TDbConnection>
        where TDbConnection : DbConnection
     {
+        #region Executions
+
+        private static IEnumerable<dynamic> OnExecuteReadDynamic(IEnumerable<dynamic> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return p.IsBuffered ? odr.ToList(p.Token, p.JobCommand)
+                                : odr.ToEnumerable(p.Token, p.JobCommand);
+        }
+
+        private static dynamic OnExecuteReadFirstDynamic(dynamic d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.First(p.Token, p.JobCommand);
+        }
+
+        private static dynamic OnExecuteReadFirstOrDefaultDynamic(dynamic d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.FirstOrDefault(p.Token, p.JobCommand);
+        }
+
+        private static dynamic OnExecuteReadSingleDynamic(dynamic d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.Single(p.Token, p.JobCommand);
+        }
+
+        private static dynamic OnExecuteReadSingleOrDefaultDynamic(dynamic d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.SingleOrDefault(p.Token, p.JobCommand);
+        }
+
+        private static List<dynamic> OnExecuteReadToListDynamic(List<dynamic> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToList(p.Token, p.JobCommand);
+        }
+
+        #endregion
+
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{dynamic}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>   
         ///  <para>Use this to dynamically load the query results into an IEnumerable of <see cref="System.Dynamic.ExpandoObject"/>.</para>
@@ -49,14 +101,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return p.IsBuffered ? odr.ToList(p.Token, p.JobCommand)
-                                            : odr.ToEnumerable(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadDynamic(d, p)
                 ).SetOnError((d, e) => Enumerable.Empty<dynamic>());
         }
 
@@ -85,13 +130,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-                        p.DeferDisposable(odr);
-
-                        return odr.First(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadFirstDynamic(d, p)
                 );
         }
 
@@ -119,13 +158,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-                        p.DeferDisposable(odr);
-
-                        return odr.FirstOrDefault(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadFirstOrDefaultDynamic(d, p)
                 );
         }
 
@@ -155,13 +188,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.Single(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadSingleDynamic(d, p)
                 );
         }
 
@@ -190,13 +217,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.SingleOrDefault(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadSingleOrDefaultDynamic(d, p)
                 );
         }
 
@@ -224,13 +245,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.ToList(p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadToListDynamic(d, p)
                 ).SetOnError((d, e) => new List<dynamic>());
         }
     }
