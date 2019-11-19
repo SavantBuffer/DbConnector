@@ -24,6 +24,626 @@ namespace DbConnector.Core
     public partial class DbConnector<TDbConnection> : IDbConnector<TDbConnection>
        where TDbConnection : DbConnection
     {
+        #region Execution
+
+        private static (T1, T2, T3, T4, T5, T6, T7, T8) OnExecuteReadOne<T1, T2, T3, T4, T5, T6, T7, T8>((T1, T2, T3, T4, T5, T6, T7, T8) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.First<T4>(p.Token, p.JobCommand) : odr.Single<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.First<T5>(p.Token, p.JobCommand) : odr.Single<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.First<T6>(p.Token, p.JobCommand) : odr.Single<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = isFirst ? odr.First<T7>(p.Token, p.JobCommand) : odr.Single<T7>(p.Token, p.JobCommand);
+                        break;
+                    case 8:
+                        d.Item8 = isFirst ? odr.First<T8>(p.Token, p.JobCommand) : odr.Single<T8>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 8)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5, T6, T7) OnExecuteReadOne<T1, T2, T3, T4, T5, T6, T7>((T1, T2, T3, T4, T5, T6, T7) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.First<T4>(p.Token, p.JobCommand) : odr.Single<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.First<T5>(p.Token, p.JobCommand) : odr.Single<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.First<T6>(p.Token, p.JobCommand) : odr.Single<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = isFirst ? odr.First<T7>(p.Token, p.JobCommand) : odr.Single<T7>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 7)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5, T6) OnExecuteReadOne<T1, T2, T3, T4, T5, T6>((T1, T2, T3, T4, T5, T6) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.First<T4>(p.Token, p.JobCommand) : odr.Single<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.First<T5>(p.Token, p.JobCommand) : odr.Single<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.First<T6>(p.Token, p.JobCommand) : odr.Single<T6>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 6)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5) OnExecuteReadOne<T1, T2, T3, T4, T5>((T1, T2, T3, T4, T5) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.First<T4>(p.Token, p.JobCommand) : odr.Single<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.First<T5>(p.Token, p.JobCommand) : odr.Single<T5>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 5)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4) OnExecuteReadOne<T1, T2, T3, T4>((T1, T2, T3, T4) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.First<T4>(p.Token, p.JobCommand) : odr.Single<T4>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 4)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3) OnExecuteReadOne<T1, T2, T3>((T1, T2, T3) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.First<T3>(p.Token, p.JobCommand) : odr.Single<T3>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 3)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2) OnExecuteReadOne<T1, T2>((T1, T2) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while (hasNext && odr.HasRows)
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.First<T1>(p.Token, p.JobCommand) : odr.Single<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.First<T2>(p.Token, p.JobCommand) : odr.Single<T2>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            if ((!hasNext || !odr.HasRows) && index <= 2)
+            {
+                throw new InvalidOperationException("The query result is empty for item " + index + ".");
+            }
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5, T6, T7, T8) OnExecuteReadOneOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>((T1, T2, T3, T4, T5, T6, T7, T8) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.FirstOrDefault<T4>(p.Token, p.JobCommand) : odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.FirstOrDefault<T5>(p.Token, p.JobCommand) : odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.FirstOrDefault<T6>(p.Token, p.JobCommand) : odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = isFirst ? odr.FirstOrDefault<T7>(p.Token, p.JobCommand) : odr.SingleOrDefault<T7>(p.Token, p.JobCommand);
+                        break;
+                    case 8:
+                        d.Item8 = isFirst ? odr.FirstOrDefault<T8>(p.Token, p.JobCommand) : odr.SingleOrDefault<T8>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5, T6, T7) OnExecuteReadOneOrDefault<T1, T2, T3, T4, T5, T6, T7>((T1, T2, T3, T4, T5, T6, T7) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.FirstOrDefault<T4>(p.Token, p.JobCommand) : odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.FirstOrDefault<T5>(p.Token, p.JobCommand) : odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.FirstOrDefault<T6>(p.Token, p.JobCommand) : odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = isFirst ? odr.FirstOrDefault<T7>(p.Token, p.JobCommand) : odr.SingleOrDefault<T7>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5, T6) OnExecuteReadOneOrDefault<T1, T2, T3, T4, T5, T6>((T1, T2, T3, T4, T5, T6) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.FirstOrDefault<T4>(p.Token, p.JobCommand) : odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.FirstOrDefault<T5>(p.Token, p.JobCommand) : odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = isFirst ? odr.FirstOrDefault<T6>(p.Token, p.JobCommand) : odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4, T5) OnExecuteReadOneOrDefault<T1, T2, T3, T4, T5>((T1, T2, T3, T4, T5) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.FirstOrDefault<T4>(p.Token, p.JobCommand) : odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = isFirst ? odr.FirstOrDefault<T5>(p.Token, p.JobCommand) : odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2, T3, T4) OnExecuteReadOneOrDefault<T1, T2, T3, T4>((T1, T2, T3, T4) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = isFirst ? odr.FirstOrDefault<T4>(p.Token, p.JobCommand) : odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2, T3) OnExecuteReadOneOrDefault<T1, T2, T3>((T1, T2, T3) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = isFirst ? odr.FirstOrDefault<T3>(p.Token, p.JobCommand) : odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        private static (T1, T2) OnExecuteReadOneOrDefault<T1, T2>((T1, T2) d, IDbExecutionModel p, bool isFirst = true)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = isFirst ? odr.FirstOrDefault<T1>(p.Token, p.JobCommand) : odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = isFirst ? odr.FirstOrDefault<T2>(p.Token, p.JobCommand) : odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+
+            return d;
+        }
+
+        #endregion
+
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
@@ -50,42 +670,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 2)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -115,45 +700,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 3)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -183,48 +730,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.First<T4>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 4)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -254,51 +760,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.First<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.First<T5>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 5)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -328,54 +790,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.First<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.First<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.First<T6>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 6)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -405,57 +820,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.First<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.First<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.First<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.First<T7>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 7)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -485,60 +850,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.First<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.First<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.First<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.First<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.First<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.First<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.First<T7>(p.Token, p.JobCommand);
-                                    break;
-                                case 8:
-                                    d.Item8 = odr.First<T8>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 8)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p)
                 );
         }
 
@@ -567,38 +879,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -627,41 +908,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -690,44 +937,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.FirstOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -756,47 +966,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.FirstOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.FirstOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -825,50 +995,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.FirstOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.FirstOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.FirstOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -897,53 +1024,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.FirstOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.FirstOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.FirstOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.FirstOrDefault<T7>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
 
@@ -972,56 +1053,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.FirstOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.FirstOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.FirstOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.FirstOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.FirstOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.FirstOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.FirstOrDefault<T7>(p.Token, p.JobCommand);
-                                    break;
-                                case 8:
-                                    d.Item8 = odr.FirstOrDefault<T8>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p)
                 );
         }
     }

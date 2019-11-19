@@ -51,42 +51,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 2)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -117,45 +82,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 3)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -186,48 +113,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.Single<T4>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 4)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -258,51 +144,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.Single<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.Single<T5>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 5)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -333,54 +175,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.Single<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.Single<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.Single<T6>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 6)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -411,57 +206,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.Single<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.Single<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.Single<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.Single<T7>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 7)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -492,60 +237,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while (hasNext && odr.HasRows)
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.Single<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.Single<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.Single<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.Single<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.Single<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.Single<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.Single<T7>(p.Token, p.JobCommand);
-                                    break;
-                                case 8:
-                                    d.Item8 = odr.Single<T8>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        if ((!hasNext || !odr.HasRows) && index <= 8)
-                        {
-                            throw new InvalidOperationException("The query result is empty for item " + index + ".");
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
 
@@ -575,38 +267,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -636,41 +297,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -700,44 +327,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -767,47 +357,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -837,50 +387,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -910,53 +417,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.SingleOrDefault<T7>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
 
@@ -986,56 +447,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, (CommandBehavior.Default)));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.SingleOrDefault<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.SingleOrDefault<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.SingleOrDefault<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.SingleOrDefault<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.SingleOrDefault<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.SingleOrDefault<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.SingleOrDefault<T7>(p.Token, p.JobCommand);
-                                    break;
-                                case 8:
-                                    d.Item8 = odr.SingleOrDefault<T8>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
     }
