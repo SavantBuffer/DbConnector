@@ -83,5 +83,65 @@ namespace DbConnector.Tests
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);
         }
+
+        [Fact]
+        public void ReadTo_Simple()
+        {
+            var result = _dbConnector.ReadTo<IEnumerable<Currency>>("SELECT TOP(3) * FROM [Sales].[Currency]", null,
+            (d, e, odr) =>
+            {
+                return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
+                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+
+            }).Execute();
+
+            Assert.Equal(3, result.Count());
+
+            var values = (result as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void ReadTo_Simple_Deferred()
+        {
+            var result = _dbConnector.ReadTo<IEnumerable<Currency>>("SELECT TOP(3) * FROM [Sales].[Currency]", null,
+            (d, e, odr) =>
+            {
+                return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
+                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+            }).WithBuffering(false).Execute();
+
+            Assert.Equal(3, result.Count());
+
+            var values = result.ToList();
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void Build_Simple()
+        {
+            var result = _dbConnector.Build<IEnumerable<Currency>>("SELECT TOP(3) * FROM [Sales].[Currency]", null,
+            (d, e) =>
+            {
+                using (var odr = e.Command.ExecuteReader(e.JobCommand.CommandBehavior ?? (CommandBehavior.SequentialAccess | CommandBehavior.Default)))
+                {
+                    return odr.ToList<Currency>(e.Token, e.JobCommand);
+                }
+            }).Execute();
+
+            Assert.Equal(3, result.Count());
+
+            var values = (result as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
     }
 }

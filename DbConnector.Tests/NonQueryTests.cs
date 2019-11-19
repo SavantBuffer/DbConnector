@@ -97,6 +97,80 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void NonQuery_Simple()
+        {
+            var result = _dbConnector.NonQuery(
+                @"
+                    INSERT INTO [Production].[Location]
+                        ([Name]
+                        ,[CostRate])
+                    VALUES
+                        (@Name
+                        ,@CostRate)
+                ",
+                new
+                {
+                    Name = "4100",
+                    CostRate = 5
+                }
+            ).Execute();
+
+            Assert.NotNull(result);
+            Assert.Equal(1, result);
+
+            var deleteResult = _dbConnector.NonQuery(
+                @"
+                    DELETE FROM [Production].[Location] WHERE Name = @Name
+                ",
+                new
+                {
+                    Name = "4100",
+                    CostRate = 5
+                }
+            ).Execute();
+
+            Assert.NotNull(deleteResult);
+            Assert.Equal(1, deleteResult);
+        }
+
+        [Fact]
+        public void NonQuery_Simple_Generic()
+        {
+            var result = _dbConnector.NonQuery<bool?>(
+                @"
+                    INSERT INTO [Production].[Location]
+                        ([Name]
+                        ,[CostRate])
+                    VALUES
+                        (@Name
+                        ,@CostRate)
+                ",
+                new
+                {
+                    Name = "8002",
+                    CostRate = 5
+                }
+            ).OnCompleted(d => true).Execute();
+
+            Assert.NotNull(result);
+            Assert.Equal(true, result);
+
+            var deleteResult = _dbConnector.NonQuery(
+                @"
+                    DELETE FROM [Production].[Location] WHERE Name = @Name
+                ",
+                new
+                {
+                    Name = "8002",
+                    CostRate = 5
+                }
+            ).Execute();
+
+            Assert.NotNull(deleteResult);
+            Assert.Equal(1, deleteResult);
+        }
+
+        [Fact]
         public void NonQueries()
         {
             var jobInsert = _dbConnector.NonQueries((cmds) =>

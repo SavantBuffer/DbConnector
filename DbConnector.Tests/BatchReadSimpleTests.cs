@@ -1,0 +1,138 @@
+using DbConnector.Tests.Entities;
+using DbConnector.Core;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using Xunit;
+
+namespace DbConnector.Tests
+{
+    public class BatchReadSimpleTests : TestBase
+    {
+        [Fact]
+        public void BatchRead_2()
+        {
+            var result = _dbConnector.Read<Currency, Person>("SELECT TOP(3) * FROM [Sales].[Currency]; SELECT TOP(10) * FROM [Person].[Person];").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+        }
+
+        [Fact]
+        public void BatchRead_3()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person>(
+                @"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                "
+            ).Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+        }
+
+        [Fact]
+        public void BatchRead_4()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person, Currency>(@"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                    SELECT TOP(5) * FROM [Sales].[Currency];
+                ").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+            Assert.Equal(5, result.Item4.Count());
+        }
+
+        [Fact]
+        public void BatchRead_5()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person, Currency, Culture>(@"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                    SELECT TOP(5) * FROM [Sales].[Currency];
+                    SELECT TOP(8) * FROM [Production].[Culture];
+                ").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+            Assert.Equal(5, result.Item4.Count());
+            Assert.Equal(8, result.Item5.Count());
+        }
+
+        [Fact]
+        public void BatchRead_6()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person, Currency, Culture, Address>(@"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                    SELECT TOP(5) * FROM [Sales].[Currency];
+                    SELECT TOP(8) * FROM [Production].[Culture];
+                    SELECT TOP (20) * FROM [Person].[Address];
+                ").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+            Assert.Equal(5, result.Item4.Count());
+            Assert.Equal(8, result.Item5.Count());
+            Assert.Equal(20, result.Item6.Count());
+        }
+
+        [Fact]
+        public void BatchRead_7()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person, Currency, Culture, Address, Address>(@"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                    SELECT TOP(5) * FROM [Sales].[Currency];
+                    SELECT TOP(8) * FROM [Production].[Culture];
+                    SELECT TOP (20) * FROM [Person].[Address];
+                    SELECT TOP (500) * FROM [Person].[Address];
+                ").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+            Assert.Equal(5, result.Item4.Count());
+            Assert.Equal(8, result.Item5.Count());
+            Assert.Equal(20, result.Item6.Count());
+            Assert.Equal(500, result.Item7.Count());
+        }
+
+        [Fact]
+        public void BatchRead_8()
+        {
+            var result = _dbConnector.Read<Currency, Person, Person, Currency, Culture, Address, Address, Person>(@"
+                    SELECT TOP(3) * FROM [Sales].[Currency]; 
+                    SELECT TOP(10) * FROM [Person].[Person];
+                    SELECT TOP(100) * FROM [Person].[Person];
+                    SELECT TOP(5) * FROM [Sales].[Currency];
+                    SELECT TOP(8) * FROM [Production].[Culture];
+                    SELECT TOP (20) * FROM [Person].[Address];
+                    SELECT TOP (500) * FROM [Person].[Address];
+                    SELECT TOP (1000) * FROM [Person].[Person];
+                ").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+            Assert.Equal(100, result.Item3.Count());
+            Assert.Equal(5, result.Item4.Count());
+            Assert.Equal(8, result.Item5.Count());
+            Assert.Equal(20, result.Item6.Count());
+            Assert.Equal(500, result.Item7.Count());
+            Assert.Equal(1000, result.Item8.Count());
+        }
+    }
+}

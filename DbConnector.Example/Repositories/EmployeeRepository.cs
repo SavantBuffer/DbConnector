@@ -66,7 +66,6 @@ namespace DbConnector.Example.Repositories
             return _dbConnector.ReadToDataTable(
                onInit: (cmd) =>
                {
-                   cmd.CommandType = System.Data.CommandType.StoredProcedure;
                    cmd.CommandText = "SELECT * FROM Employees";
 
                }).ExecuteAsync();
@@ -134,7 +133,6 @@ namespace DbConnector.Example.Repositories
             return _dbConnector.NonQuery(
                onInit: (cmd) =>
                {
-                   //PostgreSQL Example
                    cmd.CommandType = System.Data.CommandType.Text;
                    cmd.CommandText = @"INSERT INTO "
                     + typeof(Employee).GetAttributeValue((TableAttribute ta) => ta.Name) ?? typeof(Employee).Name

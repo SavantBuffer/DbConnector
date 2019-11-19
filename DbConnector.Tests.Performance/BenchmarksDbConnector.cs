@@ -18,114 +18,93 @@ namespace DbConnector.Tests.Performance
             DbConnectorBaseSetup();
         }
 
-        //[Benchmark(Description = "Read<T> (buffered)")]
-        //public Post ReadBuffered()
-        //{
-        //    Step();
-        //    return _dbConnector.Read<Post>(
-        //        (cmd) =>
-        //        {
-        //            cmd.CommandText = "select * from Post where Id = @Id";
-        //            cmd.Parameters.AddFor(new { Id = i });//cmd.Parameters.AddWithValue("Id", i);
-        //        })
-        //        .Execute(_connection)
-        //        .First();
-        //}
+        [Benchmark(Description = "Read<T> (buffered)")]
+        public Post ReadBuffered()
+        {
+            Step();
+            return _dbConnector.Read<Post>("select * from Post where Id = @Id", new { Id = i })
+                .Execute(_connection)
+                .First();
+        }
 
-        //[Benchmark(Description = "Read<dynamic> (buffered)")]
-        //public dynamic ReadBufferedDynamic()
-        //{
-        //    Step();
-        //    return _dbConnector.Read((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
-        //        .Execute(_connection)
-        //        .First();
-        //}
+        [Benchmark(Description = "Read<dynamic> (buffered)")]
+        public dynamic ReadBufferedDynamic()
+        {
+            Step();
+            return _dbConnector.Read("select * from Post where Id = @Id", new { Id = i })
+                .Execute(_connection)
+                .First();
+        }
 
-        //[Benchmark(Description = "Read<T> (unbuffered)")]
-        //public Post ReadUnbuffered()
-        //{
-        //    Step();
-        //    return _dbConnector.Read<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
-        //        .WithBuffering(false)
-        //        .Execute(_connection)
-        //        .First();
-        //}
+        [Benchmark(Description = "Read<T> (unbuffered)")]
+        public Post ReadUnbuffered()
+        {
+            Step();
+            return _dbConnector.Read<Post>("select * from Post where Id = @Id", new { Id = i })
+                .WithBuffering(false)
+                .Execute(_connection)
+                .First();
+        }
 
-        //[Benchmark(Description = "Read<dynamic> (unbuffered)")]
-        //public dynamic ReadUnbufferedDynamic()
-        //{
-        //    Step();
-        //    return _dbConnector.Read((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })        //        
-        //        .WithBuffering(false)
-        //        .Execute(_connection)
-        //        .First();
-        //}
+        [Benchmark(Description = "Read<dynamic> (unbuffered)")]
+        public dynamic ReadUnbufferedDynamic()
+        {
+            Step();
+            return _dbConnector.Read("select * from Post where Id = @Id", new { Id = i })
+                .WithBuffering(false)
+                .Execute(_connection)
+                .First();
+        }
 
         [Benchmark(Description = "ReadFirstOrDefault<T>")]
         public Post ReadFirstOrDefault()
-        {
-            Step();
-            return _dbConnector.ReadFirstOrDefault<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
-                  .Execute(_connection);
-        }
-
-        [Benchmark(Description = "ReadFirstOrDefault<T> (Simple)")]
-        public Post ReadFirstOrDefaultSimple()
         {
             Step();
             return _dbConnector.ReadFirstOrDefault<Post>("select * from Post where Id = @Id", new { Id = i })
                   .Execute(_connection);
         }
 
-        [Benchmark(Description = "ReadToList<T> (Simple)")]
-        public List<Post> ReadToListSimple()
+        [Benchmark(Description = "ReadFirstOrDefault<dynamic>")]
+        public dynamic ReadFirstOrDefaultDynamic()
         {
             Step();
-            return _dbConnector.ReadToList<Post>("select * from Post where Id = @Id", new { Id = i })
-                  .Execute(_connection);
+            return _dbConnector.ReadFirstOrDefault("select * from Post where Id = @Id", new { Id = i })
+                .Execute(_connection);
         }
 
-        //[Benchmark(Description = "ReadFirstOrDefault<dynamic>")]
-        //public dynamic ReadFirstOrDefaultDynamic()
-        //{
-        //    Step();
-        //    return _dbConnector.ReadFirstOrDefault((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
-        //        .Execute(_connection);
-        //}
+        private static readonly IDbJobCacheable<Post, int> _readFirstOrDefault =
+            new DbConnector<SqlConnection>(ConnectionString)
+            .ReadFirstOrDefault<Post>(
+                (IDbJobCommand cmd) =>
+                {
+                    cmd.CommandText = "select * from Post where Id = @Id";
+                    cmd.Parameters.AddFor(new { Id = (cmd as IDbJobCommand<int>).StateParam });
+                }
+            ).ToCacheable<int>();
 
-        //private static readonly IDbJobCacheable<Post, int> _readFirstOrDefault =
-        //    new DbConnector<SqlConnection>(ConnectionString)
-        //    .ReadFirstOrDefault<Post>(
-        //        (IDbJobCommand cmd) =>
-        //        {
-        //            cmd.CommandText = "select * from Post where Id = @Id";
-        //            cmd.Parameters.AddFor(new { Id = (cmd as IDbJobCommand<int>).StateParam });
-        //        }
-        //    ).ToCacheable<int>();
+        [Benchmark(Description = "ReadFirstOrDefault<T> (cached)")]
+        public Post ReadFirstOrDefaultCached()
+        {
+            Step();
+            return _readFirstOrDefault
+                  .Execute(i, _connection);
+        }
 
-        //[Benchmark(Description = "ReadFirstOrDefault<T> (cached)")]
-        //public Post ReadFirstOrDefaultCached()
-        //{
-        //    Step();
-        //    return _readFirstOrDefault
-        //          .Execute(i, _connection);
-        //}
+        [Benchmark(Description = "ReadFirstOrDefault<T> (cached)(auto connection)")]
+        public Post ReadFirstOrDefaultCachedAutoConnection()
+        {
+            Step();
+            return _readFirstOrDefault
+                  .Execute(i);
+        }
 
-        //[Benchmark(Description = "ReadFirstOrDefault<T> (cached)(auto connection)")]
-        //public Post ReadFirstOrDefaultCachedAutoConnection()
-        //{
-        //    Step();
-        //    return _readFirstOrDefault
-        //          .Execute(i);
-        //}
-
-        //[Benchmark(Description = "ReadFirstOrDefault<T> (auto connection)")]
-        //public Post ReadFirstOrDefaultAutoConnection()
-        //{
-        //    Step();
-        //    return _dbConnector.ReadFirstOrDefault<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
-        //          .Execute();
-        //}
+        [Benchmark(Description = "ReadFirstOrDefault<T> (auto connection)")]
+        public Post ReadFirstOrDefaultAutoConnection()
+        {
+            Step();
+            return _dbConnector.ReadFirstOrDefault<Post>("select * from Post where Id = @Id", new { Id = i })
+                  .Execute();
+        }
 
         //[Benchmark(Description = "ReadToListOfDictionaries")]
         //public List<Dictionary<string, object>> ReadToListOfDictionaries()

@@ -196,8 +196,8 @@ namespace DbConnector.Core
         private static IDbJobCommand[] BuildJobCommandForSimpleState(
             DbConnection conn,
             IDbJobState state,
-            string commandText,
             IColumnMapSetting mapSettings,
+            string commandText,
             object param = null,
             CommandType commandType = CommandType.Text,
             CommandBehavior? commandBehavior = null,

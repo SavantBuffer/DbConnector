@@ -57,7 +57,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -125,7 +125,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -193,7 +193,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -261,7 +261,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -329,7 +329,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -397,7 +397,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -465,7 +465,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOne(d, p, false)
                 );
         }
@@ -538,7 +538,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -604,7 +604,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -670,7 +670,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -736,7 +736,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -802,7 +802,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -868,7 +868,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }
@@ -934,7 +934,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, mapSettings, param, commandType, commandBehavior, commandTimeout, flags),
+                    onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadOneOrDefault(d, p, false)
                 );
         }

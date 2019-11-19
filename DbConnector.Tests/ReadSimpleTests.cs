@@ -267,6 +267,32 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadToListOfDictionaries()
+        {
+            var result = _dbConnector.ReadToListOfDictionaries("SELECT TOP(5) * FROM [Sales].[Currency]").Execute();
+
+            Assert.NotNull(result);
+
+            var item = result.First();
+
+            Assert.Equal("AED", item["CurrencyCode"]);
+            Assert.Equal("Emirati Dirham", item["Name"]);
+        }
+
+        [Fact]
+        public void ReadToListOfKeyValuePairs()
+        {
+            var result = _dbConnector.ReadToListOfKeyValuePairs("SELECT TOP(5) * FROM [Sales].[Currency]").Execute();
+
+            Assert.NotNull(result);
+
+            var item = result.First();
+
+            Assert.Equal("AED", item.First(i => i.Key == "CurrencyCode").Value);
+            Assert.Equal("Emirati Dirham", item.First(i => i.Key == "Name").Value);
+        }
+
+        [Fact]
         public void ReadToDbCollectionSet()
         {
             var result = _dbConnector.ReadToDbCollectionSet("SELECT TOP(5) * FROM [Sales].[Currency]; SELECT TOP(5) * FROM [Sales].[Currency]").Execute();

@@ -20,12 +20,7 @@ namespace DbConnector.Tests.PerformanceNF
         public Post ReadBuffered()
         {
             Step();
-            return _dbConnector.Read<Post>(
-                (cmd) =>
-                {
-                    cmd.CommandText = "select * from Post where Id = @Id";
-                    cmd.Parameters.AddFor(new { Id = i });//cmd.Parameters.AddWithValue("Id", i);
-                })
+            return _dbConnector.Read<Post>("select * from Post where Id = @Id", new { Id = i })
                 .Execute(_connection)
                 .First();
         }
@@ -34,7 +29,7 @@ namespace DbConnector.Tests.PerformanceNF
         public dynamic ReadBufferedDynamic()
         {
             Step();
-            return _dbConnector.Read((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
+            return _dbConnector.Read("select * from Post where Id = @Id", new { Id = i })
                 .Execute(_connection)
                 .First();
         }
@@ -43,7 +38,7 @@ namespace DbConnector.Tests.PerformanceNF
         public Post ReadUnbuffered()
         {
             Step();
-            return _dbConnector.Read<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
+            return _dbConnector.Read<Post>("select * from Post where Id = @Id", new { Id = i })
                 .WithBuffering(false)
                 .Execute(_connection)
                 .First();
@@ -53,7 +48,7 @@ namespace DbConnector.Tests.PerformanceNF
         public dynamic ReadUnbufferedDynamic()
         {
             Step();
-            return _dbConnector.Read((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })        //        
+            return _dbConnector.Read("select * from Post where Id = @Id", new { Id = i })
                 .WithBuffering(false)
                 .Execute(_connection)
                 .First();
@@ -63,7 +58,7 @@ namespace DbConnector.Tests.PerformanceNF
         public Post ReadFirstOrDefault()
         {
             Step();
-            return _dbConnector.ReadFirstOrDefault<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
+            return _dbConnector.ReadFirstOrDefault<Post>("select * from Post where Id = @Id", new { Id = i })
                   .Execute(_connection);
         }
 
@@ -71,7 +66,7 @@ namespace DbConnector.Tests.PerformanceNF
         public dynamic ReadFirstOrDefaultDynamic()
         {
             Step();
-            return _dbConnector.ReadFirstOrDefault((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
+            return _dbConnector.ReadFirstOrDefault("select * from Post where Id = @Id", new { Id = i })
                 .Execute(_connection);
         }
 
@@ -105,7 +100,7 @@ namespace DbConnector.Tests.PerformanceNF
         public Post ReadFirstOrDefaultAutoConnection()
         {
             Step();
-            return _dbConnector.ReadFirstOrDefault<Post>((cmd) => { cmd.CommandText = "select * from Post where Id = @Id"; cmd.Parameters.AddFor(new { Id = i }); })
+            return _dbConnector.ReadFirstOrDefault<Post>("select * from Post where Id = @Id", new { Id = i })
                   .Execute();
         }
 
