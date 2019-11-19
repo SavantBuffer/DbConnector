@@ -26,6 +26,59 @@ namespace DbConnector.Core
     public partial class DbConnector<TDbConnection> : IDbConnector<TDbConnection>
        where TDbConnection : DbConnection
     {
+        #region Executions
+
+        private static IEnumerable<object> OnExecuteRead(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return p.IsBuffered ? odr.ToList(type, p.Token, p.JobCommand)
+                                : odr.ToEnumerable(type, p.Token, p.JobCommand);
+        }
+
+        private static object OnExecuteReadFirst(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.First(type, p.Token, p.JobCommand);
+        }
+
+        private static object OnExecuteReadFirstOrDefault(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
+            p.DeferDisposable(odr);
+
+            return odr.FirstOrDefault(type, p.Token, p.JobCommand);
+        }
+
+        private static object OnExecuteReadSingle(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.Single(type, p.Token, p.JobCommand);
+        }
+
+        private static object OnExecuteReadSingleOrDefault(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.SingleOrDefault(type, p.Token, p.JobCommand);
+        }
+
+        private static List<object> OnExecuteReadToList(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToList(type, p.Token, p.JobCommand);
+        }
+
+        #endregion
+
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{object}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
@@ -56,14 +109,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return p.IsBuffered ? odr.ToList(type, p.Token, p.JobCommand)
-                                            : odr.ToEnumerable(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteRead(type, p)
                 ).SetOnError((d, e) => Enumerable.Empty<object>());
         }
 
@@ -98,25 +144,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () =>
-                    {
-                        if (type.IsValueType)
-                        {
-                            return Activator.CreateInstance(type);
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    },
+                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-                        p.DeferDisposable(odr);
-
-                        return odr.First(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadFirst(type, p)
                 );
         }
 
@@ -150,25 +180,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () =>
-                    {
-                        if (type.IsValueType)
-                        {
-                            return Activator.CreateInstance(type);
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    },
+                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, _commandBehaviorSingleResultOrSingleRow));
-                        p.DeferDisposable(odr);
-
-                        return odr.FirstOrDefault(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadFirstOrDefault(type, p)
                 );
         }
 
@@ -204,25 +218,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () =>
-                    {
-                        if (type.IsValueType)
-                        {
-                            return Activator.CreateInstance(type);
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    },
+                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.Single(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadSingle(type, p)
                 );
         }
 
@@ -257,25 +255,9 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () =>
-                    {
-                        if (type.IsValueType)
-                        {
-                            return Activator.CreateInstance(type);
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    },
+                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.SingleOrDefault(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadSingleOrDefault(type, p)
                 );
         }
 
@@ -309,13 +291,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
-                        p.DeferDisposable(odr);
-
-                        return odr.ToList(type, p.Token, p.JobCommand);
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(type, p)
                 ).SetOnError((d, e) => new List<object>());
         }
 
@@ -344,14 +320,7 @@ namespace DbConnector.Core
                     {
                         object scalar = p.Command.ExecuteScalar();
 
-                        if (scalar != DBNull.Value)
-                        {
-                            return scalar;
-                        }
-                        else
-                        {
-                            return null;
-                        }
+                        return scalar != DBNull.Value ? scalar : null;
                     }
                 );
         }
