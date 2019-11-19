@@ -24,9 +24,307 @@ namespace DbConnector.Core
     public partial class DbConnector<TDbConnection> : IDbConnector<TDbConnection>
        where TDbConnection : DbConnection
     {
+        #region Executions
+
+        private static (List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>, List<T8>) OnExecuteReadToList<T1, T2, T3, T4, T5, T6, T7, T8>
+           ((List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>, List<T8>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = odr.ToList<T7>(p.Token, p.JobCommand);
+                        break;
+                    case 8:
+                        d.Item8 = odr.ToList<T8>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>) OnExecuteReadToList<T1, T2, T3, T4, T5, T6, T7>
+           ((List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
+                        break;
+                    case 7:
+                        d.Item7 = odr.ToList<T7>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>) OnExecuteReadToList<T1, T2, T3, T4, T5, T6>
+           ((List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
+                        break;
+                    case 6:
+                        d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>, List<T3>, List<T4>, List<T5>) OnExecuteReadToList<T1, T2, T3, T4, T5>
+           ((List<T1>, List<T2>, List<T3>, List<T4>, List<T5>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
+                        break;
+                    case 5:
+                        d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>, List<T3>, List<T4>) OnExecuteReadToList<T1, T2, T3, T4>
+           ((List<T1>, List<T2>, List<T3>, List<T4>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    case 4:
+                        d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>, List<T3>) OnExecuteReadToList<T1, T2, T3>
+           ((List<T1>, List<T2>, List<T3>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    case 3:
+                        d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        private static (List<T1>, List<T2>) OnExecuteReadToList<T1, T2>
+           ((List<T1>, List<T2>) d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
+            p.DeferDisposable(odr);
+
+            bool hasNext = true;
+            int index = 1;
+
+            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            {
+                if (p.Token.IsCancellationRequested)
+                    return d;
+
+                switch (index)
+                {
+                    case 1:
+                        d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
+                        break;
+                    case 2:
+                        d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
+                        break;
+                    default:
+                        return d;
+                }
+
+                hasNext = odr.NextResult();
+                index++;
+            }
+
+            return d;
+        }
+
+        #endregion
+
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -48,43 +346,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -106,46 +374,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -167,49 +402,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -231,52 +430,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}, List{T6}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -298,55 +458,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}, List{T6}, List{T7}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -368,58 +486,13 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.ToList<T7>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>()));
         }
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}, List{T6}, List{T7}, List{T8}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -441,55 +514,7 @@ namespace DbConnector.Core
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
-                    onExecute: (d, p) =>
-                    {
-                        DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.Default));
-                        p.DeferDisposable(odr);
-
-                        bool hasNext = true;
-                        int index = 1;
-
-                        while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
-                        {
-                            if (p.Token.IsCancellationRequested)
-                                return d;
-
-                            switch (index)
-                            {
-                                case 1:
-                                    d.Item1 = odr.ToList<T1>(p.Token, p.JobCommand);
-                                    break;
-                                case 2:
-                                    d.Item2 = odr.ToList<T2>(p.Token, p.JobCommand);
-                                    break;
-                                case 3:
-                                    d.Item3 = odr.ToList<T3>(p.Token, p.JobCommand);
-                                    break;
-                                case 4:
-                                    d.Item4 = odr.ToList<T4>(p.Token, p.JobCommand);
-                                    break;
-                                case 5:
-                                    d.Item5 = odr.ToList<T5>(p.Token, p.JobCommand);
-                                    break;
-                                case 6:
-                                    d.Item6 = odr.ToList<T6>(p.Token, p.JobCommand);
-                                    break;
-                                case 7:
-                                    d.Item7 = odr.ToList<T7>(p.Token, p.JobCommand);
-                                    break;
-                                case 8:
-                                    d.Item8 = odr.ToList<T8>(p.Token, p.JobCommand);
-                                    break;
-                                default:
-                                    return d;
-                            }
-
-                            hasNext = odr.NextResult();
-                            index++;
-                        }
-
-                        return d;
-                    }
+                    onExecute: (d, p) => OnExecuteReadToList(d, p)
                 ).SetOnError((d, e) => (new List<T1>(), new List<T2>(), new List<T3>(), new List<T4>(), new List<T5>(), new List<T6>(), new List<T7>(), new List<T8>()));
         }
     }

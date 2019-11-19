@@ -26,7 +26,7 @@ namespace DbConnector.Core.Extensions
     {
         /// <summary>
         /// Reads data into an <see cref="IEnumerable{T}"/> in a deferred/yielded manner.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The generic type to use.</typeparam>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
@@ -34,7 +34,7 @@ namespace DbConnector.Core.Extensions
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
         /// <returns>The <see cref="IEnumerable{T}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is missing a parameterless constructor.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="IEnumerable"/>.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
         public static IEnumerable<T> ToEnumerable<T>(this DbDataReader odr, CancellationToken token = default, IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
@@ -165,7 +165,7 @@ namespace DbConnector.Core.Extensions
 
         /// <summary>
         /// Reads data into an <see cref="IEnumerable{object}"/> in a deferred/yielded manner.
-        /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>        
+        /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>        
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="objType">The <see cref="Type"/> to use.</param>
@@ -173,7 +173,7 @@ namespace DbConnector.Core.Extensions
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
         /// <returns>The <see cref="IEnumerable{object}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is missing a parameterless constructor.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is assignable from <see cref="IEnumerable"/>.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
         public static IEnumerable<object> ToEnumerable(this DbDataReader odr, Type objType, CancellationToken token = default, IDbJobCommand cmd = null)
         {
             if (odr.HasRows)

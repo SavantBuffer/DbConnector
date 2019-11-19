@@ -124,8 +124,8 @@ namespace DbConnector.Core
 
         /// <summary>
         /// <para>Use this function to disable or enable buffered (non-deferred/non-yielded) execution when reading data (this is enabled by default).</para>
-        /// <para>Note: Deferred execution is only possible for <see cref="IEnumerable{}"/> types. Consequently, normal execution will be used when encountering non <see cref="IEnumerable{}"/> types.</para> 
-        /// Warning: Exceptions may occur while looping deferred <see cref="IEnumerable{}"/> types because of the implicit database connection dependency.
+        /// <para>Note: Deferred execution is only possible for <see cref="System.Collections.IEnumerable"/> types. Consequently, normal execution will be used when encountering non <see cref="System.Collections.IEnumerable"/> types.</para> 
+        /// Warning: Exceptions may occur while looping deferred <see cref="System.Collections.IEnumerable"/> types because of the implicit database connection dependency.
         /// </summary>
         /// <returns><see cref="IDbJob{T}"/></returns>
         IDbJob<T> WithBuffering(bool isEnabled);

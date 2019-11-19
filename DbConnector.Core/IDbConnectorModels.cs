@@ -174,7 +174,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Removes and returns the first element of the data collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <returns>The object of <typeparamref name="T"/> type.</returns>
@@ -183,7 +183,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Removes and returns the first element of the data collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="settings">The <see cref="IColumnMapSetting"/> to use.</param>
@@ -193,7 +193,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Removes and returns the data as a <see cref="IEnumerable{T}"/> collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <returns>The <see cref="IEnumerable{T}"/> result.</returns>
@@ -202,7 +202,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Removes and returns the data as a <see cref="IEnumerable{T}"/> collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="settings">The <see cref="IColumnMapSetting"/> to use.</param>
@@ -212,7 +212,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Returns the first element of the data collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="index">The index to use.</param>
@@ -222,7 +222,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Returns the first element of the data collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="index">The index to use.</param>
@@ -233,7 +233,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Returns the data as a <see cref="IEnumerable{T}"/> collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="index">The index to use.</param>
@@ -243,7 +243,7 @@ namespace DbConnector.Core
 
         /// <summary>
         /// Returns the data as a <see cref="IEnumerable{T}"/> collection.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="index">The index to use.</param>

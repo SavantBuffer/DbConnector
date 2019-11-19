@@ -27,7 +27,7 @@ namespace DbConnector.Core
     {
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{IEnumerable{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -42,7 +42,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -59,7 +59,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -75,7 +75,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of <typeparamref name="T"/>.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -93,7 +93,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of <typeparamref name="T"/>.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -109,7 +109,7 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{List{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader"/>
         /// </summary>
@@ -271,7 +271,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="IEnumerable"/> or <see cref="IListSource"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
         /// </summary>

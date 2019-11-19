@@ -26,7 +26,7 @@ namespace DbConnector.Core.Extensions
     {
         /// <summary>
         /// Reads data into a <see cref="List{T}"/>.
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The generic type to use.</typeparam>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
@@ -34,7 +34,7 @@ namespace DbConnector.Core.Extensions
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
         /// <returns>The <see cref="List{T}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is missing a parameterless constructor.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="IEnumerable"/>.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
         public static List<T> ToList<T>(this DbDataReader odr, CancellationToken token = default, IDbJobCommand cmd = null)
         {
             List<T> projectedData = new List<T>();
@@ -150,7 +150,7 @@ namespace DbConnector.Core.Extensions
 
         /// <summary>
         /// Reads data into a <see cref="List{object}"/>.
-        /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="IEnumerable"/> (Note: only properties will be mapped).</para>
+        /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="objType">The <see cref="Type"/> to use.</param>
@@ -158,7 +158,7 @@ namespace DbConnector.Core.Extensions
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
         /// <returns>The <see cref="List{object}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is missing a parameterless constructor.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is assignable from <see cref="IEnumerable"/>.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
         public static List<object> ToList(this DbDataReader odr, Type objType, CancellationToken token = default, IDbJobCommand cmd = null)
         {
             List<object> projectedData = new List<object>();
