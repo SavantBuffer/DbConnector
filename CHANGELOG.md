@@ -1,4 +1,4 @@
-# [v1.1.1](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.1)  | Nov 20, 2019
+# [v1.1.1](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.1.1)  | Nov 20, 2019
 
 ### Bug Fixes
  - **documentation:** Fixed function documentation and settings for NuGet package
