@@ -683,10 +683,10 @@ namespace DbConnector.Core
         #region Implementation
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IEnumerable{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{IEnumerable{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -728,11 +728,11 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -775,11 +775,11 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -821,11 +821,11 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -869,11 +869,11 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -916,10 +916,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{List{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{List{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -961,9 +961,9 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{System.Data.DataTable}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{System.Data.DataTable}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -1004,9 +1004,9 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{System.Data.DataSet}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{System.Data.DataSet}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>  
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
@@ -1102,10 +1102,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>This is usefull when requiring a generic data list from the query result.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -1130,10 +1130,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.
+        ///  <para>Creates an <see cref="IDbJob{IEnumerable{Dictionary{string, object}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.
         ///  This is usefull when requiring a non-concrete data list from unique columns of the query result.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -1158,10 +1158,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{List{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>This is usefull when requiring a generic data list from the query result.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -1186,10 +1186,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{List{Dictionary{string, object}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.
+        ///  <para>Creates an <see cref="IDbJob{List{Dictionary{string, object}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.
         ///  This is usefull when requiring a non-concrete data list from unique columns of the query result.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -1230,10 +1230,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IDbCollectionSet}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{IDbCollectionSet}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>This is usefull when wanting to create a concrete object from multiple/different queries.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>    
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
@@ -1329,9 +1329,9 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to load the data based on the <paramref name="onLoad"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to load the data based on the <paramref name="onLoad"/> action.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <typeparam name="T">The element type to use for the result.</typeparam>
         /// <param name="onInit">Action that is used to configure and enqueue all the <see cref="IDbJobCommand"/>.</param>
@@ -1368,7 +1368,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row in the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
         ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
         ///  See also:
@@ -1407,7 +1407,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
         ///  <para> The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
@@ -1434,7 +1434,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -1460,7 +1460,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
         ///  <para>The result will be null if a non-query fails. Otherwise, the result will be the number of rows affected if all non-queries ran successfully.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
@@ -1486,7 +1486,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>

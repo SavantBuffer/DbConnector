@@ -591,7 +591,7 @@ namespace DbConnector.Core
         /// </param>        
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="T"/> result.</returns>
+        /// <returns>The T result.</returns>
         public virtual T Execute(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
             object executionLock = _executionLock;
@@ -1672,7 +1672,7 @@ namespace DbConnector.Core
         /// </param>        
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="T"/> result.</returns>
+        /// <returns>The T result.</returns>
         public virtual T Execute(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
             object cloneLock = _cloneLock;

@@ -25,17 +25,17 @@ namespace DbConnector.Core
        where TDbConnection : DbConnection
     {
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -56,17 +56,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -87,17 +87,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -118,17 +118,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -149,17 +149,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -180,17 +180,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -211,17 +211,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
@@ -242,17 +242,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2)> ReadSingleOrDefault<T1, T2>(Action<IDbJobCommand> onInit)
@@ -272,17 +272,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3)> ReadSingleOrDefault<T1, T2, T3>(Action<IDbJobCommand> onInit)
@@ -302,17 +302,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3, T4)> ReadSingleOrDefault<T1, T2, T3, T4>(Action<IDbJobCommand> onInit)
@@ -332,17 +332,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3, T4, T5)> ReadSingleOrDefault<T1, T2, T3, T4, T5>(Action<IDbJobCommand> onInit)
@@ -362,17 +362,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6>(Action<IDbJobCommand> onInit)
@@ -392,17 +392,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6, T7>(Action<IDbJobCommand> onInit)
@@ -422,17 +422,17 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only a single row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result has more than one result.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadSingleOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>(Action<IDbJobCommand> onInit)

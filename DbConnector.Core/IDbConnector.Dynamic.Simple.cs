@@ -23,10 +23,10 @@ namespace DbConnector.Core
        where TDbConnection : DbConnection
     {
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IEnumerable{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
+        ///  <para>Creates an <see cref="IDbJob{IEnumerable{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
         ///  <para>Use this to dynamically load the query results into an IEnumerable of <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -49,10 +49,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{IEnumerable{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
+        ///  <para>Creates an <see cref="IDbJob{IEnumerable{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
         ///  <para>Use this to dynamically load the query results into an IEnumerable of <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -67,10 +67,10 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only the first row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>        
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -94,10 +94,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only the first row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>        
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -113,10 +113,10 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only the first row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -139,10 +139,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only the first row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
@@ -157,10 +157,10 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only a single row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -185,10 +185,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only a single row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -205,10 +205,10 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only a single row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>        
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -232,10 +232,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to dynamically load only a single row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>        
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -251,10 +251,10 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{List{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
+        ///  <para>Creates an <see cref="IDbJob{List{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
         ///  <para>Use this to dynamically load the query results into a List of <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
@@ -277,10 +277,10 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{List{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
+        ///  <para>Creates an <see cref="IDbJob{List{dynamic}}"/> able to execute a reader based on the configured parameters.</para>   
         ///  <para>Use this to dynamically load the query results into a List of <see cref="System.Dynamic.ExpandoObject"/>.</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.

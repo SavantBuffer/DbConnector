@@ -40,7 +40,7 @@ namespace DbConnector.Core
         /// </param>        
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="T"/> result.</returns>
+        /// <returns>The T result.</returns>
         T Execute(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null);
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace DbConnector.Core
         /// </param>        
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="T"/> result.</returns>
+        /// <returns>The T result.</returns>
         T Execute(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null);
 
         /// <summary>

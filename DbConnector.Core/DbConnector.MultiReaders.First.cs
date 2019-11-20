@@ -24,18 +24,18 @@ namespace DbConnector.Core
        where TDbConnection : DbConnection
     {
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2)> ReadFirst<T1, T2>(
@@ -91,18 +91,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3)> ReadFirst<T1, T2, T3>(
@@ -162,18 +162,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3, T4)> ReadFirst<T1, T2, T3, T4>(
@@ -237,18 +237,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3, T4, T5)> ReadFirst<T1, T2, T3, T4, T5>(
@@ -316,18 +316,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirst<T1, T2, T3, T4, T5, T6>(
@@ -399,18 +399,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirst<T1, T2, T3, T4, T5, T6, T7>(
@@ -486,18 +486,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirst<T1, T2, T3, T4, T5, T6, T7, T8>(
@@ -577,18 +577,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2)> ReadFirstOrDefault<T1, T2>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -643,18 +643,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T3}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3)> ReadFirstOrDefault<T1, T2, T3>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -713,18 +713,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3, T4)> ReadFirstOrDefault<T1, T2, T3, T4>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -787,18 +787,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3, T4, T5)> ReadFirstOrDefault<T1, T2, T3, T4, T5>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -865,18 +865,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -947,18 +947,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
@@ -1033,18 +1033,18 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.SingleResult"/> and <see cref="CommandBehavior.SingleRow"/> behavior by default.
         /// </remarks>
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{T1,T2,T4,T5,T6,T7,T8}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         public IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)

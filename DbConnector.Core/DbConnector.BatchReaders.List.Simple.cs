@@ -23,10 +23,10 @@ namespace DbConnector.Core
        where TDbConnection : DbConnection
     {
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -38,7 +38,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>, List<T8>)> ReadToList<T1, T2, T3, T4, T5, T6, T7, T8>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -58,10 +58,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}, List{T6}, List{T7}, List{T8}}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -69,7 +69,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{List{T1}, List{T2}, List{T3}, List{T4}, List{T5}, List{T6}, List{T7}, List{T8}}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>, List<T8>)> ReadToList<T1, T2, T3, T4, T5, T6, T7, T8>(
             string sql,
             object param = null,
@@ -85,10 +85,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -100,7 +100,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>)> ReadToList<T1, T2, T3, T4, T5, T6, T7>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -120,10 +120,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -131,7 +131,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>, List<T7>)> ReadToList<T1, T2, T3, T4, T5, T6, T7>(
             string sql,
             object param = null,
@@ -147,10 +147,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -162,7 +162,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>)> ReadToList<T1, T2, T3, T4, T5, T6>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -182,10 +182,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -193,7 +193,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>, List<T6>)> ReadToList<T1, T2, T3, T4, T5, T6>(
             string sql,
             object param = null,
@@ -209,10 +209,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -224,7 +224,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>)> ReadToList<T1, T2, T3, T4, T5>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -244,10 +244,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -255,7 +255,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>, List<T5>)> ReadToList<T1, T2, T3, T4, T5>(
             string sql,
             object param = null,
@@ -271,10 +271,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -286,7 +286,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>)> ReadToList<T1, T2, T3, T4>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -306,10 +306,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -317,7 +317,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>, List<T4>)> ReadToList<T1, T2, T3, T4>(
             string sql,
             object param = null,
@@ -333,10 +333,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -348,7 +348,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>)> ReadToList<T1, T2, T3>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -368,10 +368,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -379,7 +379,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>, List<T3>)> ReadToList<T1, T2, T3>(
             string sql,
             object param = null,
@@ -395,10 +395,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -410,7 +410,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>)> ReadToList<T1, T2>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -430,10 +430,10 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -441,7 +441,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         public IDbJob<(List<T1>, List<T2>)> ReadToList<T1, T2>(
             string sql,
             object param = null,

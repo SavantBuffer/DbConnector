@@ -24,11 +24,11 @@ namespace DbConnector.Core
     {
         #region ReadFirst
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -40,7 +40,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirst<T1, T2, T3, T4, T5, T6, T7, T8>(
             IColumnMapSetting mapSettings,
@@ -52,11 +52,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -64,7 +64,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirst<T1, T2, T3, T4, T5, T6, T7, T8>(
             string sql,
@@ -72,11 +72,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -88,7 +88,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirst<T1, T2, T3, T4, T5, T6, T7>(
             IColumnMapSetting mapSettings,
@@ -100,11 +100,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -112,7 +112,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirst<T1, T2, T3, T4, T5, T6, T7>(
             string sql,
@@ -120,11 +120,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -136,7 +136,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirst<T1, T2, T3, T4, T5, T6>(
             IColumnMapSetting mapSettings,
@@ -148,11 +148,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -160,7 +160,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirst<T1, T2, T3, T4, T5, T6>(
             string sql,
@@ -168,11 +168,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -184,7 +184,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5)> ReadFirst<T1, T2, T3, T4, T5>(
             IColumnMapSetting mapSettings,
@@ -196,11 +196,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -208,7 +208,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4, T5)> ReadFirst<T1, T2, T3, T4, T5>(
             string sql,
@@ -216,11 +216,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -232,7 +232,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4)> ReadFirst<T1, T2, T3, T4>(
             IColumnMapSetting mapSettings,
@@ -244,11 +244,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -256,7 +256,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3, T4)> ReadFirst<T1, T2, T3, T4>(
             string sql,
@@ -264,11 +264,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -280,7 +280,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3)> ReadFirst<T1, T2, T3>(
             IColumnMapSetting mapSettings,
@@ -292,11 +292,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -304,7 +304,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2, T3)> ReadFirst<T1, T2, T3>(
             string sql,
@@ -312,11 +312,11 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -328,7 +328,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2)> ReadFirst<T1, T2>(
             IColumnMapSetting mapSettings,
@@ -340,11 +340,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -352,7 +352,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="InvalidOperationException">The query result is empty.</exception>
         IDbJob<(T1, T2)> ReadFirst<T1, T2>(
             string sql,
@@ -366,11 +366,11 @@ namespace DbConnector.Core
         #region ReadFirstOrDefault
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -382,7 +382,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -393,11 +393,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -405,18 +405,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7, T8)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7, T8>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -428,7 +428,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -439,11 +439,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -451,18 +451,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6, T7)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6, T7>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -474,7 +474,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -485,11 +485,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -497,18 +497,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5, T6)> ReadFirstOrDefault<T1, T2, T3, T4, T5, T6>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -520,7 +520,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5)> ReadFirstOrDefault<T1, T2, T3, T4, T5>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -531,11 +531,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -543,18 +543,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4, T5)> ReadFirstOrDefault<T1, T2, T3, T4, T5>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -566,7 +566,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4)> ReadFirstOrDefault<T1, T2, T3, T4>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -577,11 +577,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -589,18 +589,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3, T4)> ReadFirstOrDefault<T1, T2, T3, T4>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -612,7 +612,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3)> ReadFirstOrDefault<T1, T2, T3>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -623,11 +623,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -635,18 +635,18 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2, T3)> ReadFirstOrDefault<T1, T2, T3>(
             string sql,
             object param = null,
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -658,7 +658,7 @@ namespace DbConnector.Core
         /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
         /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
         /// <param name="flags">The flags to use. (Optional)</param> 
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2)> ReadFirstOrDefault<T1, T2>(
             IColumnMapSetting mapSettings,
             string sql,
@@ -669,11 +669,11 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates a <see cref="IDbJob{ValueTuple{}}"/> able to execute a reader based on the configured parameters.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of T.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteReader"/>
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
         /// This will use the <see cref="CommandBehavior.Default"/> behavior by default.
@@ -681,7 +681,7 @@ namespace DbConnector.Core
         /// <param name="sql">The query text command to run against the data source.</param>
         /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
         /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbJob{ValueTuple{}}"/>.</returns>
+        /// <returns>The <see cref="IDbJob"/>.</returns>
         IDbJob<(T1, T2)> ReadFirstOrDefault<T1, T2>(
             string sql,
             object param = null,
