@@ -35,6 +35,10 @@ namespace DbConnector.Core
 
         internal static readonly ConcurrentDictionary<Type, Func<DbConnection>> DbConnectionBuilderCache = new ConcurrentDictionary<Type, Func<DbConnection>>();
 
+
+        /// <summary>
+        /// Clears all the cache.
+        /// </summary>
         public static void ClearCache()
         {
             DbConnectionBuilderCache.Clear();
@@ -44,11 +48,19 @@ namespace DbConnector.Core
             ColumnMapCache.Clear();
         }
 
+        /// <summary>
+        /// Clear the ColumnMap cache.
+        /// </summary>
         public static void ClearColumnMapCache()
         {
             ColumnMapCache.Clear();
         }
 
+        /// <summary>
+        /// Get the current ColumnMap cache count. This can be used to monitor memory usage and/or establish cache removal.
+        /// <para>See also: <seealso cref="DbConnectorCache.ClearColumnMapCache()"/> and <seealso cref="DbConnectorCache.ClearCache()"/></para>
+        /// </summary>
+        /// <returns>The ColumnMap cache count.</returns>
         public static int GetColumnMapCacheCount()
         {
             return ColumnMapCache.Count;
