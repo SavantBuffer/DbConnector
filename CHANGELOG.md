@@ -1,3 +1,15 @@
+# [v1.1.2](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.1.2)  | Apr 29, 2020
+
+### Bug Fixes
+ - **execution:** Batch-Reading, with "Read" or "ReadToList", would incorrectly assign NULL values instead of empty lists when encountering empty query results.
+ - **documentation:** Fixed function documentation thus enabling a better IntelliSense experience
+
+### Dependency Updates
+ - Microsoft.CSharp
+ - System.ComponentModel.Annotations
+ - System.Reflection.Emit.Lightweight
+
+
 # [v1.1.1](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.1.1)  | Nov 20, 2019
 
 ### Bug Fixes

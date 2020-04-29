@@ -53,7 +53,7 @@ namespace DbConnector.Tests.PerformanceNF
         public Post SqlQuery()
         {
             Step();
-            return Context.Posts.FromSql("select * from Post where Id = {0}", i).First();
+            return Context.Posts.FromSqlRaw("select * from Post where Id = {0}", i).First();
         }
 
         [Benchmark(Description = "First (No Tracking)")]

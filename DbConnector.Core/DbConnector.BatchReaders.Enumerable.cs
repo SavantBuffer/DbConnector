@@ -35,7 +35,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -75,14 +75,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T8>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>) OnExecuteRead<T1, T2, T3, T4, T5, T6, T7>
@@ -94,7 +95,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -130,14 +131,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T7>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>) OnExecuteRead<T1, T2, T3, T4, T5, T6>
@@ -149,7 +151,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -181,14 +183,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T6>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>) OnExecuteRead<T1, T2, T3, T4, T5>
@@ -200,7 +203,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -228,14 +231,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T5>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>) OnExecuteRead<T1, T2, T3, T4>
@@ -247,7 +251,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -271,14 +275,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>) OnExecuteRead<T1, T2, T3>
@@ -290,7 +295,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -310,14 +315,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         private static (IEnumerable<T1>, IEnumerable<T2>) OnExecuteRead<T1, T2>
@@ -329,7 +335,7 @@ namespace DbConnector.Core
             bool hasNext = true;
             int index = 1;
 
-            while ((hasNext && odr.HasRows) || (odr.NextResult() && (++index) > 0))
+            while (true)
             {
                 if (p.Token.IsCancellationRequested)
                     return d;
@@ -345,14 +351,15 @@ namespace DbConnector.Core
                                 : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     default:
-                        return d;
+                        return d;//EXIT
                 }
 
-                hasNext = odr.NextResult();
+                if (hasNext)
+                {
+                    hasNext = odr.NextResult();
+                }
                 index++;
             }
-
-            return d;
         }
 
         #endregion

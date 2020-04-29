@@ -713,7 +713,7 @@ namespace DbConnector.Core
 
         public ConcurrentBag<string> NamesToExclude { get; internal set; }
 
-        public ConcurrentDictionary<Type, string> Joins { get; internal set; }
+        public ConcurrentDictionary<Type, string> Splits { get; internal set; }
 
         public ConcurrentDictionary<Type, Dictionary<string, string>> Aliases { get; internal set; }
 
@@ -723,7 +723,7 @@ namespace DbConnector.Core
 
         public bool HasAliases { get { return Aliases?.IsEmpty == false; } }
 
-        public bool HasJoins { get { return Joins?.IsEmpty == false; } }
+        public bool HasSplits { get { return Splits?.IsEmpty == false; } }
 
         /// <summary>
         /// Set the starting/locator inclusive column name to use when mapping an object of <typeparamref name="T"/> type.
@@ -778,12 +778,12 @@ namespace DbConnector.Core
                 throw new ArgumentNullException("columnName");
             }
 
-            if (Joins == null)
+            if (Splits == null)
             {
-                Joins = new ConcurrentDictionary<Type, string>();
+                Splits = new ConcurrentDictionary<Type, string>();
             }
 
-            Joins.TryAdd(tType, columnName);
+            Splits.TryAdd(tType, columnName);
 
             return this;
         }

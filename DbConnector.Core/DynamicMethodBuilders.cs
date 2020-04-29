@@ -162,7 +162,7 @@ namespace DbConnector.Core
                     {
                         NonExcludedCount = ordinalColumnMap.Length,
                         ProcessedTypes = new HashSet<Type>(),
-                        HasJoins = settings.HasJoins,
+                        HasJoins = settings.HasSplits,
                         HasAliases = settings.HasAliases
                     };
 
@@ -223,7 +223,7 @@ namespace DbConnector.Core
 
                     if (
                             state.HasJoins
-                         && settings.Joins.ContainsKey(propertyType)
+                         && settings.Splits.ContainsKey(propertyType)
                          && !state.ProcessedTypes.Contains(propertyType)
                          && !DbConnectorUtilities._directTypeMap.Contains(propertyType)
                          && ((propertyType.IsClass && propertyType.GetConstructor(Type.EmptyTypes) != null) || (propertyType.IsValueType && !(propertyType.IsEnum || (nullUnderlyingType?.IsEnum ?? false))))

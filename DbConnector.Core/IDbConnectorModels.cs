@@ -88,7 +88,7 @@ namespace DbConnector.Core
 
         ConcurrentBag<string> NamesToExclude { get; }
 
-        ConcurrentDictionary<Type, string> Joins { get; }
+        ConcurrentDictionary<Type, string> Splits { get; }
 
         ConcurrentDictionary<Type, Dictionary<string, string>> Aliases { get; }
 
@@ -98,7 +98,7 @@ namespace DbConnector.Core
 
         bool HasAliases { get; }
 
-        bool HasJoins { get; }
+        bool HasSplits { get; }
 
         /// <summary>
         /// Set the starting/locator inclusive column name to use when mapping an object of <typeparamref name="T"/> type.

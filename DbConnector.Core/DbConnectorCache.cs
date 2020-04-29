@@ -192,9 +192,9 @@ namespace DbConnector.Core
                     localHash = 0;
                 }
 
-                if (jobCommand.MapSettings.HasJoins)
+                if (jobCommand.MapSettings.HasSplits)
                 {
-                    foreach (var item in jobCommand.MapSettings.Joins)
+                    foreach (var item in jobCommand.MapSettings.Splits)
                     {
                         localHash += (item.Key.GetHashCode() + item.Value.GetHashCode());
                     }

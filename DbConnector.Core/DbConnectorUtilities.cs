@@ -152,7 +152,7 @@ namespace DbConnector.Core
                 {
                     NonExcludedCount = ordinalColumnMap.Length,
                     ProcessedTypes = new HashSet<Type>(),
-                    HasJoins = settings.HasJoins,
+                    HasJoins = settings.HasSplits,
                     HasAliases = settings.HasAliases,
                 },
                 settings
@@ -199,7 +199,7 @@ namespace DbConnector.Core
 
                     if (
                             state.HasJoins
-                         && settings.Joins.ContainsKey(propertyType)
+                         && settings.Splits.ContainsKey(propertyType)
                          && !state.ProcessedTypes.Contains(propertyType)
                          && !_directTypeMap.Contains(propertyType)
                          && ((propertyType.IsClass && propertyType.GetConstructor(Type.EmptyTypes) != null) || (propertyType.IsValueType && !(propertyType.IsEnum || (nullUnderlyingType?.IsEnum ?? false))))
@@ -279,7 +279,7 @@ namespace DbConnector.Core
 
         internal static int GetJoinStartIndex(Type tType, OrdinalColumnMap[] ordinalColumnMap, IColumnMapSetting settings)
         {
-            if (settings.Joins.TryGetValue(tType, out string columnName))
+            if (settings.Splits.TryGetValue(tType, out string columnName))
             {
                 int splitStartIndex = Array.FindIndex(ordinalColumnMap, c => !c.IsMapped && c.Name == columnName);
 
