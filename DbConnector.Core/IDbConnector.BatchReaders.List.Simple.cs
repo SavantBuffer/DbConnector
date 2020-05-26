@@ -12,15 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
 namespace DbConnector.Core
 {
-    public partial interface IDbConnector<TDbConnection>
-       where TDbConnection : DbConnection
+    public partial interface IDbConnector
     {
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob"/> able to execute a reader based on the configured parameters.</para>

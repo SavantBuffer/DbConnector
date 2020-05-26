@@ -23,9 +23,26 @@ namespace DbConnector.Core
     /// <summary>
     /// A performance-driven and ADO.NET data provider-agnostic ORM library.
     /// </summary>
-    public partial interface IDbConnector<TDbConnection>
+    public partial interface IDbConnector<TDbConnection> : IDbConnector
        where TDbConnection : DbConnection
     {
+    }
+
+    /// <summary>
+    /// A performance-driven and ADO.NET data provider-agnostic ORM library.
+    /// </summary>
+    public partial interface IDbConnector
+    {
+        /// <summary>
+        /// Gets the string used to open the connection.
+        /// </summary>
+        string ConnectionString { get; }
+
+        /// <summary>
+        /// Gets the type of <see cref="DbConnection"/> being used.
+        /// </summary>
+        Type ConnectionType { get; }
+
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{IEnumerable{T}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>

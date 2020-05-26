@@ -8,19 +8,19 @@ namespace DbConnector.Example
 {
     public class ClientExample
     {
-        IEmployeeRepository _repoEmployee;
+        readonly IEmployeeRepository _repoEmployee;
 
         public ClientExample()
         {
-            //TODO: Potentially use dependency injection to do the following:
+            //TODO: Potentially use dependency injection for the repositories:
 
             //Also, note that you can use any type of data provider adapter that implements a DbConnection.
             //E.g. PostgreSQL, Oracle, MySql, SQL Server
 
             //Example using SQL Server connection
-            IDbConnector<SqlConnection> dbConnector = new DbConnector<SqlConnection>("connection string goes here");
+            IDbConnector dbConnector = new DbConnector<SqlConnection>("connection string goes here");
 
-            _repoEmployee = new EmployeeRepository<SqlConnection>(dbConnector);
+            _repoEmployee = new EmployeeRepository(dbConnector);
         }
 
         public async Task<Employee> GetEmployee(int id)

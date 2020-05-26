@@ -19,8 +19,7 @@ using System.Data.Common;
 
 namespace DbConnector.Core
 {
-    public partial interface IDbConnector<TDbConnection>
-       where TDbConnection : DbConnection
+    public partial interface IDbConnector
     {
         #region ReadFirst
         /// <summary>

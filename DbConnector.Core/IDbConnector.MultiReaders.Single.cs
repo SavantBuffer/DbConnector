@@ -13,14 +13,12 @@
 //limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
 namespace DbConnector.Core
 {
-    public partial interface IDbConnector<TDbConnection>
-       where TDbConnection : DbConnection
+    public partial interface IDbConnector
     {
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>

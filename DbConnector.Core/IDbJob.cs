@@ -22,10 +22,13 @@ namespace DbConnector.Core
 {
     public interface IDbJob
     {
+        /// <summary>
+        /// Gets the string used to open the connection.
+        /// </summary>
         string ConnectionString { get; }
 
         /// <summary>
-        /// Returns the type of DbConnection being used.
+        /// Gets the type of <see cref="DbConnection"/> being used.
         /// </summary>
         Type ConnectionType { get; }
     }

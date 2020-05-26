@@ -19,8 +19,7 @@ using System.Data.Common;
 
 namespace DbConnector.Core
 {
-    public partial interface IDbConnector<TDbConnection>
-       where TDbConnection : DbConnection
+    public partial interface IDbConnector
     {
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{IEnumerable{object}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>

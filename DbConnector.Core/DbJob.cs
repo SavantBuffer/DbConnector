@@ -53,13 +53,16 @@ namespace DbConnector.Core
             get { return default; }
         }
 
+        /// <summary>
+        /// Gets the string used to open the connection.
+        /// </summary>
         public string ConnectionString
         {
             get { return _settings.ConnectionString; }
         }
 
         /// <summary>
-        /// Returns the type of DbConnection being used.
+        /// Gets the type of <see cref="DbConnection"/> being used.
         /// </summary>
         public Type ConnectionType
         {

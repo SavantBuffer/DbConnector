@@ -2,18 +2,16 @@
 using DbConnector.Core.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace DbConnector.Example.Repositories
 {
-    public abstract class EntityRepository<TDbConnection, T> : IEntityRepository<T>
+    public abstract class EntityRepository<T> : IEntityRepository<T>
         where T : new()
-        where TDbConnection : DbConnection
     {
-        protected static IDbConnector<TDbConnection> _dbConnector;
+        protected readonly IDbConnector _dbConnector;
 
-        public EntityRepository(IDbConnector<TDbConnection> dbConnector)
+        public EntityRepository(IDbConnector dbConnector)
         {
             _dbConnector = dbConnector;
         }

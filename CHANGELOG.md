@@ -1,3 +1,10 @@
+# [v1.2.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.2.0)  | May 25, 2020
+ 
+### Features
+ - Non-generic `IDbConnector` base interface. This allows to implement cleaner declarations when knowledge of connection types aren't necessary.
+ - The main DbConnector class now provides new `ConnectionString` and `ConnectionType` properties.
+
+
 # [v1.1.2](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.1.2)  | Apr 29, 2020
 
 ### Bug Fixes

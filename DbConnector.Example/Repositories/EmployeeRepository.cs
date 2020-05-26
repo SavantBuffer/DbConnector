@@ -4,7 +4,6 @@ using DbConnector.Example.Entities;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Common;
 using System.Threading.Tasks;
 
 
@@ -13,12 +12,10 @@ namespace DbConnector.Example.Repositories
     /// <summary>
     /// This class architecture allows for the querying of any type of database.
     /// </summary>
-    /// <typeparam name="TDbConnection"></typeparam>
-    public class EmployeeRepository<TDbConnection>
-        : EntityRepository<TDbConnection, Employee>, IEmployeeRepository
-        where TDbConnection : DbConnection
+    public class EmployeeRepository
+        : EntityRepository<Employee>, IEmployeeRepository
     {
-        public EmployeeRepository(IDbConnector<TDbConnection> dbConnector)
+        public EmployeeRepository(IDbConnector dbConnector)
             : base(dbConnector)
         {
 

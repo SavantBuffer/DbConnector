@@ -4,7 +4,6 @@ using DbConnector.Example.Entities;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Data.Common;
 using System.Threading.Tasks;
 
 
@@ -13,12 +12,10 @@ namespace DbConnector.Example.Repositories
     /// <summary>
     /// This class architecture allows for the querying of any type of database.
     /// </summary>
-    /// <typeparam name="TDbConnection"></typeparam>
     public class EmployeeSimpleRepository<TDbConnection>
-        : EntityRepository<TDbConnection, Employee>, IEmployeeRepository
-        where TDbConnection : DbConnection
+        : EntityRepository<Employee>, IEmployeeRepository
     {
-        public EmployeeSimpleRepository(IDbConnector<TDbConnection> dbConnector)
+        public EmployeeSimpleRepository(IDbConnector dbConnector)
             : base(dbConnector)
         {
 
@@ -50,7 +47,6 @@ namespace DbConnector.Example.Repositories
                onInit: () => (
                 (cmd1) =>
                 {
-                    cmd1.CommandType = System.Data.CommandType.Text;
                     cmd1.CommandText = @"
                         SELECT * FROM Employees WHERE name LIKE 'a%'; 
                     ";
@@ -58,7 +54,6 @@ namespace DbConnector.Example.Repositories
                ,
                 (cmd2) =>
                 {
-                    cmd2.CommandType = System.Data.CommandType.Text;
                     cmd2.CommandText = @"
                         SELECT * FROM Employees WHERE name LIKE 'b%';
                     ";
