@@ -1,3 +1,9 @@
+# [v1.2.1](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.2.1)  | Jun 03, 2020
+
+### Bug Fixes
+ - **execution:** Fixed "System.InvalidProgramException", related to internally generated "IL Dynamic Methods", bug when targeting .NET Core 3.0 and later.
+
+
 # [v1.2.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.2.0)  | May 25, 2020
  
 ### Features

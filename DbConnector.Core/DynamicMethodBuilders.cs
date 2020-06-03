@@ -252,16 +252,17 @@ namespace DbConnector.Core
                                     if (p.CanRead)
                                     {
                                         //Maybe the constructor instantiated the child property?
+                                        MethodInfo getMethod = p.GetGetMethod();
                                         Label lblInit = il.DefineLabel();
                                         Label lblSkipInit = il.DefineLabel();
 
                                         il.Emit(OpCodes.Dup);//target/target/target
-                                        il.Emit(OpCodes.Callvirt, p.GetGetMethod());//target/target/child_object or null                            
+                                        il.Emit(OpCodes.Callvirt, getMethod);//target/target/child_object or null                            
                                         il.Emit(OpCodes.Ldnull);//target/target/child_object or null/null
                                         il.Emit(OpCodes.Beq_S, lblInit);//target/target                                       
 
                                         il.Emit(OpCodes.Dup);//target/target/target
-                                        il.Emit(OpCodes.Callvirt, p.GetGetMethod());//target/target/child_object
+                                        il.Emit(OpCodes.Callvirt, getMethod);//target/target/child_object
                                         il.Emit(OpCodes.Br_S, lblSkipInit);//target/target/child_object    
 
                                         il.MarkLabel(lblInit);
@@ -373,6 +374,10 @@ namespace DbConnector.Core
 
                                 //Set property
                                 il.LoadLocal(localGuid);//target/target/guid
+
+                                if (nullUnderlyingType != null)
+                                    il.Emit(OpCodes.Newobj, propertyType.GetConstructor(new[] { nullUnderlyingType })); //target/target/nullable_guid
+
                                 il.Emit(OpCodes.Call, p.GetSetMethod());//target
 
                                 if (!isLast)
@@ -410,9 +415,7 @@ namespace DbConnector.Core
                                     il.LoadLocal(localEnum);//target/target/enum_value
 
                                     if (nullUnderlyingType != null)
-                                    {
                                         il.Emit(OpCodes.Newobj, propertyType.GetConstructor(new[] { nullUnderlyingType })); //target/target/nullable_enum_value
-                                    }
 
                                     il.Emit(OpCodes.Call, p.GetSetMethod());//target
 
@@ -443,9 +446,7 @@ namespace DbConnector.Core
                                     il.LoadLocal(localIndex);//target/target/typed-value
 
                                     if (nullUnderlyingType != null)
-                                    {
                                         il.Emit(OpCodes.Newobj, propertyType.GetConstructor(new[] { nullUnderlyingType })); //target/target/nullable_value
-                                    }
 
                                     il.Emit(OpCodes.Call, p.GetSetMethod());//target
 
@@ -489,7 +490,11 @@ namespace DbConnector.Core
                                 //Set property
                                 if (unboxType.IsValueType)
                                 {
-                                    il.Emit(OpCodes.Unbox_Any, unboxType);
+                                    il.Emit(OpCodes.Unbox_Any, unboxType);//target/target/value
+
+                                    if (nullUnderlyingType != null)
+                                        il.Emit(OpCodes.Newobj, propertyType.GetConstructor(new[] { nullUnderlyingType })); //target/target/nullable_value
+
                                     il.Emit(OpCodes.Call, p.GetSetMethod());//target
                                 }
                                 else
@@ -583,7 +588,7 @@ namespace DbConnector.Core
                     il.LoadLocal(localDbNull);//target/target/colname/object/DbNull
                     il.Emit(OpCodes.Beq_S, lblSetNull);//target/target/colname/object
 
-                    il.Emit(OpCodes.Call, _iDictionaryIndexerSet);//target
+                    il.Emit(OpCodes.Callvirt, _iDictionaryIndexerSet);//target
                     il.Emit(OpCodes.Br_S, lblDone);//target
 
                     //Branch for nulls
@@ -591,7 +596,7 @@ namespace DbConnector.Core
                     il.Emit(OpCodes.Pop);//target/target/colname
                     il.Emit(OpCodes.Ldnull);//target/target/colname/null
 
-                    il.Emit(OpCodes.Call, _iDictionaryIndexerSet);//target
+                    il.Emit(OpCodes.Callvirt, _iDictionaryIndexerSet);//target
 
                     //Branch incoming stack: target
                     il.MarkLabel(lblDone);
@@ -651,7 +656,7 @@ namespace DbConnector.Core
                     il.LoadLocal(localDbNull);//target/target/colname/object/object/DbNull
                     il.Emit(OpCodes.Beq_S, lblSetNull);//target/target/colname/object
 
-                    il.Emit(OpCodes.Call, _iDictionaryIndexerSet);//target
+                    il.Emit(OpCodes.Callvirt, _iDictionaryIndexerSet);//target
                     il.Emit(OpCodes.Br_S, lblDone);//target
 
                     //Branch for nulls
@@ -659,7 +664,7 @@ namespace DbConnector.Core
                     il.Emit(OpCodes.Pop);//target/target/colname
                     il.Emit(OpCodes.Ldnull);//target/target/colname/null
 
-                    il.Emit(OpCodes.Call, _iDictionaryIndexerSet);//target
+                    il.Emit(OpCodes.Callvirt, _iDictionaryIndexerSet);//target
 
                     //Branch incoming stack: target
                     il.MarkLabel(lblDone);
