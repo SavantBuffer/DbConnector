@@ -120,7 +120,20 @@ namespace DbConnector.Core
         IDbJob<List<object>> ReadToList(Type type, Action<IDbJobCommand> onInit);
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{HashSet{object}}"/> able to read the first column of each row from the query result based on the <paramref name="onInit"/> action. All other columns are ignored.</para>  
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{HashSet{object}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<HashSet<object>> ReadToHashSet(Action<IDbJobCommand> onInit);
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>        
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>

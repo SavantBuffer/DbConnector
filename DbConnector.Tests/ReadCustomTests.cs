@@ -2,7 +2,11 @@ using DbConnector.Core.Extensions;
 using DbConnector.Tests.Entities;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DbConnector.Tests
@@ -142,6 +146,49 @@ namespace DbConnector.Tests
             Assert.Equal("AED", values[0].CurrencyCode);
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void Read_Custom_Connection()
+        {
+            using (var conn = new SqlConnection(TestBase.ConnectionString))
+            {
+                conn.Open();
+
+                var x = _dbConnector.Read<Currency>("SELECT TOP(1) * FROM [Sales].[Currency]").Execute(conn);
+                var y = _dbConnector.Read<Currency>("SELECT TOP(3) * FROM [Sales].[Currency]").Execute(conn);
+                var z = _dbConnector.Read<Currency>("SELECT TOP(2) * FROM [Sales].[Currency]").Execute(conn);
+
+                Assert.Single(x);
+
+                Assert.Equal(3, y.Count());
+
+                Assert.Equal(2, z.Count());
+            }
+        }
+
+        [Fact]
+        public void Read_Custom_Transaction()
+        {
+            using (var conn = new SqlConnection(TestBase.ConnectionString))
+            {
+                conn.Open();
+
+                using (var transaction = conn.BeginTransaction())
+                {
+                    var x = _dbConnector.Read<Currency>("SELECT TOP(1) * FROM [Sales].[Currency]").Execute(transaction);
+                    var y = _dbConnector.Read<Currency>("SELECT TOP(3) * FROM [Sales].[Currency]").Execute(transaction);
+                    var z = _dbConnector.Read<Currency>("SELECT TOP(2) * FROM [Sales].[Currency]").Execute(transaction);
+
+                    Assert.Single(x);
+
+                    Assert.Equal(3, y.Count());
+
+                    Assert.Equal(2, z.Count());
+
+                    transaction.Commit();
+                }
+            }
         }
     }
 }

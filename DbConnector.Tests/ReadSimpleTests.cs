@@ -442,5 +442,53 @@ namespace DbConnector.Tests
             Assert.Equal("AFA", values[1]);
             Assert.Equal("ALL", values[2]);
         }
+
+        [Fact]
+        public void ReadToHashSet()
+        {
+            var result = _dbConnector.ReadToHashSet<string>("SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] ORDER BY CurrencyCode;").Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
+
+        [Fact]
+        public void ReadToHashSet_Param()
+        {
+            var result = _dbConnector.ReadToHashSet<string>("SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] WHERE @test = 1 ORDER BY CurrencyCode;", new { test = 1 }).Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
+
+        [Fact]
+        public void ReadToHashSetOfObject()
+        {
+            var result = _dbConnector.ReadToHashSet("SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] ORDER BY CurrencyCode;").Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
+
+        [Fact]
+        public void ReadToHashSetOfObject_Param()
+        {
+            var result = _dbConnector.ReadToHashSet("SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] WHERE @test = 1 ORDER BY CurrencyCode;", new { test = 1 }).Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
     }
 }

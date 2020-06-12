@@ -758,5 +758,29 @@ namespace DbConnector.Tests
                 Assert.Equal(MaritalStatusType.s, result[0].MaritalStatus.Value);
             }
         }
+
+        [Fact]
+        public void ReadToHashSet()
+        {
+            var result = _dbConnector.ReadToHashSet<string>((cmd) => cmd.CommandText = "SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] ORDER BY CurrencyCode;").Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
+
+        [Fact]
+        public void ReadToHashSetOfObject()
+        {
+            var result = _dbConnector.ReadToHashSet((cmd) => cmd.CommandText = "SELECT TOP(10) CurrencyCode FROM [Sales].[Currency] ORDER BY CurrencyCode;").Execute();
+
+            Assert.NotNull(result);
+
+            Assert.Equal(10, result.Count());
+
+            Assert.Contains("AED", result);
+        }
     }
 }

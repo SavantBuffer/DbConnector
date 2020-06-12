@@ -76,6 +76,14 @@ namespace DbConnector.Core
             return odr.ToList(type, p.Token, p.JobCommand);
         }
 
+        private static HashSet<object> OnExecuteReadToHashSetOfObject(HashSet<object> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToHashSet(p.Token);
+        }
+
         #endregion
 
         /// <summary>
@@ -95,12 +103,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<object>, TDbConnection>
@@ -131,12 +139,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<object, TDbConnection>
@@ -167,12 +175,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<object, TDbConnection>
@@ -205,12 +213,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<object, TDbConnection>
@@ -242,12 +250,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<object, TDbConnection>
@@ -277,12 +285,12 @@ namespace DbConnector.Core
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type cannot be null!");
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
             }
 
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<object>, TDbConnection>
@@ -295,7 +303,34 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{HashSet{object}}"/> able to read the first column of each row from the query result based on the <paramref name="onInit"/> action. All other columns are ignored.</para>  
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{HashSet{object}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<HashSet<object>> ReadToHashSet(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
+            }
+
+            return new DbJob<HashSet<object>, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteReadToHashSetOfObject(d, p)
+                );
+        }
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>        
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
@@ -307,7 +342,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<object, TDbConnection>

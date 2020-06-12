@@ -775,7 +775,7 @@ namespace DbConnector.Core
         {
             if (columnName == null)
             {
-                throw new ArgumentNullException("columnName");
+                throw new ArgumentNullException(nameof(columnName));
             }
 
             if (Splits == null)

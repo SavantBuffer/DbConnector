@@ -93,7 +93,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<dynamic>, TDbConnection>
@@ -122,7 +122,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<dynamic, TDbConnection>
@@ -150,7 +150,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<dynamic, TDbConnection>
@@ -180,7 +180,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<dynamic, TDbConnection>
@@ -209,7 +209,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<dynamic, TDbConnection>
@@ -237,7 +237,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<dynamic>, TDbConnection>

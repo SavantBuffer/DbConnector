@@ -870,7 +870,7 @@ namespace DbConnector.Core
                 || typeof(IListSource).IsAssignableFrom(tType)
              )
             {
-                throw new InvalidCastException("The type " + tType + " is not supported.");
+                throw new InvalidCastException("The type " + tType + " is not supported. Please use an anonymous type, or any struct or class that is not a .NET built-in type and is not assignable from System.Collections.IEnumerable or System.ComponentModel.IListSource, as a parameter.");
             }
 
             if (props.Length > 0)
@@ -1089,25 +1089,27 @@ namespace DbConnector.Core
 
     internal class DynamicDbJobMethodBuilder
     {
-        public Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic> OnExecuteDeferred { get; private set; }
+        public Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic> OnExecuteDeferred { get; private set; }
 
 
-        public static Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic> CreateBuilderFunction(Type tType, MethodInfo mi)
+        public static Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic> CreateBuilderFunction(Type tType, MethodInfo mi)
         {
             DynamicMethod method = new DynamicMethod("DynamicExecuteDeferred_" + Guid.NewGuid().ToString(), typeof(object),
-                    new Type[] { typeof(IDbJob), typeof(DbConnection), typeof(CancellationToken), typeof(IDbJobState) }, tType, true);
+                    new Type[] { typeof(IDbJob), typeof(DbConnection), typeof(DbTransaction), typeof(CancellationToken), typeof(IDbJobState) }, tType, true);
             ILGenerator il = method.GetILGenerator();
 
+            const short argIndex4 = 4;
 
             il.Emit(OpCodes.Ldarg_0);//IDbJob
             il.Emit(OpCodes.Ldarg_1);//IDbJob/DbConnection
-            il.Emit(OpCodes.Ldarg_2);//IDbJob/DbConnection/token
-            il.Emit(OpCodes.Ldarg_3);//IDbJob/DbConnection/token/IDbJobState
+            il.Emit(OpCodes.Ldarg_2);//IDbJob/DbConnection/DbTransaction
+            il.Emit(OpCodes.Ldarg_3);//IDbJob/DbConnection/DbTransaction/token
+            il.Emit(OpCodes.Ldarg, argIndex4);//IDbJob/DbConnection/DbTransaction/token/IDbJobState
             il.Emit(OpCodes.Call, mi); //object
             il.Emit(OpCodes.Ret);//
 
 
-            return (Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic>)method.CreateDelegate(typeof(Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic>));
+            return (Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic>)method.CreateDelegate(typeof(Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic>));
         }
 
 

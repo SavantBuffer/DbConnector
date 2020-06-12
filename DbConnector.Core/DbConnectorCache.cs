@@ -31,7 +31,7 @@ namespace DbConnector.Core
 
         internal static readonly ConcurrentDictionary<MultiReaderBranchCacheModel, DynamicDbConnectorMethodBuilder[]> MultiReaderBranchCache = new ConcurrentDictionary<MultiReaderBranchCacheModel, DynamicDbConnectorMethodBuilder[]>();
 
-        internal static readonly ConcurrentDictionary<DbJobCacheModel, Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic>> DbJobCache = new ConcurrentDictionary<DbJobCacheModel, Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic>>();
+        internal static readonly ConcurrentDictionary<DbJobCacheModel, Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic>> DbJobCache = new ConcurrentDictionary<DbJobCacheModel, Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic>>();
 
         internal static readonly ConcurrentDictionary<Type, Func<DbConnection>> DbConnectionBuilderCache = new ConcurrentDictionary<Type, Func<DbConnection>>();
 

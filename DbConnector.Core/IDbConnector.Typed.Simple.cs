@@ -326,7 +326,49 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{HashSet{object}}"/> able to read the first column of each row from the query result based on the configured parameters. All other columns are ignored.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{HashSet{object}}"/>.</returns>
+        IDbJob<HashSet<object>> ReadToHashSet(
+            IColumnMapSetting mapSettings,
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{HashSet{object}}"/> able to read the first column of each row from the query result based on the configured parameters. All other columns are ignored.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>        
+        /// <returns>The <see cref="IDbJob{HashSet{object}}"/>.</returns>
+        IDbJob<HashSet<object>> ReadToHashSet(
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text);
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>        
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
@@ -349,7 +391,7 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{object}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>        
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>

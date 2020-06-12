@@ -392,6 +392,54 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{HashSet{T}}"/> able to read the first column of each row from the query result based on the configured parameters. All other columns are ignored.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{HashSet{T}}"/>.</returns>
+        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
+        IDbJob<HashSet<T>> ReadToHashSet<T>(
+            IColumnMapSetting mapSettings,
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{HashSet{T}}"/> able to read the first column of each row from the query result based on the configured parameters. All other columns are ignored.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param> 
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>        
+        /// <returns>The <see cref="IDbJob{HashSet{T}}"/>.</returns>
+        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
+        IDbJob<HashSet<T>> ReadToHashSet<T>(
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text);
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>This is usefull when requiring a generic data list from the query result.</para>
         ///  See also:
@@ -650,9 +698,9 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
         /// </summary>
@@ -676,9 +724,9 @@ namespace DbConnector.Core
             DbJobCommandFlags flags = DbJobCommandFlags.None);
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
         /// </summary>

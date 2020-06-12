@@ -163,6 +163,22 @@ namespace DbConnector.Core
         IDbJob<DataSet> ReadToDataSet(Action<Queue<Action<IDbJobCommand>>> onInit, bool? withIsolatedConnections = null);
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{HashSet{T}}"/> able to read the first column of each row from the query result based on the <paramref name="onInit"/> action. All other columns are ignored.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{HashSet{T}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
+        IDbJob<HashSet<T>> ReadToHashSet<T>(Action<IDbJobCommand> onInit);
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>This is usefull when requiring a generic data list from the query result.</para>
         ///  See also:
@@ -244,8 +260,23 @@ namespace DbConnector.Core
             Func<T, IDbExecutionModel, DbDataReader, T> onLoad);
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row from the result
+        ///  set returned by the query. All other columns and rows are ignored.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteScalar"/>
+        /// </summary>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
+        IDbJob<T> Scalar<T>(Action<IDbJobCommand> onInit);
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
         ///  <para> The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -256,6 +287,7 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -268,6 +300,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
         ///  <para>The result will be null if a non-query fails. Otherwise, the result will be the number of rows affected if all non-queries ran successfully.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -278,6 +311,7 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -285,20 +319,6 @@ namespace DbConnector.Core
         /// <returns>The <see cref="IDbJob{T}"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
         IDbJob<T> NonQueries<T>(Action<Queue<Action<IDbJobCommand>>> onInit);
-
-        /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row in the result
-        ///  set returned by the query. All other columns and rows are ignored.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
-        ///  See also:
-        ///  <seealso cref="DbCommand.ExecuteScalar"/>
-        /// </summary>
-        /// <typeparam name="T">The element type to use for the result.</typeparam>
-        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
-        /// <returns>The <see cref="IDbJob{T}"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
-        IDbJob<T> Scalar<T>(Action<IDbJobCommand> onInit);
 
         /// <summary>
         ///  Creates a <see cref="IDbJob{T}"/> which can be controlled 

@@ -380,7 +380,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>), TDbConnection>
@@ -408,7 +408,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>), TDbConnection>
@@ -436,7 +436,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>), TDbConnection>
@@ -464,7 +464,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>), TDbConnection>
@@ -492,7 +492,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>), TDbConnection>
@@ -520,7 +520,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>), TDbConnection>
@@ -548,7 +548,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>, IEnumerable<T8>), TDbConnection>

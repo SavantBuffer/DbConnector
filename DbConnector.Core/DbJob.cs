@@ -24,6 +24,10 @@ using System.Threading.Tasks;
 
 namespace DbConnector.Core
 {
+    /// <summary>
+    /// Represents a configurable and executable database job.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class DbJobBase<T> : IDbJob<T>
     {
         #region Properties
@@ -187,7 +191,9 @@ namespace DbConnector.Core
             return false;
         }
 
-        protected virtual void ExecuteImplementation(ref T result, DbConnection connection, CancellationToken cancellationToken, IDbJobState state)
+
+
+        protected virtual void ExecuteImplementation(ref T result, DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
             if (_onInit != null)
             {
@@ -201,7 +207,7 @@ namespace DbConnector.Core
 
                 DbJobCacheModel cacheModel = new DbJobCacheModel(dbJobType, "ExecuteDeferred");
 
-                if (!DbConnectorCache.DbJobCache.TryGetValue(cacheModel, out Func<IDbJob, DbConnection, CancellationToken, IDbJobState, dynamic> onExecuteDeferred))
+                if (!DbConnectorCache.DbJobCache.TryGetValue(cacheModel, out Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic> onExecuteDeferred))
                 {
                     MethodInfo mi = dbJobType.GetMethod(nameof(this.ExecuteDeferred), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo genericExecuteDeferred = mi.MakeGenericMethod(typeof(T).GetGenericArguments().Single());
@@ -212,7 +218,7 @@ namespace DbConnector.Core
                 }
 
                 //Invoke ExecuteDeferred
-                result = onExecuteDeferred(this, connection, cancellationToken, state);
+                result = onExecuteDeferred(this, connection, externalTransaction, cancellationToken, state);
             }
             else if (_isIsolatedConnections && _onBranch != null)
             {
@@ -241,7 +247,7 @@ namespace DbConnector.Core
                     }
 
 
-                    DbTransaction transaction = null;
+                    DbTransaction transaction = externalTransaction;
                     IDbJobCommand[] dbJobCommands = null;
                     try
                     {
@@ -263,7 +269,7 @@ namespace DbConnector.Core
 
 
                         //Begin transaction.
-                        if (_isolationLevel.HasValue)
+                        if (_isolationLevel.HasValue && externalTransaction == null)
                         {
                             transaction = conn.BeginTransaction(_isolationLevel.Value);
                         }
@@ -322,7 +328,10 @@ namespace DbConnector.Core
                             }
                         }
 
-                        transaction?.Commit();
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Commit();
+                        }
                     }
                     catch (Exception)
                     {
@@ -334,13 +343,19 @@ namespace DbConnector.Core
                             }
                         }
 
-                        transaction?.Rollback();
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Rollback();
+                        }
 
                         throw;
                     }
                     finally
                     {
-                        transaction?.Dispose();
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Dispose();
+                        }
                     }
                 }
                 finally
@@ -363,11 +378,11 @@ namespace DbConnector.Core
             }
         }
 
-        internal IEnumerable<TChild> ExecuteDeferred<TChild>(DbConnection connection, CancellationToken cancellationToken, IDbJobState state)
+        internal IEnumerable<TChild> ExecuteDeferred<TChild>(DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
             dynamic result = null;
             DbConnection conn = null;
-            DbTransaction transaction = null;
+            DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
             bool isTransactionCommitted = false;
             bool wasConnectionClosed = false;
@@ -399,7 +414,7 @@ namespace DbConnector.Core
 
 
                 //Set transaction
-                if (_isolationLevel.HasValue)
+                if (_isolationLevel.HasValue && externalTransaction == null)
                 {
                     transaction = conn.BeginTransaction(_isolationLevel.Value);
                 }
@@ -472,7 +487,7 @@ namespace DbConnector.Core
                     }
                 }
 
-                if (transaction != null)
+                if (transaction != null && externalTransaction == null)
                 {
                     transaction.Commit();
                     isTransactionCommitted = true;
@@ -492,7 +507,10 @@ namespace DbConnector.Core
                             }
                         }
 
-                        transaction?.Rollback();
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Rollback();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -503,7 +521,10 @@ namespace DbConnector.Core
                 }
                 finally
                 {
-                    transaction?.Dispose();
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Dispose();
+                    }
 
                     if (connection == null && conn != null)
                     {
@@ -517,85 +538,7 @@ namespace DbConnector.Core
             }
         }
 
-        /// <summary>
-        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
-        public virtual IDbResult<T> ExecuteHandled(DbConnection connection = null, CancellationToken token = default)
-        {
-            object executionLock = _executionLock;
-            bool isLockAcquired = false;
-            IDbResult<T> result = new DbResult<T>();
-            T data = default;
-            DbJobBase<T> job = null;
-            try
-            {
-                Monitor.TryEnter(executionLock, ref isLockAcquired);
-
-                job = isLockAcquired ? this : Clone();
-
-                job.ExecuteImplementation(ref data, connection, token, job._state);
-
-                result.Data = data;
-            }
-            catch (Exception ex)
-            {
-                ex.Log(job?._settings.Logger, job?._isLoggingEnabled ?? false);
-
-                if (job?._onError != null)
-                {
-                    try
-                    {
-                        result.Data = job._onError(data, ex);
-                    }
-                    catch (Exception exInner)
-                    {
-                        exInner.Log(job._settings.Logger, job._isLoggingEnabled);
-
-                        ex = exInner;
-                    }
-                }
-
-                result.Error = ex;
-            }
-            finally
-            {
-                if (isLockAcquired)
-                {
-                    Monitor.Exit(executionLock);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/> asynchronously.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="Task{IDbResult{T}}"/>.</returns>
-        public virtual Task<IDbResult<T>> ExecuteHandledAsync(DbConnection connection = null, CancellationToken token = default)
-        {
-            return Task.Run(() => ExecuteHandled(connection, token), token);
-        }
-
-        /// <summary>
-        /// Execute the <see cref="IDbJob{T}"/>.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>        
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The T result.</returns>
-        public virtual T Execute(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        private T TryExecute(DbConnection connection, DbTransaction transaction, CancellationToken token, bool? isThrowExceptions)
         {
             object executionLock = _executionLock;
             bool isLockAcquired = false;
@@ -607,7 +550,7 @@ namespace DbConnector.Core
 
                 job = isLockAcquired ? this : Clone();
 
-                job.ExecuteImplementation(ref result, connection, token, job._state);
+                job.ExecuteImplementation(ref result, connection, transaction, token, job._state);
             }
             catch (Exception ex)
             {
@@ -649,20 +592,179 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/>.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>       
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The T result.</returns>
+        public virtual T Execute(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecute(connection, null, token, isThrowExceptions);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/>.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The T result.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="transaction"/> is null.</exception>
+        public virtual T Execute(DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecute(transaction?.Connection, transaction, token, isThrowExceptions);
+        }
+
+        /// <summary>
         /// Execute the <see cref="IDbJob{T}"/> asynchronously.
         /// </summary>
         /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
         /// </param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
         /// <returns>The <see cref="Task{T}"/>.</returns>
         public virtual Task<T> ExecuteAsync(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
-            return Task.Run(() => Execute(connection, token, isThrowExceptions), token);
+            return Task.Run(() => TryExecute(connection, null, token, isThrowExceptions), token);
         }
 
-        protected virtual void ExecuteDisposableImplementation(ref DbDisposable<T> result, DbConnection connection, CancellationToken cancellationToken, IDbJobState state)
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/> asynchronously.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="Task{T}"/>.</returns>
+        public virtual Task<T> ExecuteAsync(DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return Task.Run(() => TryExecute(transaction?.Connection, transaction, token, isThrowExceptions), token);
+        }
+
+
+
+        private IDbResult<T> TryExecuteHandled(DbConnection connection, DbTransaction transaction, CancellationToken token)
+        {
+            object executionLock = _executionLock;
+            bool isLockAcquired = false;
+            IDbResult<T> result = new DbResult<T>();
+            T data = default;
+            DbJobBase<T> job = null;
+            try
+            {
+                Monitor.TryEnter(executionLock, ref isLockAcquired);
+
+                job = isLockAcquired ? this : Clone();
+
+                job.ExecuteImplementation(ref data, connection, transaction, token, job._state);
+
+                result.Data = data;
+            }
+            catch (Exception ex)
+            {
+                ex.Log(job?._settings.Logger, job?._isLoggingEnabled ?? false);
+
+                if (job?._onError != null)
+                {
+                    try
+                    {
+                        result.Data = job._onError(data, ex);
+                    }
+                    catch (Exception exInner)
+                    {
+                        exInner.Log(job._settings.Logger, job._isLoggingEnabled);
+
+                        ex = exInner;
+                    }
+                }
+
+                result.Error = ex;
+            }
+            finally
+            {
+                if (isLockAcquired)
+                {
+                    Monitor.Exit(executionLock);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
+        public virtual IDbResult<T> ExecuteHandled(DbConnection connection = null, CancellationToken token = default)
+        {
+            return TryExecuteHandled(connection, null, token);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
+        public virtual IDbResult<T> ExecuteHandled(DbTransaction transaction, CancellationToken token = default)
+        {
+            return TryExecuteHandled(transaction?.Connection, transaction, token);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/> asynchronously.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{T}}"/>.</returns>
+        public virtual Task<IDbResult<T>> ExecuteHandledAsync(DbConnection connection = null, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteHandled(connection, null, token), token);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJob{T}"/> and handle any exceptions while opening the <see cref="DbConnection"/> asynchronously.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{T}}"/>.</returns>
+        public virtual Task<IDbResult<T>> ExecuteHandledAsync(DbTransaction transaction, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteHandled(transaction?.Connection, transaction, token), token);
+        }
+
+
+
+        protected virtual void ExecuteDisposableImplementation(ref DbDisposable<T> result, DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
             result = new DbDisposable<T>(_isLoggingEnabled, _settings.Logger);
 
@@ -718,7 +820,7 @@ namespace DbConnector.Core
 
 
                     //Begin transaction.
-                    DbTransaction transaction = result.Transaction = _isolationLevel.HasValue ? conn.BeginTransaction(_isolationLevel.Value) : null;
+                    DbTransaction transaction = result.Transaction = (_isolationLevel.HasValue && externalTransaction == null) ? conn.BeginTransaction(_isolationLevel.Value) : externalTransaction;
 
                     DbExecutionModel eParam = CreateDbExecutionModel(!_isDeferredExecution, true, conn, transaction, state, cancellationToken);
 
@@ -804,92 +906,7 @@ namespace DbConnector.Core
             }
         }
 
-        /// <summary>
-        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
-        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(DbConnection connection = null, CancellationToken token = default)
-        {
-            object executionLock = _executionLock;
-            bool isLockAcquired = false;
-            IDbResult<IDbDisposable<T>> result = new DbResult<IDbDisposable<T>>();
-            DbDisposable<T> disposableResult = default;
-            DbJobBase<T> job = null;
-            try
-            {
-                Monitor.TryEnter(executionLock, ref isLockAcquired);
-
-                job = isLockAcquired ? this : Clone();
-
-                job.ExecuteDisposableImplementation(ref disposableResult, connection, token, job._state);
-
-                result.Data = disposableResult;
-            }
-            catch (Exception ex)
-            {
-                disposableResult?.Dispose(false);
-
-                ex.Log(job?._settings.Logger, job?._isLoggingEnabled ?? false);
-
-                if (disposableResult != null && job?._onError != null)
-                {
-                    try
-                    {
-                        disposableResult.Source = job._onError(disposableResult.Source, ex);
-
-                        result.Data = disposableResult;
-                    }
-                    catch (Exception exInner)
-                    {
-                        exInner.Log(job._settings.Logger, job._isLoggingEnabled);
-
-                        ex = exInner;
-                    }
-                }
-
-                result.Error = ex;
-            }
-            finally
-            {
-                if (isLockAcquired)
-                {
-                    Monitor.Exit(executionLock);
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
-        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(DbConnection connection = null, CancellationToken token = default)
-        {
-            return Task.Run(() => ExecuteDisposableHandled(connection, token), token);
-        }
-
-        /// <summary>
-        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
-        /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
-        public virtual IDbDisposable<T> ExecuteDisposable(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        private IDbDisposable<T> TryExecuteDisposable(DbConnection connection, DbTransaction transaction, CancellationToken token, bool? isThrowExceptions)
         {
             object executionLock = _executionLock;
             bool isLockAcquired = false;
@@ -901,7 +918,7 @@ namespace DbConnector.Core
 
                 job = isLockAcquired ? this : Clone();
 
-                job.ExecuteDisposableImplementation(ref result, connection, token, job._state);
+                job.ExecuteDisposableImplementation(ref result, connection, transaction, token, job._state);
             }
             catch (Exception ex)
             {
@@ -945,19 +962,188 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
+        public virtual IDbDisposable<T> ExecuteDisposable(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecuteDisposable(connection, null, token, isThrowExceptions);
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
+        public virtual IDbDisposable<T> ExecuteDisposable(DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecuteDisposable(transaction?.Connection, transaction, token, isThrowExceptions);
+        }
+
+        /// <summary>
         /// Use this asynchronous function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
         /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
         /// </summary>
         /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
         /// </param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
         /// <returns>The <see cref="Task{IDbDisposable{T}}"/>.</returns>
         public virtual Task<IDbDisposable<T>> ExecuteDisposableAsync(DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
-            return Task.Run(() => ExecuteDisposable(connection, token, isThrowExceptions), token);
+            return Task.Run(() => TryExecuteDisposable(connection, null, token, isThrowExceptions), token);
         }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbDisposable{T}}"/>.</returns>
+        public virtual Task<IDbDisposable<T>> ExecuteDisposableAsync(DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return Task.Run(() => TryExecuteDisposable(transaction?.Connection, transaction, token, isThrowExceptions), token);
+        }
+
+
+
+        private IDbResult<IDbDisposable<T>> TryExecuteDisposableHandled(DbConnection connection, DbTransaction transaction, CancellationToken token)
+        {
+            object executionLock = _executionLock;
+            bool isLockAcquired = false;
+            IDbResult<IDbDisposable<T>> result = new DbResult<IDbDisposable<T>>();
+            DbDisposable<T> disposableResult = default;
+            DbJobBase<T> job = null;
+            try
+            {
+                Monitor.TryEnter(executionLock, ref isLockAcquired);
+
+                job = isLockAcquired ? this : Clone();
+
+                job.ExecuteDisposableImplementation(ref disposableResult, connection, transaction, token, job._state);
+
+                result.Data = disposableResult;
+            }
+            catch (Exception ex)
+            {
+                disposableResult?.Dispose(false);
+
+                ex.Log(job?._settings.Logger, job?._isLoggingEnabled ?? false);
+
+                if (disposableResult != null && job?._onError != null)
+                {
+                    try
+                    {
+                        disposableResult.Source = job._onError(disposableResult.Source, ex);
+
+                        result.Data = disposableResult;
+                    }
+                    catch (Exception exInner)
+                    {
+                        exInner.Log(job._settings.Logger, job._isLoggingEnabled);
+
+                        ex = exInner;
+                    }
+                }
+
+                result.Error = ex;
+            }
+            finally
+            {
+                if (isLockAcquired)
+                {
+                    Monitor.Exit(executionLock);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
+        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(DbConnection connection = null, CancellationToken token = default)
+        {
+            return TryExecuteDisposableHandled(connection, null, token);
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
+        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(DbTransaction transaction, CancellationToken token = default)
+        {
+            return TryExecuteDisposableHandled(transaction?.Connection, transaction, token);
+        }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJob{T}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
+        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(DbConnection connection = null, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteDisposableHandled(connection, null, token), token);
+        }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJob{T}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
+        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(DbTransaction transaction, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteDisposableHandled(transaction?.Connection, transaction, token), token);
+        }
+
+
 
         /// <summary>
         /// Use this function to disable or enable error logging (this is enabled by default). Disabling this can be useful when logging errors in order to prevent an infinite loop.
@@ -977,7 +1163,7 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        /// Use this function to set the <see cref="IsolationLevel"/> for this <see cref="IDbJob{T}"/>.
+        /// Use this function to set the <see cref="IsolationLevel"/> and enable the use of a <see cref="DbTransaction"/> for this <see cref="IDbJob{T}"/>.
         /// </summary>
         /// <returns><see cref="IDbJob{T}"/></returns>
         public virtual IDbJob<T> WithIsolationLevel(IsolationLevel? level)
@@ -1304,7 +1490,11 @@ namespace DbConnector.Core
         #endregion        
     }
 
-
+    /// <summary>
+    /// Represents a configurable and executable database job.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TStateParam"></typeparam>
     public abstract class DbJobBase<T, TStateParam> : DbJobBase<T>
     {
         #region Properties
@@ -1666,17 +1856,9 @@ namespace DbConnector.Core
             return DbConnectionBuilder();
         }
 
-        /// <summary>
-        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/>.
-        /// </summary>
-        /// <param name="parameter">The state parameter to use.</param>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>        
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The T result.</returns>
-        public virtual T Execute(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+
+
+        private T TryExecute(TStateParam parameter, DbConnection connection, DbTransaction transaction, CancellationToken token, bool? isThrowExceptions)
         {
             object cloneLock = _cloneLock;
             bool isLockAcquired = false;
@@ -1688,11 +1870,11 @@ namespace DbConnector.Core
                 if (isLockAcquired)
                 {
                     _state.StateParam = parameter;
-                    ExecuteImplementation(ref result, connection, token, _state);
+                    ExecuteImplementation(ref result, connection, transaction, token, _state);
                 }
                 else
                 {
-                    ExecuteImplementation(ref result, connection, token, _state.Clone(parameter));
+                    ExecuteImplementation(ref result, connection, transaction, token, _state.Clone(parameter));
                 }
             }
             catch (Exception ex)
@@ -1735,30 +1917,74 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/>.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>      
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The T result.</returns>
+        public virtual T Execute(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecute(parameter, connection, null, token, isThrowExceptions);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/>.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>    
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The T result.</returns>
+        public virtual T Execute(TStateParam parameter, DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecute(parameter, transaction?.Connection, transaction, token, isThrowExceptions);
+        }
+
+        /// <summary>
         /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> asynchronously.
         /// </summary>
         /// <param name="parameter">The state parameter to use.</param>
         /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
         /// </param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
         /// <returns>The <see cref="Task{T}"/>.</returns>
         public virtual Task<T> ExecuteAsync(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
-            return Task.Run(() => Execute(parameter, connection, token, isThrowExceptions), token);
+            return Task.Run(() => TryExecute(parameter, connection, null, token, isThrowExceptions), token);
         }
 
         /// <summary>
-        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> asynchronously.
         /// </summary>
         /// <param name="parameter">The state parameter to use.</param>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>  
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
-        public virtual IDbResult<T> ExecuteHandled(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="Task{T}"/>.</returns>
+        public virtual Task<T> ExecuteAsync(TStateParam parameter, DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return Task.Run(() => TryExecute(parameter, transaction?.Connection, transaction, token, isThrowExceptions), token);
+        }
+
+
+
+        private IDbResult<T> TryExecuteHandled(TStateParam parameter, DbConnection connection, DbTransaction transaction, CancellationToken token)
         {
             object cloneLock = _cloneLock;
             bool isLockAcquired = false;
@@ -1771,11 +1997,11 @@ namespace DbConnector.Core
                 if (isLockAcquired)
                 {
                     _state.StateParam = parameter;
-                    ExecuteImplementation(ref data, connection, token, _state);
+                    ExecuteImplementation(ref data, connection, transaction, token, _state);
                 }
                 else
                 {
-                    ExecuteImplementation(ref data, connection, token, _state.Clone(parameter));
+                    ExecuteImplementation(ref data, connection, transaction, token, _state.Clone(parameter));
                 }
 
                 result.Data = data;
@@ -1812,113 +2038,70 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
+        public virtual IDbResult<T> ExecuteHandled(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
+        {
+            return TryExecuteHandled(parameter, connection, null, token);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> and handle any exceptions while opening the <see cref="DbConnection"/>.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>  
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{T}"/>.</returns>
+        public virtual IDbResult<T> ExecuteHandled(TStateParam parameter, DbTransaction transaction, CancellationToken token = default)
+        {
+            return TryExecuteHandled(parameter, transaction?.Connection, transaction, token);
+        }
+
+        /// <summary>
         /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> and handle any exceptions while opening the <see cref="DbConnection"/> asynchronously.
         /// </summary>
         /// <param name="parameter">The state parameter to use.</param>
         /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
         /// </param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <returns>The <see cref="Task{IDbResult{T}}"/>.</returns>
         public virtual Task<IDbResult<T>> ExecuteHandledAsync(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
         {
-            return Task.Run(() => ExecuteHandled(parameter, connection, token), token);
+            return Task.Run(() => TryExecuteHandled(parameter, connection, null, token), token);
         }
 
         /// <summary>
-        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// Execute the <see cref="IDbJobCacheable{T, TStateParam}"/> and handle any exceptions while opening the <see cref="DbConnection"/> asynchronously.
         /// </summary>
         /// <param name="parameter">The state parameter to use.</param>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>  
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
-        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
+        /// <returns>The <see cref="Task{IDbResult{T}}"/>.</returns>
+        public virtual Task<IDbResult<T>> ExecuteHandledAsync(TStateParam parameter, DbTransaction transaction, CancellationToken token = default)
         {
-            object cloneLock = _cloneLock;
-            bool isLockAcquired = false;
-            IDbResult<IDbDisposable<T>> result = new DbResult<IDbDisposable<T>>();
-            DbDisposable<T> disposableResult = default;
-            try
-            {
-                Monitor.TryEnter(cloneLock, ref isLockAcquired);
-
-                if (isLockAcquired)
-                {
-                    _state.StateParam = parameter;
-                    ExecuteDisposableImplementation(ref disposableResult, connection, token, _state);
-                }
-                else
-                {
-                    ExecuteDisposableImplementation(ref disposableResult, connection, token, _state.Clone(parameter));
-                }
-
-                result.Data = disposableResult;
-            }
-            catch (Exception ex)
-            {
-                disposableResult?.Dispose(false);
-
-                ex.Log(_settings.Logger, _isLoggingEnabled);
-
-                if (disposableResult != null && _onError != null)
-                {
-                    try
-                    {
-                        disposableResult.Source = _onError(disposableResult.Source, ex);
-
-                        result.Data = disposableResult;
-                    }
-                    catch (Exception exInner)
-                    {
-                        exInner.Log(_settings.Logger, _isLoggingEnabled);
-
-                        ex = exInner;
-                    }
-                }
-
-                result.Error = ex;
-            }
-            finally
-            {
-                if (isLockAcquired)
-                {
-                    Monitor.Exit(cloneLock);
-                }
-            }
-
-            return result;
+            return Task.Run(() => TryExecuteHandled(parameter, transaction?.Connection, transaction, token), token);
         }
 
-        /// <summary>
-        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
-        /// </summary>
-        /// <param name="parameter">The state parameter to use.</param>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
-        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
-        {
-            return Task.Run(() => ExecuteDisposableHandled(parameter, connection, token), token);
-        }
 
-        /// <summary>
-        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
-        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
-        /// </summary>
-        /// <param name="parameter">The state parameter to use.</param>
-        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
-        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
-        /// </param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
-        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
-        public virtual IDbDisposable<T> ExecuteDisposable(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+
+        private IDbDisposable<T> TryExecuteDisposable(TStateParam parameter, DbConnection connection, DbTransaction transaction, CancellationToken token, bool? isThrowExceptions)
         {
             object cloneLock = _cloneLock;
             bool isLockAcquired = false;
@@ -1930,11 +2113,11 @@ namespace DbConnector.Core
                 if (isLockAcquired)
                 {
                     _state.StateParam = parameter;
-                    ExecuteDisposableImplementation(ref result, connection, token, _state);
+                    ExecuteDisposableImplementation(ref result, connection, transaction, token, _state);
                 }
                 else
                 {
-                    ExecuteDisposableImplementation(ref result, connection, token, _state.Clone(parameter));
+                    ExecuteDisposableImplementation(ref result, connection, transaction, token, _state.Clone(parameter));
                 }
             }
             catch (Exception ex)
@@ -1979,19 +2162,198 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
+        public virtual IDbDisposable<T> ExecuteDisposable(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecuteDisposable(parameter, connection, null, token, isThrowExceptions);
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param> 
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="IDbDisposable{T}"/>.</returns>
+        public virtual IDbDisposable<T> ExecuteDisposable(TStateParam parameter, DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return TryExecuteDisposable(parameter, transaction?.Connection, transaction, token, isThrowExceptions);
+        }
+
+        /// <summary>
         /// Use this asynchronous function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
         /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
         /// </summary>
         /// <param name="parameter">The state parameter to use.</param>
         /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
         /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
         /// </param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
         /// <returns>The <see cref="Task{IDbDisposable{T}}"/>.</returns>
         public virtual Task<IDbDisposable<T>> ExecuteDisposableAsync(TStateParam parameter, DbConnection connection = null, CancellationToken token = default, bool? isThrowExceptions = null)
         {
-            return Task.Run(() => ExecuteDisposable(parameter, connection, token, isThrowExceptions), token);
+            return Task.Run(() => TryExecuteDisposable(parameter, connection, null, token, isThrowExceptions), token);
+        }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param> 
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="isThrowExceptions">Use to override the <see cref="DbConnectorFlags.NoExceptionThrowingForNonHandledExecution"/>. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbDisposable{T}}"/>.</returns>
+        public virtual Task<IDbDisposable<T>> ExecuteDisposableAsync(TStateParam parameter, DbTransaction transaction, CancellationToken token = default, bool? isThrowExceptions = null)
+        {
+            return Task.Run(() => TryExecuteDisposable(parameter, transaction?.Connection, transaction, token, isThrowExceptions), token);
+        }
+
+
+
+        private IDbResult<IDbDisposable<T>> TryExecuteDisposableHandled(TStateParam parameter, DbConnection connection, DbTransaction transaction, CancellationToken token)
+        {
+            object cloneLock = _cloneLock;
+            bool isLockAcquired = false;
+            IDbResult<IDbDisposable<T>> result = new DbResult<IDbDisposable<T>>();
+            DbDisposable<T> disposableResult = default;
+            try
+            {
+                Monitor.TryEnter(cloneLock, ref isLockAcquired);
+
+                if (isLockAcquired)
+                {
+                    _state.StateParam = parameter;
+                    ExecuteDisposableImplementation(ref disposableResult, connection, transaction, token, _state);
+                }
+                else
+                {
+                    ExecuteDisposableImplementation(ref disposableResult, connection, transaction, token, _state.Clone(parameter));
+                }
+
+                result.Data = disposableResult;
+            }
+            catch (Exception ex)
+            {
+                disposableResult?.Dispose(false);
+
+                ex.Log(_settings.Logger, _isLoggingEnabled);
+
+                if (disposableResult != null && _onError != null)
+                {
+                    try
+                    {
+                        disposableResult.Source = _onError(disposableResult.Source, ex);
+
+                        result.Data = disposableResult;
+                    }
+                    catch (Exception exInner)
+                    {
+                        exInner.Log(_settings.Logger, _isLoggingEnabled);
+
+                        ex = exInner;
+                    }
+                }
+
+                result.Error = ex;
+            }
+            finally
+            {
+                if (isLockAcquired)
+                {
+                    Monitor.Exit(cloneLock);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
+        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
+        {
+            return TryExecuteDisposableHandled(parameter, connection, null, token);
+        }
+
+        /// <summary>
+        /// Use this function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param> 
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbResult{IDbDisposable{T}}"/>.</returns>
+        public virtual IDbResult<IDbDisposable<T>> ExecuteDisposableHandled(TStateParam parameter, DbTransaction transaction, CancellationToken token = default)
+        {
+            return TryExecuteDisposableHandled(parameter, transaction?.Connection, transaction, token);
+        }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="connection">The <see cref="DbConnection"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution. (Optional)
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
+        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(TStateParam parameter, DbConnection connection = null, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteDisposableHandled(parameter, connection, null, token), token);
+        }
+
+        /// <summary>
+        /// Use this asynchronous function when a serialized data extraction is required and to handle any exceptions while opening the <see cref="DbConnection"/>. E.g. When using <see cref="CommandBehavior.SequentialAccess"/> to get a <see cref="System.IO.Stream"/>.
+        /// This function returns an <see cref="IDisposable"/> object that must me disposed in order to commit the transaction and prevent leaks.
+        /// </summary>
+        /// <param name="parameter">The state parameter to use.</param>
+        /// <param name="transaction">The <see cref="DbTransaction"/> to use for this <see cref="IDbJobCacheable{T, TStateParam}"/> execution.
+        /// <para>Note: A new <see cref="DbConnection"/> will be created automatically by default if this parameter is null.</para>
+        /// <para>Note: This will override the use of <see cref="IDbJob{T}.WithIsolationLevel(IsolationLevel?)"/>.</para>
+        /// <para>Warning: Multiple Active Result Sets (MARS) needs to be supported and enabled when executing multiple <see cref="DbCommand"/> simultaneously in the same <see cref="DbConnection"/>. Regardless, the use of isolated connections is encouraged.</para>
+        /// </param> 
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <returns>The <see cref="Task{IDbResult{IDbDisposable{T}}}"/>.</returns>
+        public virtual Task<IDbResult<IDbDisposable<T>>> ExecuteDisposableHandledAsync(TStateParam parameter, DbTransaction transaction, CancellationToken token = default)
+        {
+            return Task.Run(() => TryExecuteDisposableHandled(parameter, transaction?.Connection, transaction, token), token);
         }
 
         #endregion
@@ -2089,585 +2451,5 @@ namespace DbConnector.Core
         }
 
         #endregion
-    }
-
-
-    /// <summary>
-    /// Used to execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-    /// </summary>
-    public static class DbJob
-    {
-        private static void ExecuteAllImplementation(
-            ref List<(List<IDbExecutedModel>, dynamic)> result,
-            ref IDbConnectorLogger logger,
-            IEnumerable<IDbJob> items,
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            CancellationToken token = default)
-        {
-            int itemCount;
-
-            if (items != null && (itemCount = items.Count()) != 0)
-            {
-                result = new List<(List<IDbExecutedModel>, dynamic)>(itemCount);
-
-                dynamic firstItem = items.First();
-
-                if (firstItem == null)
-                {
-                    throw new ArgumentNullException("IDbJob items cannot be null!");
-                }
-
-                lock (firstItem._executionLock)
-                {
-                    logger = logger ?? firstItem._settings.Logger;
-                }
-
-
-                //Create connection
-                using (DbConnection conn = firstItem.CreateConnectionInstance())
-                {
-                    //Open connection
-                    conn.ConnectionString = firstItem.ConnectionString;
-                    conn.Open();
-
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    //BeginTransaction
-                    using (DbTransaction transaction = conn.BeginTransaction(isolationLevel))
-                    {
-                        try
-                        {
-                            foreach (dynamic item in items)
-                            {
-                                if (item == null)
-                                {
-                                    throw new ArgumentNullException("IDbJob items cannot be null!");
-                                }
-
-                                lock (item._executionLock)
-                                {
-                                    if (token.IsCancellationRequested)
-                                        return;
-
-
-                                    bool isCacheEnabled = item._isCacheEnabled;
-                                    dynamic currentResult = item.DefaultValueOfT;
-
-
-                                    //Call onInit
-                                    if (item._onInit != null)
-                                    {
-                                        currentResult = item._onInit();
-                                    }
-
-
-                                    IDbJobCommand[] dbJobCommands = null;
-                                    try
-                                    {
-                                        //Set settings and commands.
-                                        dbJobCommands = item._isCreateDbCommand ? item._onCommands(conn, item._state) : new IDbJobCommand[] { null };
-
-                                        if (dbJobCommands == null)
-                                        {
-                                            dbJobCommands = new IDbJobCommand[] { item._isCreateDbCommand ? item.CreateDbJobCommand(conn.CreateCommand(), item._state) : null };
-                                        }
-
-                                        var executedModels = new List<IDbExecutedModel>(dbJobCommands.Length);
-                                        DbExecutionModel eParam = item.CreateDbExecutionModel(true, false, conn, transaction, item._state, token);
-
-
-                                        //Execute all commands
-                                        for (int i = 0; i < dbJobCommands.Length; i++)
-                                        {
-                                            if (token.IsCancellationRequested)
-                                            {
-                                                if (item._isCreateDbCommand)
-                                                {
-                                                    for (int x = i; x < dbJobCommands.Length; x++)
-                                                    {
-                                                        dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                                                    }
-                                                }
-
-                                                return;
-                                            }
-
-                                            DbCommand cmd = null;
-                                            var jCommand = dbJobCommands[i];
-
-                                            eParam.Index = i;
-                                            eParam.Command = null;
-                                            eParam.JobCommand = jCommand;
-                                            eParam.JobState = item._state;
-
-                                            try
-                                            {
-                                                if (item._isCreateDbCommand)
-                                                {
-                                                    eParam.Command = cmd = jCommand.GetDbCommand();
-                                                    cmd.Connection = conn;
-                                                    cmd.Transaction = transaction;
-
-                                                    if (!isCacheEnabled)
-                                                    {
-                                                        jCommand.Flags |= DbJobCommandFlags.NoCache;
-                                                    }
-                                                }
-
-                                                currentResult = item._onExecute(currentResult, eParam);
-
-                                                if (item._onExecuted != null)
-                                                {
-                                                    eParam.Parameters = cmd?.Parameters;
-
-                                                    currentResult = item._onExecuted(currentResult, eParam.CreateExecutedModel());
-                                                }
-
-                                                //Fail-safe for potential deferred IEnumerables;
-                                                currentResult = ((currentResult != null && DbConnectorUtilities.IsEnumerable(currentResult.GetType())) ? Enumerable.ToList(currentResult) : currentResult);
-
-                                                executedModels.Add(eParam.CreateExecutedModel());
-                                            }
-                                            finally
-                                            {
-                                                eParam.DeferrableDisposable?.Dispose();
-                                                cmd?.Dispose();
-                                            }
-                                        }
-
-
-                                        result.Add((executedModels, currentResult));
-                                    }
-                                    catch (Exception)
-                                    {
-                                        if (item._isCreateDbCommand && dbJobCommands != null)
-                                        {
-                                            for (int x = 0; x < dbJobCommands.Length; x++)
-                                            {
-                                                dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                                            }
-                                        }
-
-                                        throw;
-                                    }
-                                }
-                            }
-
-                            transaction.Commit();
-                        }
-                        catch (Exception)
-                        {
-                            transaction.Rollback();
-
-                            throw;
-                        }
-                    }
-                }
-
-
-                //Call onCompleted
-                int index = 0;
-                foreach (dynamic item in items)
-                {
-                    lock (item._executionLock)
-                    {
-                        if (item._onCompleted != null)
-                        {
-                            var itemResult = result.ElementAtOrDefault(index);
-
-                            if (!itemResult.Equals(default))
-                            {
-                                itemResult.Item2 = item._onCompleted(itemResult.Item2);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-
-                    index++;
-                }
-            }
-            else
-            {
-                result = new List<(List<IDbExecutedModel>, dynamic)>();
-            }
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="isLoggingEnabled">Use to disable logging. (Optional)</param>
-        /// <param name="logger">The <see cref="IDbConnectorLogger"/> to use. The logger from the first provided <see cref="IDbJob"/> item will be used by default when null. (Optional)</param>      
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static IDbResult<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllHandled(
-            IEnumerable<IDbJob> items,
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            bool isLoggingEnabled = true,
-            IDbConnectorLogger logger = null,
-            CancellationToken token = default)
-        {
-            IDbResult<List<(List<IDbExecutedModel>, dynamic)>> result = new DbResult<List<(List<IDbExecutedModel>, dynamic)>>();
-            List<(List<IDbExecutedModel>, dynamic)> data = null;
-            try
-            {
-                ExecuteAllImplementation(ref data, ref logger, items, isolationLevel, token);
-
-                result.Data = data;
-            }
-            catch (Exception ex)
-            {
-                ex.Log(logger, isLoggingEnabled);
-
-                if (items != null && data != null)
-                {
-                    try
-                    {
-                        int index = 0;
-                        foreach (dynamic item in items)
-                        {
-                            if (item == null)
-                            {
-                                throw new ArgumentNullException("IDbJob items cannot be null!");
-                            }
-
-                            lock (item._executionLock)
-                            {
-                                if (item._onError != null)
-                                {
-                                    var itemResult = data.ElementAtOrDefault(index);
-
-                                    if (!itemResult.Equals(default))
-                                    {
-                                        itemResult.Item2 = item._onError(itemResult.Item2, ex);
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            index++;
-                        }
-                    }
-                    catch (Exception exInner)
-                    {
-                        exInner.Log(logger, isLoggingEnabled);
-
-                        ex = exInner;
-                    }
-                }
-
-                result.Error = ex;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static IDbResult<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllHandled(
-            params IDbJob[] items)
-        {
-            return ExecuteAllHandled(items, logger: null);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use.</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static IDbResult<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllHandled(
-            IsolationLevel isolationLevel,
-            params IDbJob[] items)
-        {
-            return ExecuteAllHandled(items, isolationLevel);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static IDbResult<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllHandled(
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            CancellationToken token = default,
-            params IDbJob[] items)
-        {
-            return ExecuteAllHandled(items, isolationLevel: isolationLevel, token: token);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="isLoggingEnabled">Use to disable logging. (Optional)</param>
-        /// <param name="logger">The <see cref="IDbConnectorLogger"/> to use. The logger from the first provided <see cref="IDbJob"/> item will be used by default when null. (Optional)</param>      
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static Task<IDbResult<List<(List<IDbExecutedModel>, dynamic)>>> ExecuteAllHandledAsync(
-            IEnumerable<IDbJob> items,
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            bool isLoggingEnabled = true,
-            IDbConnectorLogger logger = null,
-            CancellationToken token = default)
-        {
-            return Task.Run(() => ExecuteAllHandled(items, isolationLevel, isLoggingEnabled, logger, token), token);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        ///  <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static Task<IDbResult<List<(List<IDbExecutedModel>, dynamic)>>> ExecuteAllHandledAsync(
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAllHandled(items, logger: null));
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use.</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        ///  <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static Task<IDbResult<List<(List<IDbExecutedModel>, dynamic)>>> ExecuteAllHandledAsync(
-            IsolationLevel isolationLevel,
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAllHandled(items, isolationLevel));
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items and handle any exceptions in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="IDbResult{List{ValueTuple{List{IDbExecutedModel}, dynamic}}}"/> with all the executed results.</returns>
-        public static Task<IDbResult<List<(List<IDbExecutedModel>, dynamic)>>> ExecuteAllHandledAsync(
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            CancellationToken token = default,
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAllHandled(items, isolationLevel: isolationLevel, token: token), token);
-        }
-
-
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="isLoggingEnabled">Use to disable logging. (Optional)</param>
-        /// <param name="logger">The <see cref="IDbConnectorLogger"/> to use. The logger from the first provided <see cref="IDbJob"/> item will be used by default when null. (Optional)</param>      
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to disable the throwing of transactions. (Optional)</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static List<(List<IDbExecutedModel>, dynamic)> ExecuteAll(
-            IEnumerable<IDbJob> items,
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            bool isLoggingEnabled = true,
-            IDbConnectorLogger logger = null,
-            CancellationToken token = default,
-            bool isThrowExceptions = true)
-        {
-            List<(List<IDbExecutedModel>, dynamic)> data = null;
-
-            try
-            {
-                ExecuteAllImplementation(ref data, ref logger, items, isolationLevel, token);
-            }
-            catch (Exception ex)
-            {
-                ex.Log(logger, isThrowExceptions ? false : isLoggingEnabled);
-
-
-                if (items != null && data != null)
-                {
-                    try
-                    {
-                        int index = 0;
-                        foreach (dynamic item in items)
-                        {
-                            if (item == null)
-                            {
-                                throw new ArgumentNullException("IDbJob items cannot be null!");
-                            }
-
-                            lock (item._executionLock)
-                            {
-                                if (item._onError != null)
-                                {
-                                    var itemResult = data.ElementAtOrDefault(index);
-
-                                    if (!itemResult.Equals(default))
-                                    {
-                                        itemResult.Item2 = item._onError(itemResult.Item2, ex);
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-
-                            index++;
-                        }
-                    }
-                    catch (Exception exInner)
-                    {
-                        exInner.Log(logger, isThrowExceptions ? false : isLoggingEnabled);
-
-                        if (isThrowExceptions)
-                        {
-                            throw;
-                        }
-                    }
-                }
-
-
-                if (isThrowExceptions)
-                {
-                    throw;
-                }
-            }
-
-            return data;
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static List<(List<IDbExecutedModel>, dynamic)> ExecuteAll(
-            params IDbJob[] items)
-        {
-            return ExecuteAll(items, logger: null);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use.</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static List<(List<IDbExecutedModel>, dynamic)> ExecuteAll(
-            IsolationLevel isolationLevel,
-            params IDbJob[] items)
-        {
-            return ExecuteAll(items, isolationLevel);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to disable the throwing of transactions. (Optional)</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static List<(List<IDbExecutedModel>, dynamic)> ExecuteAll(
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            CancellationToken token = default,
-            bool isThrowExceptions = true,
-            params IDbJob[] items)
-        {
-            return ExecuteAll(items, isolationLevel: isolationLevel, token: token, isThrowExceptions: isThrowExceptions);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="isLoggingEnabled">Use to disable logging. (Optional)</param>
-        /// <param name="logger">The <see cref="IDbConnectorLogger"/> to use. The logger from the first provided <see cref="IDbJob"/> item will be used by default when null. (Optional)</param>      
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to disable the throwing of transactions. (Optional)</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static Task<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllAsync(
-            IEnumerable<IDbJob> items,
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            bool isLoggingEnabled = true,
-            IDbConnectorLogger logger = null,
-            CancellationToken token = default,
-            bool isThrowExceptions = true)
-        {
-            return Task.Run(() => ExecuteAll(items, isolationLevel, isLoggingEnabled, logger, token, isThrowExceptions), token);
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static Task<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllAsync(
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAll(items, logger: null));
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use.</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static Task<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllAsync(
-            IsolationLevel isolationLevel,
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAll(items, isolationLevel));
-        }
-
-        /// <summary>
-        /// Execute all the <see cref="IDbJob"/> items in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/> asynchronously.
-        /// <para>Note: The <see cref="DbConnection"/> will be created based on the first provided <see cref="IDbJob"/> item.</para>
-        /// </summary>
-        /// <param name="isolationLevel">The <see cref="IsolationLevel"/> to use. (Optional)</param>
-        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
-        /// <param name="isThrowExceptions">Use to disable the throwing of transactions. (Optional)</param>
-        /// <param name="items">The <see cref="IDbJob"/> items to execute in the same <see cref="DbConnection"/> and <see cref="DbTransaction"/>.</param>
-        /// <returns>The <see cref="List{ValueTuple{List{IDbExecutedModel}, dynamic}}"/> with all the executed results.</returns>
-        public static Task<List<(List<IDbExecutedModel>, dynamic)>> ExecuteAllAsync(
-            IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
-            CancellationToken token = default,
-            bool isThrowExceptions = true,
-            params IDbJob[] items)
-        {
-            return Task.Run(() => ExecuteAll(items, isolationLevel: isolationLevel, token: token, isThrowExceptions: isThrowExceptions), token);
-        }
     }
 }

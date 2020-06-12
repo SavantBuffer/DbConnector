@@ -3,6 +3,7 @@ using DbConnector.Tests.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using Xunit;
 
@@ -303,6 +304,40 @@ namespace DbConnector.Tests
 
             Assert.NotNull(deleteResult);
             Assert.Equal(2, deleteResult);
+        }
+
+        [Fact]
+        public void NonQuery_Simple_Custom_Trasaction()
+        {
+            using (var conn = new SqlConnection(TestBase.ConnectionString))
+            {
+                conn.Open();
+
+                using (var transaction = conn.BeginTransaction())
+                {
+                    var result = _dbConnector.NonQuery(
+                        @"
+                            INSERT INTO [Production].[Location]
+                                ([Name]
+                                ,[CostRate])
+                            VALUES
+                                (@Name
+                                ,@CostRate);
+                            DELETE FROM [Production].[Location] WHERE Name = @Name;
+                        ",
+                        new
+                        {
+                            Name = "4606",
+                            CostRate = 5
+                        }
+                    ).Execute(transaction);
+
+                    Assert.NotNull(result);
+                    Assert.Equal(2, result);
+
+                    transaction.Commit();
+                }
+            }
         }
     }
 }

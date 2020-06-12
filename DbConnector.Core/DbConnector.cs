@@ -450,6 +450,7 @@ namespace DbConnector.Core
                 Type dataType = branchResult.Data.Source.GetType();
                 CancellationToken token = p.Token;
                 MultiReaderBranchCacheModel cacheModel = new MultiReaderBranchCacheModel(dataType, readerType, isWithStateParam);
+                DbConnection connectionNullCache = null;
 
                 if (!DbConnectorCache.MultiReaderBranchCache.TryGetValue(cacheModel, out DynamicDbConnectorMethodBuilder[] methodBuilders))
                 {
@@ -528,11 +529,11 @@ namespace DbConnector.Core
                         //Execute the job
                         if (p.IsDisposable)
                         {
-                            tempTasks.Enqueue(jobItem.ExecuteDisposableAsync(null, token, true));
+                            tempTasks.Enqueue(jobItem.ExecuteDisposableAsync(connectionNullCache, token, true));
                         }
                         else
                         {
-                            tempTasks.Enqueue(jobItem.ExecuteAsync(null, token, true));
+                            tempTasks.Enqueue(jobItem.ExecuteAsync(connectionNullCache, token, true));
                         }
                     }
 
@@ -570,11 +571,11 @@ namespace DbConnector.Core
                         //Execute the job
                         if (p.IsDisposable)
                         {
-                            tempTasks[i] = jobItem.ExecuteDisposableAsync(null, token, true);
+                            tempTasks[i] = jobItem.ExecuteDisposableAsync(connectionNullCache, token, true);
                         }
                         else
                         {
-                            tempTasks[i] = jobItem.ExecuteAsync(null, token, true);
+                            tempTasks[i] = jobItem.ExecuteAsync(connectionNullCache, token, true);
                         }
                     }
 
@@ -715,7 +716,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<T>, TDbConnection>
@@ -731,7 +732,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<T>, TStateParam, TDbConnection>
@@ -762,7 +763,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -778,7 +779,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TStateParam, TDbConnection>
@@ -808,7 +809,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -824,7 +825,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TStateParam, TDbConnection>
@@ -856,7 +857,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -872,7 +873,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TStateParam, TDbConnection>
@@ -903,7 +904,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -919,7 +920,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TStateParam, TDbConnection>
@@ -948,7 +949,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<T>, TDbConnection>
@@ -964,7 +965,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<T>, TStateParam, TDbConnection>
@@ -991,7 +992,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<DataTable, TDbConnection>
@@ -1007,7 +1008,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<DataTable, TStateParam, TDbConnection>
@@ -1032,7 +1033,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             //Load Actions
@@ -1059,6 +1060,7 @@ namespace DbConnector.Core
                         dynamic j = (job as dynamic);
                         bool isWithStateParam = j.IsWithStateParam();
                         CancellationToken token = p.Token;
+                        DbConnection connectionNullCache = null;
 
                         for (int i = 0; actions.Count > 0; i++)
                         {
@@ -1083,11 +1085,11 @@ namespace DbConnector.Core
 
                             if (p.IsDisposable)
                             {
-                                tasks[i] = jobItem.ExecuteDisposableAsync(null, token, true);
+                                tasks[i] = jobItem.ExecuteDisposableAsync(connectionNullCache, token, true);
                             }
                             else
                             {
-                                tasks[i] = jobItem.ExecuteAsync(null, token, true);
+                                tasks[i] = jobItem.ExecuteAsync(connectionNullCache, token, true);
                             }
                         }
                     }
@@ -1118,6 +1120,36 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{HashSet{T}}"/> able to read the first column of each row from the query result based on the <paramref name="onInit"/> action. All other columns are ignored.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default. <see cref="DBNull"/> values will be excluded.
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>
+        /// <returns>The <see cref="IDbJob{HashSet{T}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        /// <exception cref="InvalidCastException">Thrown when <typeparamref name="T"/> is not supported.</exception>
+        public IDbJob<HashSet<T>> ReadToHashSet<T>(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
+            }
+
+            return new DbJob<HashSet<T>, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteReadToHashSet(d, p)
+                );
+        }
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{IEnumerable{List{KeyValuePair{string, object}}}}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>This is usefull when requiring a generic data list from the query result.</para>
         ///  See also:
@@ -1133,7 +1165,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<List<KeyValuePair<string, object>>>, TDbConnection>
@@ -1161,7 +1193,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<IEnumerable<Dictionary<string, object>>, TDbConnection>
@@ -1189,7 +1221,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<List<KeyValuePair<string, object>>>, TDbConnection>
@@ -1217,7 +1249,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<Dictionary<string, object>>, TDbConnection>
@@ -1229,11 +1261,11 @@ namespace DbConnector.Core
                 ).SetOnError((d, e) => new List<Dictionary<string, object>>());
         }
 
-        public IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionariesByState<TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
+        protected internal IDbJob<List<Dictionary<string, object>>> ReadToListOfDictionariesByState<TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<List<Dictionary<string, object>>, TStateParam, TDbConnection>
@@ -1259,7 +1291,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             //Load Actions
@@ -1286,6 +1318,7 @@ namespace DbConnector.Core
                         dynamic j = (job as dynamic);
                         bool isWithStateParam = j.IsWithStateParam();
                         CancellationToken token = p.Token;
+                        DbConnection connectionNullCache = null;
 
                         for (int i = 0; actions.Count > 0; i++)
                         {
@@ -1310,11 +1343,11 @@ namespace DbConnector.Core
 
                             if (p.IsDisposable)
                             {
-                                tasks[i] = jobItem.ExecuteDisposableAsync(null, token, true);
+                                tasks[i] = jobItem.ExecuteDisposableAsync(connectionNullCache, token, true);
                             }
                             else
                             {
-                                tasks[i] = jobItem.ExecuteAsync(null, token, true);
+                                tasks[i] = jobItem.ExecuteAsync(connectionNullCache, token, true);
                             }
                         }
                     }
@@ -1360,12 +1393,12 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             if (onLoad == null)
             {
-                throw new ArgumentNullException("onLoad cannot be null!");
+                throw new ArgumentNullException(nameof(onLoad), "The onLoad delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -1384,9 +1417,9 @@ namespace DbConnector.Core
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row in the result
+        ///  <para>Creates an <see cref="IDbJob{T}"/> to get the first column of the first row from the result
         ///  set returned by the query. All other columns and rows are ignored.</para>
-        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type, or any non-reference type that is not assignable from <see cref="System.Collections.IEnumerable"/> or <see cref="IListSource"/>.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: any .NET built-in type or ADO.NET data provider supported type.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteScalar"/>
         /// </summary>
@@ -1399,18 +1432,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
-            }
-
-            Type tType = typeof(T);
-
-            if (
-                   !DbConnectorUtilities._directTypeMap.Contains(tType)
-                && !(tType.IsValueType && !(typeof(IEnumerable).IsAssignableFrom(tType) || typeof(IListSource).IsAssignableFrom(tType)))
-                && !tType.IsArray
-             )
-            {
-                throw new InvalidCastException("The type " + tType + " is not supported.");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -1424,7 +1446,8 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
-        ///  <para> The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
+        ///  <para>The result will be null if the non-query fails. Otherwise, the result will be the number of rows affected if the non-query ran successfully.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -1435,7 +1458,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<int?, TDbConnection>
@@ -1451,6 +1474,7 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a non-query based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -1462,7 +1486,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -1478,6 +1502,7 @@ namespace DbConnector.Core
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{int?}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
         ///  <para>The result will be null if a non-query fails. Otherwise, the result will be the number of rows affected if all non-queries ran successfully.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -1488,7 +1513,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<int?, TDbConnection>
@@ -1503,6 +1528,7 @@ namespace DbConnector.Core
 
         /// <summary>
         ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute all non-queries based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Note: A <see cref="DbTransaction"/> with <see cref="IsolationLevel.ReadCommitted"/> will be used by default.</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteNonQuery"/>
         /// </summary>
@@ -1513,7 +1539,7 @@ namespace DbConnector.Core
         {
             if (onInit == null)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -1541,12 +1567,12 @@ namespace DbConnector.Core
         {
             if (onInit == null && isCreateDbCommand)
             {
-                throw new ArgumentNullException("onInit cannot be null!");
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
             if (onExecute == null)
             {
-                throw new ArgumentNullException("onExecute cannot be null!");
+                throw new ArgumentNullException(nameof(onExecute), "The onExecute delegate cannot be null!");
             }
 
             return new DbJob<T, TDbConnection>
@@ -1637,6 +1663,14 @@ namespace DbConnector.Core
             p.DeferDisposable(odr);
 
             return odr.ToDataTable(false, p.Token, p.JobCommand.MapSettings);
+        }
+
+        private static HashSet<T> OnExecuteReadToHashSet<T>(HashSet<T> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.ToHashSet<T>(p.Token);
         }
 
         private static IEnumerable<List<KeyValuePair<string, object>>> OnExecuteReadToKeyValuePairs(IEnumerable<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)
@@ -1749,11 +1783,11 @@ namespace DbConnector.Core
         {
             object scalar = p.Command.ExecuteScalar();
 
-            if (scalar != DBNull.Value)
+            if (scalar != null && scalar != DBNull.Value)
             {
-                Type tTypeS = typeof(T);
+                Type tType = typeof(T);
 
-                return (T)(DbConnectorUtilities.ThrowIfFailedToMatchColumnType(tTypeS, (Nullable.GetUnderlyingType(tTypeS) ?? tTypeS), scalar));
+                return (T)(DbConnectorUtilities.ThrowIfFailedToMatchColumnType(tType, (Nullable.GetUnderlyingType(tType) ?? tType), scalar));
             }
             else
             {
