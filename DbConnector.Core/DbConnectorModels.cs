@@ -99,7 +99,7 @@ namespace DbConnector.Core
         ReadSingleOrDefault = 16
     }
 
-    public readonly struct CalculatedDbConnectorFlags
+    internal readonly struct CalculatedDbConnectorFlags
     {
         public readonly bool IsCommandBehaviorOptimization;
 

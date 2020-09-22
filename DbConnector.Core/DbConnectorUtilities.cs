@@ -242,7 +242,7 @@ namespace DbConnector.Core
                     }
 
 
-                    var keyIndex = Array.FindIndex(keys, joinStartIndex, c => !c.IsMapped && c.Name == propColName);
+                    var keyIndex = Array.FindIndex(keys, joinStartIndex, c => !c.IsMapped && string.Equals(c.Name, propColName, StringComparison.OrdinalIgnoreCase));
 
                     if (keyIndex >= 0)
                     {
@@ -280,7 +280,7 @@ namespace DbConnector.Core
         {
             if (settings.Splits.TryGetValue(tType, out string columnName))
             {
-                int splitStartIndex = Array.FindIndex(ordinalColumnMap, c => !c.IsMapped && c.Name == columnName);
+                int splitStartIndex = Array.FindIndex(ordinalColumnMap, c => !c.IsMapped && string.Equals(c.Name, columnName, StringComparison.OrdinalIgnoreCase));
 
                 if (splitStartIndex == -1)
                 {

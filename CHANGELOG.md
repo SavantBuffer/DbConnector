@@ -1,3 +1,8 @@
+# [v1.4.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.4.0)  | Sep 09, 2020
+
+### Features
+ - Property mapping is now case-insensitive for better flexibility.
+
 # [v1.3.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.3.0)  | Jun 11, 2020
 
 ### Bug Fixes
