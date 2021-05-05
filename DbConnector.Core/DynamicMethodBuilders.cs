@@ -72,7 +72,7 @@ namespace DbConnector.Core
         public static readonly FieldInfo _DBNullValue = typeof(DBNull).GetField(nameof(DBNull.Value));
         private static readonly MethodInfo _getValueMethod = typeof(IDataRecord).GetMethod(nameof(IDataRecord.GetValue));
         private static readonly MethodInfo _guidTryParseMethod = typeof(Guid).GetMethod(nameof(Guid.TryParse), new Type[] { typeof(string), typeof(Guid) });
-        private static readonly MethodInfo _enumIsDefined = typeof(Enum).GetMethod(nameof(Enum.IsDefined));
+        private static readonly MethodInfo _enumIsDefined = typeof(Enum).GetMethod(nameof(Enum.IsDefined), new Type[] { typeof(Type), typeof(object) });
 
         private static readonly MethodInfo _iDictionaryIndexerSet = typeof(IDictionary<string, object>).GetMethod("set_Item");
         private static readonly ConstructorInfo _DictionaryCtorByCapacity = typeof(Dictionary<string, object>).GetConstructor(new Type[] { typeof(int) });
