@@ -1,3 +1,12 @@
+# [v1.5.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.5.0)  | Jul 20, 2021
+
+### Bug Fixes
+ - **execution:** Fixed .NET 5.0 `System.Reflection.AmbiguousMatchException` exception.
+
+### Features
+ - Support for `.NET 5.0`.
+
+
 # [v1.4.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.4.0)  | Sep 22, 2020
 
 ### Features
