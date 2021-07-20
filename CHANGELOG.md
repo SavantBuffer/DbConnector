@@ -6,6 +6,9 @@
 ### Features
  - Support for `.NET 5.0`.
 
+### Dependency Updates
+ - System.ComponentModel.Annotations
+
 
 # [v1.4.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.4.0)  | Sep 22, 2020
 
