@@ -96,7 +96,8 @@ namespace DbConnector.Core
         ReadFirst = 2,
         ReadFirstOrDefault = 4,
         ReadSingle = 8,
-        ReadSingleOrDefault = 16
+        ReadSingleOrDefault = 16,
+        ReadAsAsyncEnumerable = 32
     }
 
     internal readonly struct CalculatedDbConnectorFlags

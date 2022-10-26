@@ -76,20 +76,33 @@ namespace DbConnector.Core
             typeof(DataSet)
         };
 
+        internal static bool IsEnumerableOrAsyncEnumerable(Type tType, out bool isAsyncEnumerable)
+        {
+            if (IsEnumerable(tType))
+            {
+                isAsyncEnumerable = false;
+                return true;
+            }
+            else if (IsAsyncEnumerable(tType))
+            {
+                isAsyncEnumerable = true;
+                return true;
+            }
+            else
+            {
+                isAsyncEnumerable = false;
+                return false;
+            }
+        }
 
         internal static bool IsEnumerable(Type tType)
         {
-            if (tType != null && tType.IsInterface)
-            {
-                var interfaces = tType.GetInterfaces();
+            return tType != null && tType.IsInterface && tType.IsGenericType && tType.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+        }
 
-                if (interfaces.Length == 1 && interfaces[0] == typeof(IEnumerable))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+        internal static bool IsAsyncEnumerable(Type tType)
+        {
+            return tType != null && tType.IsInterface && tType.IsGenericType && tType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>);
         }
 
         internal static bool IsColumnNameExcluded(string columnName, bool hasNamesToInclude, bool hasNamesToExclude, IColumnMapSetting settings)

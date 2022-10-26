@@ -18,24 +18,26 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Dynamic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DbConnector.Core.Extensions
 {
     public static partial class DbDataReaderExtensions
     {
         /// <summary>
-        /// Reads data into an <see cref="IEnumerable{T}"/> in a deferred/yielded manner.
+        /// Reads data as <see cref="IAsyncEnumerable{T}"/> in a deferred/yielded manner.
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         /// </summary>
         /// <typeparam name="T">The generic type to use.</typeparam>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
-        /// <returns>The <see cref="IEnumerable{T}"/>.</returns>
+        /// <returns>The <see cref="IAsyncEnumerable{T}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is missing a parameterless constructor.</exception>
         /// <exception cref="System.InvalidCastException">Thrown when <typeparamref name="T"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
-        public static IEnumerable<T> AsEnumerable<T>(this DbDataReader odr, CancellationToken token = default, IDbJobCommand cmd = null)
+        public async static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this DbDataReader odr, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default, IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
             {
@@ -57,7 +59,7 @@ namespace DbConnector.Core.Extensions
 
                         var genericMapper = mapper as DynamicColumnMapper<T>;
 
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -80,7 +82,7 @@ namespace DbConnector.Core.Extensions
 
                         if (tType.IsClass)
                         {
-                            while (odr.Read())
+                            while (await odr.ReadAsync(token))
                             {
                                 if (token.IsCancellationRequested)
                                     yield break;
@@ -90,7 +92,7 @@ namespace DbConnector.Core.Extensions
                         }
                         else
                         {
-                            while (odr.Read())
+                            while (await odr.ReadAsync(token))
                             {
                                 if (token.IsCancellationRequested)
                                     yield break;
@@ -103,7 +105,7 @@ namespace DbConnector.Core.Extensions
                 }
                 else if (tType == typeof(Dictionary<string, object>))
                 {
-                    foreach (var item in odr.AsEnumerableDictionaries(false, token, cmd))
+                    await foreach (var item in odr.AsAsyncEnumerableDictionaries(false, token, cmd))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -113,7 +115,7 @@ namespace DbConnector.Core.Extensions
                 }
                 else if (tType == typeof(List<KeyValuePair<string, object>>))
                 {
-                    foreach (var item in odr.AsEnumerableKeyValuePairs(false, token, cmd))
+                    await foreach (var item in odr.AsAsyncEnumerableKeyValuePairs(false, token, cmd))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -123,15 +125,15 @@ namespace DbConnector.Core.Extensions
                 }
                 else if (tType == typeof(DataTable))
                 {
-                    yield return (T)Convert.ChangeType(odr.ToDataTable(false, token, cmd.MapSettings), tType);
+                    yield return (T)Convert.ChangeType(await odr.ToDataTableAsync(false, token, cmd.MapSettings), tType);
                 }
                 else if (tType == typeof(DataSet))
                 {
-                    yield return (T)Convert.ChangeType(odr.ToDataSet(false, token, cmd.MapSettings), tType);
+                    yield return (T)Convert.ChangeType(await odr.ToDataSetAsync(false, token, cmd.MapSettings), tType);
                 }
                 else if (tType == typeof(object))
                 {
-                    foreach (var item in odr.AsEnumerable(token, cmd))
+                    await foreach (var item in odr.AsAsyncEnumerable(token, cmd))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -143,7 +145,7 @@ namespace DbConnector.Core.Extensions
                 {
                     Type nonNullableObjType = tType.IsValueType ? (Nullable.GetUnderlyingType(tType) ?? tType) : tType;
 
-                    while (odr.Read())
+                    while (await odr.ReadAsync(token))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -164,17 +166,17 @@ namespace DbConnector.Core.Extensions
         }
 
         /// <summary>
-        /// Reads data into an <see cref="IEnumerable{object}"/> in a deferred/yielded manner.
+        /// Reads data as <see cref="IAsyncEnumerable{object}"/> in a deferred/yielded manner.
         /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>        
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="objType">The <see cref="Type"/> to use.</param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
-        /// <returns>The <see cref="IEnumerable{object}"/>.</returns>
+        /// <returns>The <see cref="IAsyncEnumerable{object}"/>.</returns>
         /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is missing a parameterless constructor.</exception>
         /// <exception cref="System.InvalidCastException">Thrown when <paramref name="objType"/> is assignable from <see cref="System.Collections.IEnumerable"/>.</exception>
-        public static IEnumerable<object> AsEnumerable(this DbDataReader odr, Type objType, CancellationToken token = default, IDbJobCommand cmd = null)
+        public async static IAsyncEnumerable<object> AsAsyncEnumerable(this DbDataReader odr, Type objType, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default, IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
             {
@@ -192,7 +194,7 @@ namespace DbConnector.Core.Extensions
                             DbConnectorCache.SetColumnMap(cacheModel, mapper);
                         }
 
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -213,7 +215,7 @@ namespace DbConnector.Core.Extensions
 
                         var columnMaps = odr.GetColumnMaps(objType, cmd?.MapSettings);
 
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -224,7 +226,7 @@ namespace DbConnector.Core.Extensions
                 }
                 else if (objType == typeof(Dictionary<string, object>))
                 {
-                    foreach (var item in odr.AsEnumerableDictionaries(false, token, cmd))
+                    await foreach (var item in odr.AsAsyncEnumerableDictionaries(false, token, cmd))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -234,7 +236,7 @@ namespace DbConnector.Core.Extensions
                 }
                 else if (objType == typeof(List<KeyValuePair<string, object>>))
                 {
-                    foreach (var item in odr.AsEnumerableKeyValuePairs(false, token, cmd))
+                    await foreach (var item in odr.AsAsyncEnumerableKeyValuePairs(false, token, cmd))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -244,17 +246,17 @@ namespace DbConnector.Core.Extensions
                 }
                 if (objType == typeof(DataTable))
                 {
-                    yield return Convert.ChangeType(odr.ToDataTable(false, token, cmd.MapSettings), objType);
+                    yield return Convert.ChangeType(await odr.ToDataTableAsync(false, token, cmd.MapSettings), objType);
                 }
                 else if (objType == typeof(DataSet))
                 {
-                    yield return Convert.ChangeType(odr.ToDataSet(false, token, cmd.MapSettings), objType);
+                    yield return Convert.ChangeType(await odr.ToDataSetAsync(false, token, cmd.MapSettings), objType);
                 }
                 else
                 {
                     Type nonNullableObjType = objType.IsValueType ? (Nullable.GetUnderlyingType(objType) ?? objType) : objType;
 
-                    while (odr.Read())
+                    while (await odr.ReadAsync(token))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -279,13 +281,13 @@ namespace DbConnector.Core.Extensions
         }
 
         /// <summary>
-        /// Reads data into an <see cref="IEnumerable{dynamic}"/> in a deferred/yielded manner.
+        /// Reads data as <see cref="IAsyncEnumerable{dynamic}"/> in a deferred/yielded manner.
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
-        /// <returns>The <see cref="IEnumerable{dynamic}"/>.</returns>
-        public static IEnumerable<dynamic> AsEnumerable(this DbDataReader odr, CancellationToken token = default, IDbJobCommand cmd = null)
+        /// <returns>The <see cref="IAsyncEnumerable{dynamic}"/>.</returns>
+        public async static IAsyncEnumerable<dynamic> AsAsyncEnumerable(this DbDataReader odr, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default, IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
             {
@@ -309,7 +311,7 @@ namespace DbConnector.Core.Extensions
                         }
                     }
 
-                    while (odr.Read())
+                    while (await odr.ReadAsync(token))
                     {
                         if (token.IsCancellationRequested)
                             yield break;
@@ -323,7 +325,7 @@ namespace DbConnector.Core.Extensions
 
                     if (ordinalColumnMap?.Length > 0)
                     {
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -336,17 +338,17 @@ namespace DbConnector.Core.Extensions
         }
 
         /// <summary>
-        /// Reads data into an <see cref="IEnumerable{List{KeyValuePair{string, object}}}"/> in a deferred/yielded manner.
+        /// Reads data as <see cref="IAsyncEnumerable{List{KeyValuePair{string, object}}}"/> in a deferred/yielded manner.
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="isFirstResult">Set to true if only the first row should be loaded.</param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
-        /// <returns>The <see cref="IEnumerable{List{KeyValuePair{string, object}}}"/>.</returns>
-        public static IEnumerable<List<KeyValuePair<string, object>>> AsEnumerableKeyValuePairs(
+        /// <returns>The <see cref="IAsyncEnumerable{List{KeyValuePair{string, object}}}"/>.</returns>
+        public async static IAsyncEnumerable<List<KeyValuePair<string, object>>> AsAsyncEnumerableKeyValuePairs(
             this DbDataReader odr,
             bool isFirstResult,
-            CancellationToken token = default,
+            [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default,
             IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
@@ -380,14 +382,14 @@ namespace DbConnector.Core.Extensions
 
                     if (isFirstResult)
                     {
-                        if (odr.Read())
+                        if (await odr.ReadAsync(token))
                         {
                             yield return genericMapper.OnBuild(odr);
                         }
                     }
                     else
                     {
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -404,7 +406,7 @@ namespace DbConnector.Core.Extensions
                     {
                         if (isFirstResult)
                         {
-                            if (odr.Read())
+                            if (await odr.ReadAsync(token))
                             {
                                 var row = new List<KeyValuePair<string, object>>(ordinalColumnMap.Length);
 
@@ -419,7 +421,7 @@ namespace DbConnector.Core.Extensions
                         }
                         else
                         {
-                            while (odr.Read())
+                            while (await odr.ReadAsync(token))
                             {
                                 if (token.IsCancellationRequested)
                                     yield break;
@@ -441,17 +443,17 @@ namespace DbConnector.Core.Extensions
         }
 
         /// <summary>
-        /// Reads data into an <see cref="IEnumerable{Dictionary{string, object}}"/> in a deferred/yielded manner.
+        /// Reads data as <see cref="IAsyncEnumerable{Dictionary{string, object}}"/> in a deferred/yielded manner.
         /// </summary>
         /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
         /// <param name="isFirstResult">Set to true if only the first row should be loaded.</param>
         /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
         /// <param name="cmd">The <see cref="IDbJobCommand"/> to use for data projection and caching. (Optional)</param>
-        /// <returns>The <see cref="IEnumerable{Dictionary{string, object}}"/>.</returns>
-        public static IEnumerable<Dictionary<string, object>> AsEnumerableDictionaries(
+        /// <returns>The <see cref="IAsyncEnumerable{Dictionary{string, object}}"/>.</returns>
+        public async static IAsyncEnumerable<Dictionary<string, object>> AsAsyncEnumerableDictionaries(
             this DbDataReader odr,
             bool isFirstResult,
-            CancellationToken token = default,
+            [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default,
             IDbJobCommand cmd = null)
         {
             if (odr.HasRows)
@@ -485,14 +487,14 @@ namespace DbConnector.Core.Extensions
 
                     if (isFirstResult)
                     {
-                        if (odr.Read())
+                        if (await odr.ReadAsync(token))
                         {
                             yield return genericMapper.OnBuild(odr);
                         }
                     }
                     else
                     {
-                        while (odr.Read())
+                        while (await odr.ReadAsync(token))
                         {
                             if (token.IsCancellationRequested)
                                 yield break;
@@ -509,7 +511,7 @@ namespace DbConnector.Core.Extensions
                     {
                         if (isFirstResult)
                         {
-                            if (odr.Read())
+                            if (await odr.ReadAsync(token))
                             {
                                 var row = new Dictionary<string, object>(ordinalColumnMap.Length);
 
@@ -524,7 +526,7 @@ namespace DbConnector.Core.Extensions
                         }
                         else
                         {
-                            while (odr.Read())
+                            while (await odr.ReadAsync(token))
                             {
                                 if (token.IsCancellationRequested)
                                     yield break;
@@ -544,5 +546,6 @@ namespace DbConnector.Core.Extensions
                 }
             }
         }
+
     }
 }

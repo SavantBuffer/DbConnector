@@ -36,6 +36,25 @@ namespace DbConnector.Core
         IDbJob<IEnumerable<dynamic>> Read(Action<IDbJobCommand> onInit);
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{IAsyncEnumerable{dynamic}}"/> able to execute a reader, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>   
+        ///  <para>Use this to dynamically load the query results into an IAsyncEnumerable of <see cref="System.Dynamic.ExpandoObject"/>.</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>        
+        /// <returns>The <see cref="IDbJob{IAsyncEnumerable{dynamic}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        IDbJob<IAsyncEnumerable<dynamic>> ReadAsAsyncEnumerable(Action<IDbJobCommand> onInit);
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{dynamic}"/> able to execute a reader based on the <paramref name="onInit"/> action.</para>
         ///  <para>Use this to dynamically load only the first row from the query result into a <see cref="System.Dynamic.ExpandoObject"/>.</para>        
         ///  See also:

@@ -68,6 +68,62 @@ namespace DbConnector.Core
             CommandType commandType = CommandType.Text);
 
         /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{IAsyncEnumerable{T}}"/> able to execute a reader, with an un-buffered (deferred/yielded) approach, based on the configured parameters.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="mapSettings">The <see cref="IColumnMapSetting"/> to use.</param> 
+        /// <param name="sql">The query text command to run against the data source.</param>
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param> 
+        /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use. (Optional)</param> 
+        /// <param name="commandTimeout">The time in seconds to wait for the command to execute. (Optional)</param> 
+        /// <param name="flags">The flags to use. (Optional)</param> 
+        /// <returns>The <see cref="IDbJob{IAsyncEnumerable{T}}"/>.</returns>
+        IDbJob<IAsyncEnumerable<T>> ReadAsAsyncEnumerable<T>(
+            IColumnMapSetting mapSettings,
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text,
+            CommandBehavior? commandBehavior = null,
+            int? commandTimeout = null,
+            DbJobCommandFlags flags = DbJobCommandFlags.None);
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{IAsyncEnumerable{T}}"/> able to execute a reader, with an un-buffered (deferred/yielded) approach, based on the configured parameters.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the single result.</typeparam>
+        /// <param name="sql">The query text command to run against the data source.</param>        
+        /// <param name="param">The parameter to use. <see cref="DbJobParameterCollection.AddFor(object, bool, string, string)"/> restrictions apply. (Optional)</param> 
+        /// <param name="commandType">The <see cref="CommandType"/> to use. (Optional)</param>
+        /// <returns>The <see cref="IDbJob{IAsyncEnumerable{T}}"/>.</returns>
+        IDbJob<IAsyncEnumerable<T>> ReadAsAsyncEnumerable<T>(
+            string sql,
+            object param = null,
+            CommandType commandType = CommandType.Text);
+
+        /// <summary>
         ///  <para>Creates an <see cref="IDbJob{T}"/> able to execute a reader based on the configured parameters.</para>
         ///  <para>Use this to load only the first row from the query into a result of <typeparamref name="T"/>.</para>
         ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>

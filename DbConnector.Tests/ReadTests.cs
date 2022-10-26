@@ -163,6 +163,167 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadAsAsyncEnumerable()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            }).Execute().ToListAsync().Result;
+
+            Assert.Equal(3, result.Count);
+
+            var values = (result as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public async void ReadAsAsyncEnumerable_Async()
+        {
+            var result = (await _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            }).ExecuteAsync()).ToListAsync().Result;
+
+            Assert.Equal(3, result.Count);
+
+            var values = (result as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void ReadAsAsyncEnumerable_Handled()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            }).ExecuteHandled();
+
+            var data = result.Data.ToListAsync().Result;
+
+            Assert.Equal(3, data.Count());
+
+            var values = (data as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public async void ReadAsAsyncEnumerable_HandledAsync()
+        {
+            using (var conn = new SqlConnection(ConnectionString))
+            {
+                var result = (await _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+                {
+                    cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+                }).ExecuteHandledAsync(conn)).Data.ToListAsync().Result;
+
+                Assert.Equal(3, result.Count());
+
+                var values = result;
+
+                Assert.Equal("AED", values[0].CurrencyCode);
+                Assert.Equal("AFA", values[1].CurrencyCode);
+                Assert.Equal("ALL", values[2].CurrencyCode);
+            }
+        }
+
+        [Fact]
+        public void ReadAsAsyncEnumerable_Disposable()
+        {
+            IDbJob<IAsyncEnumerable<Currency>> job = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            });
+
+            using (IDbDisposable<IAsyncEnumerable<Currency>> result = job.ExecuteDisposable())
+            {
+                var source = result.Source.ToListAsync().Result;
+
+                Assert.Equal(3, source.Count());
+
+                var values = source;
+
+                Assert.Equal("AED", values[0].CurrencyCode);
+                Assert.Equal("AFA", values[1].CurrencyCode);
+                Assert.Equal("ALL", values[2].CurrencyCode);
+            }
+        }
+
+        [Fact]
+        public async void ReadAsAsyncEnumerable_DispoableAsync()
+        {
+            IDbJob<IAsyncEnumerable<Currency>> job = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            });
+
+            using (IDbDisposable<IAsyncEnumerable<Currency>> result = await job.ExecuteDisposableAsync())
+            {
+                var source = result.Source.ToListAsync().Result;
+
+                Assert.Equal(3, source.Count());
+
+                var values = source;
+
+                Assert.Equal("AED", values[0].CurrencyCode);
+                Assert.Equal("AFA", values[1].CurrencyCode);
+                Assert.Equal("ALL", values[2].CurrencyCode);
+            }
+        }
+
+        [Fact]
+        public void ReadAsAsyncEnumerable_DispoableHandled()
+        {
+            IDbJob<IAsyncEnumerable<Currency>> job = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            });
+
+            using (IDbDisposable<IAsyncEnumerable<Currency>> result = job.ExecuteDisposableHandled().Data)
+            {
+                var source = result.Source.ToListAsync().Result;
+
+                Assert.Equal(3, source.Count());
+
+                var values = source;
+
+                Assert.Equal("AED", values[0].CurrencyCode);
+                Assert.Equal("AFA", values[1].CurrencyCode);
+                Assert.Equal("ALL", values[2].CurrencyCode);
+            }
+        }
+
+        [Fact]
+        public async void ReadAsAsyncEnumerable_DispoableHandledAsync()
+        {
+            IDbJob<IAsyncEnumerable<Currency>> job = _dbConnector.ReadAsAsyncEnumerable<Currency>((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            });
+
+            using (IDbDisposable<IAsyncEnumerable<Currency>> result = (await job.ExecuteDisposableHandledAsync()).Data)
+            {
+                var source = result.Source.ToListAsync().Result;
+
+                Assert.Equal(3, source.Count());
+
+                var values = source;
+
+                Assert.Equal("AED", values[0].CurrencyCode);
+                Assert.Equal("AFA", values[1].CurrencyCode);
+                Assert.Equal("ALL", values[2].CurrencyCode);
+            }
+        }
+
+        [Fact]
         public void ReadFirst()
         {
             var result = _dbConnector.ReadFirst<Currency>((cmd) =>

@@ -457,7 +457,7 @@ namespace DbConnector.Core
                     var tempTasks = new Queue<Task>(8);
                     var tempMethodBuilders = new Queue<DynamicDbConnectorMethodBuilder>();
                     Type dcType = GetType();
-                    bool isEnumerable = (readerType == MultiReaderTypes.Read || readerType == MultiReaderTypes.ReadToList);
+                    bool isEnumerable = (readerType == MultiReaderTypes.Read || readerType == MultiReaderTypes.ReadToList || readerType == MultiReaderTypes.ReadAsAsyncEnumerable);
                     string methodName = Enum.GetName(typeof(MultiReaderTypes), readerType);
 
                     //Get the method
@@ -728,6 +728,40 @@ namespace DbConnector.Core
                 ).SetOnError((d, e) => Enumerable.Empty<T>());
         }
 
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{IAsyncEnumerable{T}}"/> able to execute a reader, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Valid <typeparamref name="T"/> types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <typeparam name="T">The element type to use for the result.</typeparam>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>        
+        /// <returns>The <see cref="IDbJob{IAsyncEnumerable{T}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<IAsyncEnumerable<T>> ReadAsAsyncEnumerable<T>(Action<IDbJobCommand> onInit)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
+            }
+
+            return new DbJob<IAsyncEnumerable<T>, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(d, p)
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithBuffering(false);
+        }
+
         protected internal IDbJob<IEnumerable<T>> ReadByState<T, TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
         {
             if (onInit == null)
@@ -742,6 +776,22 @@ namespace DbConnector.Core
                     onCommands: (conn, state) => BuildJobCommand(conn, state), //https://github.com/dotnet/roslyn/issues/5835
                     onExecute: (d, p) => OnExecuteRead(d, p)
                 ).SetOnError((d, e) => Enumerable.Empty<T>());
+        }
+
+        protected internal IDbJob<IAsyncEnumerable<T>> ReadAsAsyncEnumerableByState<T, TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
+        {
+            if (onInit == null)
+            {
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
+            }
+
+            return new DbJob<IAsyncEnumerable<T>, TStateParam, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState<TStateParam> { Flags = _flags, OnInit = onInit, StateParam = stateParam },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state), //https://github.com/dotnet/roslyn/issues/5835
+                    onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(d, p)
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithBuffering(false);
         }
 
         /// <summary>
@@ -1614,7 +1664,15 @@ namespace DbConnector.Core
             p.DeferDisposable(odr);
 
             return p.IsBuffered ? odr.ToList<T>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T>(p.Token, p.JobCommand);
+        }
+
+        private static IAsyncEnumerable<T> OnExecuteReadAsAsyncEnumerable<T>(IAsyncEnumerable<T> d, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.AsAsyncEnumerable<T>(p.Token, p.JobCommand);
         }
 
         private static T OnExecuteReadFirst<T>(T d, IDbExecutionModel p)
@@ -1678,7 +1736,7 @@ namespace DbConnector.Core
             DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
             p.DeferDisposable(odr);
 
-            return p.IsBuffered ? odr.ToKeyValuePairs(false, p.Token, p.JobCommand) : odr.ToEnumerableKeyValuePairs(false, p.Token, p.JobCommand);
+            return p.IsBuffered ? odr.ToKeyValuePairs(false, p.Token, p.JobCommand) : odr.AsEnumerableKeyValuePairs(false, p.Token, p.JobCommand);
         }
 
         private static IEnumerable<Dictionary<string, object>> OnExecuteReadToDictionaries(IEnumerable<Dictionary<string, object>> d, IDbExecutionModel p)
@@ -1686,7 +1744,7 @@ namespace DbConnector.Core
             DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
             p.DeferDisposable(odr);
 
-            return p.IsBuffered ? odr.ToDictionaries(false, p.Token, p.JobCommand) : odr.ToEnumerableDictionaries(false, p.Token, p.JobCommand);
+            return p.IsBuffered ? odr.ToDictionaries(false, p.Token, p.JobCommand) : odr.AsEnumerableDictionaries(false, p.Token, p.JobCommand);
         }
 
         private static List<List<KeyValuePair<string, object>>> OnExecuteReadToListOfKeyValuePairs(List<List<KeyValuePair<string, object>>> d, IDbExecutionModel p)

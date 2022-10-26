@@ -25,19 +25,24 @@ namespace DbConnector.Core
        where TDbConnection : DbConnection
     {
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>)> Read<T1, T2>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>)> ReadAsAsyncEnumerable<T1, T2>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -45,7 +50,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 2 },
@@ -58,12 +63,10 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -72,38 +75,43 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>)> Read<T1, T2, T3>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>)> ReadAsAsyncEnumerable<T1, T2, T3>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -111,7 +119,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 3 },
@@ -124,16 +132,13 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -142,39 +147,44 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>)> Read<T1, T2, T3, T4>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>)> ReadAsAsyncEnumerable<T1, T2, T3, T4>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -182,7 +192,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 4 },
@@ -195,20 +205,16 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             case 4:
-                                d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
+                                d.Item4 = odr.AsAsyncEnumerable<T4>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -217,40 +223,45 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>(), AsyncEnumerable.Empty<T4>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2,
-                        (IEnumerable<T4>)data[3].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2,
+                        (IAsyncEnumerable<T4>)data[3].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>)> Read<T1, T2, T3, T4, T5>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>)> ReadAsAsyncEnumerable<T1, T2, T3, T4, T5>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -258,7 +269,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 5 },
@@ -271,24 +282,19 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             case 4:
-                                d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
+                                d.Item4 = odr.AsAsyncEnumerable<T4>(p.Token, p.JobCommand);
                                 break;
                             case 5:
-                                d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
+                                d.Item5 = odr.AsAsyncEnumerable<T5>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -297,41 +303,46 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>(), AsyncEnumerable.Empty<T4>(), AsyncEnumerable.Empty<T5>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2,
-                        (IEnumerable<T4>)data[3].Item2,
-                        (IEnumerable<T5>)data[4].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2,
+                        (IAsyncEnumerable<T4>)data[3].Item2,
+                        (IAsyncEnumerable<T5>)data[4].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>)> Read<T1, T2, T3, T4, T5, T6>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>)> ReadAsAsyncEnumerable<T1, T2, T3, T4, T5, T6>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -339,7 +350,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 6 },
@@ -352,28 +363,22 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             case 4:
-                                d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
+                                d.Item4 = odr.AsAsyncEnumerable<T4>(p.Token, p.JobCommand);
                                 break;
                             case 5:
-                                d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
+                                d.Item5 = odr.AsAsyncEnumerable<T5>(p.Token, p.JobCommand);
                                 break;
                             case 6:
-                                d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
+                                d.Item6 = odr.AsAsyncEnumerable<T6>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -382,42 +387,47 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>(), AsyncEnumerable.Empty<T4>(), AsyncEnumerable.Empty<T5>(), AsyncEnumerable.Empty<T6>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2,
-                        (IEnumerable<T4>)data[3].Item2,
-                        (IEnumerable<T5>)data[4].Item2,
-                        (IEnumerable<T6>)data[5].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2,
+                        (IAsyncEnumerable<T4>)data[3].Item2,
+                        (IAsyncEnumerable<T5>)data[4].Item2,
+                        (IAsyncEnumerable<T6>)data[5].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>)> Read<T1, T2, T3, T4, T5, T6, T7>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>, IAsyncEnumerable<T7>)> ReadAsAsyncEnumerable<T1, T2, T3, T4, T5, T6, T7>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -425,7 +435,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>, IAsyncEnumerable<T7>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 7 },
@@ -438,32 +448,25 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             case 4:
-                                d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
+                                d.Item4 = odr.AsAsyncEnumerable<T4>(p.Token, p.JobCommand);
                                 break;
                             case 5:
-                                d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
+                                d.Item5 = odr.AsAsyncEnumerable<T5>(p.Token, p.JobCommand);
                                 break;
                             case 6:
-                                d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
+                                d.Item6 = odr.AsAsyncEnumerable<T6>(p.Token, p.JobCommand);
                                 break;
                             case 7:
-                                d.Item7 = p.IsBuffered ? odr.ToList<T7>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T7>(p.Token, p.JobCommand);
+                                d.Item7 = odr.AsAsyncEnumerable<T7>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -472,43 +475,48 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>(), AsyncEnumerable.Empty<T4>(), AsyncEnumerable.Empty<T5>(), AsyncEnumerable.Empty<T6>(), AsyncEnumerable.Empty<T7>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2,
-                        (IEnumerable<T4>)data[3].Item2,
-                        (IEnumerable<T5>)data[4].Item2,
-                        (IEnumerable<T6>)data[5].Item2,
-                        (IEnumerable<T7>)data[6].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2,
+                        (IAsyncEnumerable<T4>)data[3].Item2,
+                        (IAsyncEnumerable<T5>)data[4].Item2,
+                        (IAsyncEnumerable<T6>)data[5].Item2,
+                        (IAsyncEnumerable<T7>)data[6].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
 
         /// <summary>
-        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers based on the <paramref name="onInit"/> action.</para>
+        ///  <para>Creates an <see cref="IDbJob"/> able to execute readers, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
         ///  <para>Valid T types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
         ///  See also:
         ///  <seealso cref="DbCommand.ExecuteReader()"/>
         /// </summary>
         /// <remarks>
-        /// This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
         /// </remarks>       
         /// <param name="onInit">Func delegate that is used to configure all the <see cref="IDbJobCommand"/>.</param>      
         /// <param name="withIsolatedConnections">By default, one database connection per command will be created/opened thus potentially returning a faster result. See also: <see cref="DbConnectorFlags.NoIsolatedConnectionPerCommand"/>. (Optional)</param> 
         /// <returns>The <see cref="IDbJob"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
-        public IDbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>, IEnumerable<T8>)> Read<T1, T2, T3, T4, T5, T6, T7, T8>(
+        public IDbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>, IAsyncEnumerable<T7>, IAsyncEnumerable<T8>)> ReadAsAsyncEnumerable<T1, T2, T3, T4, T5, T6, T7, T8>(
             Func<(Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>, Action<IDbJobCommand>)> onInit, bool? withIsolatedConnections = null)
         {
             if (onInit == null)
@@ -516,7 +524,7 @@ namespace DbConnector.Core
                 throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
             }
 
-            return new DbJob<(IEnumerable<T1>, IEnumerable<T2>, IEnumerable<T3>, IEnumerable<T4>, IEnumerable<T5>, IEnumerable<T6>, IEnumerable<T7>, IEnumerable<T8>), TDbConnection>
+            return new DbJob<(IAsyncEnumerable<T1>, IAsyncEnumerable<T2>, IAsyncEnumerable<T3>, IAsyncEnumerable<T4>, IAsyncEnumerable<T5>, IAsyncEnumerable<T6>, IAsyncEnumerable<T7>, IAsyncEnumerable<T8>), TDbConnection>
                 (
                     setting: _jobSetting,
                     state: new DbConnectorDynamicState { Flags = _flags, OnInit = onInit, Count = 8 },
@@ -529,36 +537,28 @@ namespace DbConnector.Core
                         switch ((p.Index + 1))
                         {
                             case 1:
-                                d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
+                                d.Item1 = odr.AsAsyncEnumerable<T1>(p.Token, p.JobCommand);
                                 break;
                             case 2:
-                                d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
+                                d.Item2 = odr.AsAsyncEnumerable<T2>(p.Token, p.JobCommand);
                                 break;
                             case 3:
-                                d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
+                                d.Item3 = odr.AsAsyncEnumerable<T3>(p.Token, p.JobCommand);
                                 break;
                             case 4:
-                                d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
+                                d.Item4 = odr.AsAsyncEnumerable<T4>(p.Token, p.JobCommand);
                                 break;
                             case 5:
-                                d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
+                                d.Item5 = odr.AsAsyncEnumerable<T5>(p.Token, p.JobCommand);
                                 break;
                             case 6:
-                                d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
+                                d.Item6 = odr.AsAsyncEnumerable<T6>(p.Token, p.JobCommand);
                                 break;
                             case 7:
-                                d.Item7 = p.IsBuffered ? odr.ToList<T7>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T7>(p.Token, p.JobCommand);
+                                d.Item7 = odr.AsAsyncEnumerable<T7>(p.Token, p.JobCommand);
                                 break;
                             case 8:
-                                d.Item8 = p.IsBuffered ? odr.ToList<T8>(p.Token, p.JobCommand)
-                                        : odr.AsEnumerable<T8>(p.Token, p.JobCommand);
+                                d.Item8 = odr.AsAsyncEnumerable<T8>(p.Token, p.JobCommand);
                                 break;
                             default:
                                 break;
@@ -567,28 +567,28 @@ namespace DbConnector.Core
                         return d;
                     }
                 )
-                .SetOnError((d, e) => (Enumerable.Empty<T1>(), Enumerable.Empty<T2>(), Enumerable.Empty<T3>(), Enumerable.Empty<T4>(), Enumerable.Empty<T5>(), Enumerable.Empty<T6>(), Enumerable.Empty<T7>(), Enumerable.Empty<T8>()))
+                .SetOnError((d, e) => (AsyncEnumerable.Empty<T1>(), AsyncEnumerable.Empty<T2>(), AsyncEnumerable.Empty<T3>(), AsyncEnumerable.Empty<T4>(), AsyncEnumerable.Empty<T5>(), AsyncEnumerable.Empty<T6>(), AsyncEnumerable.Empty<T7>(), AsyncEnumerable.Empty<T8>()))
                 .WithIsolatedConnections(_flags.IsIsolatedConnectionPerCommand ? (withIsolatedConnections ?? true) : false)
                 .OnBranch((d, p, job) =>
                 {
                     var stateParam = p.JobState as DbConnectorDynamicState;
-                    var data = OnBranchMultiReader(MultiReaderTypes.Read, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
+                    var data = OnBranchMultiReader(MultiReaderTypes.ReadAsAsyncEnumerable, ref d, p, job, GetMultiReaderActions(stateParam.Count, stateParam.OnInit));
 
                     d.Data.Source = (
-                        (IEnumerable<T1>)data[0].Item2,
-                        (IEnumerable<T2>)data[1].Item2,
-                        (IEnumerable<T3>)data[2].Item2,
-                        (IEnumerable<T4>)data[3].Item2,
-                        (IEnumerable<T5>)data[4].Item2,
-                        (IEnumerable<T6>)data[5].Item2,
-                        (IEnumerable<T7>)data[6].Item2,
-                        (IEnumerable<T8>)data[7].Item2
+                        (IAsyncEnumerable<T1>)data[0].Item2,
+                        (IAsyncEnumerable<T2>)data[1].Item2,
+                        (IAsyncEnumerable<T3>)data[2].Item2,
+                        (IAsyncEnumerable<T4>)data[3].Item2,
+                        (IAsyncEnumerable<T5>)data[4].Item2,
+                        (IAsyncEnumerable<T6>)data[5].Item2,
+                        (IAsyncEnumerable<T7>)data[6].Item2,
+                        (IAsyncEnumerable<T8>)data[7].Item2
                     );
 
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                });
+                }).WithBuffering(false);
         }
     }
 }

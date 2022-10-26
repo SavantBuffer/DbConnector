@@ -201,15 +201,15 @@ namespace DbConnector.Core
             }
 
 
-            if (_isDeferredExecution && DbConnectorUtilities.IsEnumerable(typeof(T)))
+            if (_isDeferredExecution && DbConnectorUtilities.IsEnumerableOrAsyncEnumerable(typeof(T), out bool isAsyncEnumerable))
             {
                 Type dbJobType = GetType();
 
-                DbJobCacheModel cacheModel = new DbJobCacheModel(dbJobType, "ExecuteDeferred");
+                DbJobCacheModel cacheModel = new DbJobCacheModel(dbJobType, (isAsyncEnumerable ? nameof(this.ExecuteDeferredAsync) : nameof(this.ExecuteDeferred)));
 
                 if (!DbConnectorCache.DbJobCache.TryGetValue(cacheModel, out Func<IDbJob, DbConnection, DbTransaction, CancellationToken, IDbJobState, dynamic> onExecuteDeferred))
                 {
-                    MethodInfo mi = dbJobType.GetMethod(nameof(this.ExecuteDeferred), BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo mi = dbJobType.GetMethod((isAsyncEnumerable ? nameof(this.ExecuteDeferredAsync) : nameof(this.ExecuteDeferred)), BindingFlags.NonPublic | BindingFlags.Instance);
                     MethodInfo genericExecuteDeferred = mi.MakeGenericMethod(typeof(T).GetGenericArguments().Single());
 
                     onExecuteDeferred = DynamicDbJobMethodBuilder.CreateBuilderFunction(dbJobType, genericExecuteDeferred);
@@ -384,7 +384,6 @@ namespace DbConnector.Core
             DbConnection conn = null;
             DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
-            bool isTransactionCommitted = false;
             bool wasConnectionClosed = false;
 
             try
@@ -486,36 +485,189 @@ namespace DbConnector.Core
                         }
                     }
                 }
-
-                if (transaction != null && externalTransaction == null)
+            }
+            finally
+            {
+                try
                 {
-                    transaction.Commit();
-                    isTransactionCommitted = true;
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Commit();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (_isCreateDbCommand && dbJobCommands != null)
+                    {
+                        for (int x = 0; x < dbJobCommands.Length; x++)
+                        {
+                            dbJobCommands[x]?.GetDbCommand()?.Dispose();
+                        }
+                    }
+
+                    ex.Log(_settings.Logger, false);
+
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Rollback();
+                    }
+
+                    throw;
+                }
+                finally
+                {
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Dispose();
+                    }
+
+                    if (connection == null && conn != null)
+                    {
+                        conn.Dispose();
+                    }
+                    else if (wasConnectionClosed && connection != null && conn != null)
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        internal async IAsyncEnumerable<TChild> ExecuteDeferredAsync<TChild>(DbConnection connection, DbTransaction externalTransaction, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken, IDbJobState state)
+        {
+            dynamic result = null;
+            DbConnection conn = null;
+            DbTransaction transaction = externalTransaction;
+            IDbJobCommand[] dbJobCommands = null;
+            bool wasConnectionClosed = false;
+
+            try
+            {
+                //Set connection
+                conn = connection ?? CreateConnectionInstance();
+                if (connection == null)
+                {
+                    conn.ConnectionString = _settings.ConnectionString;
+                }
+
+
+                //Set settings and commands.
+                dbJobCommands = _isCreateDbCommand ? _onCommands(conn, state) : new IDbJobCommand[] { null };
+
+                if (dbJobCommands == null)
+                {
+                    dbJobCommands = new IDbJobCommand[] { _isCreateDbCommand ? CreateDbJobCommand(conn.CreateCommand(), state) : null };
+                }
+
+
+                if (connection == null || conn.State == ConnectionState.Closed)
+                {
+                    wasConnectionClosed = true;
+                    await conn.OpenAsync(cancellationToken);
+                }
+
+
+                //Set transaction
+                if (_isolationLevel.HasValue && externalTransaction == null)
+                {
+                    transaction = conn.BeginTransaction(_isolationLevel.Value);
+                }
+                Queue<IDisposable> commands = (_isCreateDbCommand) ? new Queue<IDisposable>(dbJobCommands.Length) : null;
+                DbExecutionModel eParam = CreateDbExecutionModel(false, false, conn, transaction, state, cancellationToken);
+
+                eParam.DeferrableDisposables = new Queue<IDisposable>(dbJobCommands.Length);
+
+                var deferrableDisposablesQueue = eParam.DeferrableDisposables;
+
+                try
+                {
+                    for (int i = 0; i < dbJobCommands.Length; i++)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            yield break;
+
+                        DbCommand cmd = null;
+                        var jCommand = dbJobCommands[i];
+
+                        eParam.Index = i;
+                        eParam.Command = null;
+                        eParam.JobCommand = jCommand;
+
+                        if (_isCreateDbCommand)
+                        {
+                            eParam.Command = cmd = jCommand.GetDbCommand();
+                            cmd.Connection = conn;
+                            cmd.Transaction = transaction;
+                            commands.Enqueue(cmd);
+
+                            if (!_isCacheEnabled)
+                            {
+                                jCommand.Flags |= DbJobCommandFlags.NoCache;
+                            }
+                        }
+
+                        result = _onExecute(result, eParam);
+
+                        if (_onExecuted != null)
+                        {
+                            eParam.Parameters = cmd?.Parameters;
+
+                            result = _onExecuted(result, eParam.CreateExecutedModel());
+                        }
+                    }
+
+
+                    if (result != null)
+                    {
+                        var resultAsAsyncEnumerable = result as IAsyncEnumerable<TChild>;
+
+                        await foreach (var item in resultAsAsyncEnumerable)
+                        {
+                            yield return item;
+                        }
+                    }
+                }
+                finally
+                {
+                    while (deferrableDisposablesQueue.Count != 0)
+                    {
+                        deferrableDisposablesQueue.Dequeue()?.Dispose();
+                    }
+
+                    if (commands != null)
+                    {
+                        while (commands.Count != 0)
+                        {
+                            commands.Dequeue()?.Dispose();
+                        }
+                    }
                 }
             }
             finally
             {
                 try
                 {
-                    if (!isTransactionCommitted)
+                    if (transaction != null && externalTransaction == null)
                     {
-                        if (_isCreateDbCommand && dbJobCommands != null)
-                        {
-                            for (int x = 0; x < dbJobCommands.Length; x++)
-                            {
-                                dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                            }
-                        }
-
-                        if (transaction != null && externalTransaction == null)
-                        {
-                            transaction.Rollback();
-                        }
+                        transaction.Commit();
                     }
                 }
                 catch (Exception ex)
                 {
+                    if (_isCreateDbCommand && dbJobCommands != null)
+                    {
+                        for (int x = 0; x < dbJobCommands.Length; x++)
+                        {
+                            dbJobCommands[x]?.GetDbCommand()?.Dispose();
+                        }
+                    }
+
                     ex.Log(_settings.Logger, false);
+
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Rollback();
+                    }
 
                     throw;
                 }
@@ -814,7 +966,7 @@ namespace DbConnector.Core
 
                     if (connection == null || conn.State == ConnectionState.Closed)
                     {
-                        result.WasConnectionClosed = connection != null ? true : false;
+                        result.WasConnectionClosed = connection != null;
                         conn.Open();
                     }
 
@@ -1192,9 +1344,15 @@ namespace DbConnector.Core
 
         /// <summary>
         /// <para>Use this function to disable or enable buffered (non-deferred/non-yielded) execution when reading data (this is enabled by default).</para>
-        /// <para>Note: Deferred execution is only possible for <see cref="System.Collections.IEnumerable"/> types during individual transactions. Consequently, normal execution will be used when encountering non <see cref="System.Collections.IEnumerable"/> types or Batch-Reading implementations.</para>
-        /// Warning: Exceptions may occur while looping deferred <see cref="System.Collections.IEnumerable"/> types because of the implicit database connection dependency.
+        /// <para>Note: The use of deferred execution is only possible for <see cref="System.Collections.IEnumerable"/> types during individual transactions. Normal execution will be used when encountering non <see cref="System.Collections.IEnumerable"/> types or Batch-Reading implementations.</para>
         /// </summary>
+        /// <remarks>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="System.Collections.IEnumerable"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="Enumerable.ToList{TSource}(IEnumerable{TSource})"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="System.Collections.IEnumerable"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
         /// <returns><see cref="IDbJob{T}"/></returns>
         public virtual IDbJob<T> WithBuffering(bool isEnabled)
         {
@@ -1202,7 +1360,14 @@ namespace DbConnector.Core
             {
                 lock (_cloneLock)
                 {
-                    _isDeferredExecution = (isEnabled == false);
+                    if (!isEnabled || DbConnectorUtilities.IsAsyncEnumerable(typeof(T)))
+                    {
+                        _isDeferredExecution = true;
+                    }
+                    else
+                    {
+                        _isDeferredExecution = false;
+                    }
                 }
             }
 

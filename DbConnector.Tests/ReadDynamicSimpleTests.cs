@@ -28,6 +28,23 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadAsAsyncEnumerable_Dynamic()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable("SELECT 10 as count FROM [Person].[Person]").Execute();
+
+            Assert.Equal(10, result.FirstAsync().Result.count);
+        }
+
+        [Fact]
+        public void ReadAsAsyncEnumerable_Dynamic_WithData()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable("SELECT TOP(10) * FROM [Person].[Person] ORDER BY BusinessEntityID").Execute().ToListAsync().Result;
+
+            Assert.Equal(10, result.Count);
+            Assert.Equal(1, result.First().BusinessEntityID);
+        }
+
+        [Fact]
         public void ReadFirst_Dynamic()
         {
             var result = _dbConnector.ReadFirst("SELECT 10 as count FROM [Person].[Person]").Execute();
@@ -101,6 +118,15 @@ namespace DbConnector.Tests
         public void ReadByBatch_Dynamic()
         {
             var result = _dbConnector.Read<dynamic, dynamic>("SELECT TOP(3) * FROM [Sales].[Currency]; SELECT TOP(10) * FROM [Person].[Person];").Execute();
+
+            Assert.Equal(3, result.Item1.Count());
+            Assert.Equal(10, result.Item2.Count());
+        }
+
+        [Fact]
+        public void ReadByBatch_Dynamic_NoBuffer()
+        {
+            var result = _dbConnector.Read<dynamic, dynamic>("SELECT TOP(3) * FROM [Sales].[Currency]; SELECT TOP(10) * FROM [Person].[Person];").WithBuffering(false).Execute();
 
             Assert.Equal(3, result.Item1.Count());
             Assert.Equal(10, result.Item2.Count());

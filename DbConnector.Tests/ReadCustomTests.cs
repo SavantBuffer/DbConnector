@@ -24,7 +24,7 @@ namespace DbConnector.Tests
             (d, e, odr) =>
             {
                 return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
-                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+                : odr.AsEnumerable<Currency>(e.Token, e.JobCommand);
 
             }
             ).Execute();
@@ -49,7 +49,7 @@ namespace DbConnector.Tests
             (d, e, odr) =>
             {
                 return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
-                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+                : odr.AsEnumerable<Currency>(e.Token, e.JobCommand);
             }
             ).WithBuffering(false).Execute();
 
@@ -57,6 +57,28 @@ namespace DbConnector.Tests
 
             var values = result.ToList();
 
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void ReadTo_Deferred_AsAsyncEnumerable()
+        {
+            var result = _dbConnector.ReadTo<IAsyncEnumerable<Currency>>(
+            (cmdActions) =>
+            {
+                cmdActions.Enqueue((cmd) => cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]");
+            },
+            (d, e, odr) =>
+            {
+                return odr.AsAsyncEnumerable<Currency>(e.Token, e.JobCommand);
+            }
+            ).WithBuffering(false).Execute();
+
+            var values = result.ToListAsync().Result;
+
+            Assert.Equal(3, values.Count);
             Assert.Equal("AED", values[0].CurrencyCode);
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);
@@ -95,7 +117,7 @@ namespace DbConnector.Tests
             (d, e, odr) =>
             {
                 return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
-                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+                : odr.AsEnumerable<Currency>(e.Token, e.JobCommand);
 
             }).Execute();
 
@@ -115,13 +137,30 @@ namespace DbConnector.Tests
             (d, e, odr) =>
             {
                 return e.IsBuffered ? odr.ToList<Currency>(e.Token, e.JobCommand)
-                : odr.ToEnumerable<Currency>(e.Token, e.JobCommand);
+                : odr.AsEnumerable<Currency>(e.Token, e.JobCommand);
             }).WithBuffering(false).Execute();
 
             Assert.Equal(3, result.Count());
 
             var values = result.ToList();
 
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void ReadTo_Simple_Deferred_AsAsyncEnumerable()
+        {
+            var result = _dbConnector.ReadTo<IAsyncEnumerable<Currency>>("SELECT TOP(3) * FROM [Sales].[Currency]", null,
+            (d, e, odr) =>
+            {
+                return odr.AsAsyncEnumerable<Currency>(e.Token, e.JobCommand);
+            }).WithBuffering(false).Execute();
+
+            var values = result.ToListAsync().Result;
+
+            Assert.Equal(3, values.Count);
             Assert.Equal("AED", values[0].CurrencyCode);
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);

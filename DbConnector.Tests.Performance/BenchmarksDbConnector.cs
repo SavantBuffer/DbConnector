@@ -56,6 +56,14 @@ namespace DbConnector.Tests.Performance
                 .First();
         }
 
+        [Benchmark(Description = "ReadAsAsyncEnumerable<T> (unbuffered)")]
+        public Post ReadAsAsyncEnumerable()
+        {
+            Step();
+            return _dbConnector.ReadAsAsyncEnumerable<Post>("select * from Post where Id = @Id", new { Id = i })
+                .Execute(_connection).FirstAsync().Result;
+        }
+
         [Benchmark(Description = "ReadFirstOrDefault<T>")]
         public Post ReadFirstOrDefault()
         {
