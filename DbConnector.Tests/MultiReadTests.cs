@@ -417,5 +417,341 @@ namespace DbConnector.Tests
             Assert.Equal(500, result.Item7.Count());
             Assert.Equal(1000, result.Item8.Count());
         }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_2()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person>(
+                onInit: () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count());
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_3()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person>(
+                () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count);
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count);
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_4()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person, Currency>(
+                () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(5) * FROM [Sales].[Currency];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count);
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count);
+            Assert.Equal(5, result.Item4.ToListAsync().Result.Count);
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_5()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person, Currency, Culture>(
+               () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+               ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+               ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+               ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(5) * FROM [Sales].[Currency];
+                        ";
+                    }
+               ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(8) * FROM [Production].[Culture];
+                        ";
+                    }
+               )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count);
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count);
+            Assert.Equal(5, result.Item4.ToListAsync().Result.Count);
+            Assert.Equal(8, result.Item5.ToListAsync().Result.Count);
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_6()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person, Currency, Culture, Address>(
+                () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(5) * FROM [Sales].[Currency];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(8) * FROM [Production].[Culture];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (20) * FROM [Person].[Address];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count);
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count);
+            Assert.Equal(5, result.Item4.ToListAsync().Result.Count);
+            Assert.Equal(8, result.Item5.ToListAsync().Result.Count);
+            Assert.Equal(20, result.Item6.ToListAsync().Result.Count);
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_7()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person, Currency, Culture, Address, Address>(
+                () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(5) * FROM [Sales].[Currency];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(8) * FROM [Production].[Culture];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (20) * FROM [Person].[Address];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (500) * FROM [Person].[Address];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count);
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count);
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count);
+            Assert.Equal(5, result.Item4.ToListAsync().Result.Count);
+            Assert.Equal(8, result.Item5.ToListAsync().Result.Count);
+            Assert.Equal(20, result.Item6.ToListAsync().Result.Count);
+            Assert.Equal(500, result.Item7.ToListAsync().Result.Count);
+        }
+
+        [Fact]
+        public void MultiReadAsAsyncEnumerable_8()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable<Currency, Person, Person, Currency, Culture, Address, Address, Person>(
+                () => (
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(3) * FROM [Sales].[Currency]; 
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(10) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP(100) * FROM [Person].[Person];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(5) * FROM [Sales].[Currency];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"                   
+                            SELECT TOP(8) * FROM [Production].[Culture];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (20) * FROM [Person].[Address];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (500) * FROM [Person].[Address];
+                        ";
+                    }
+                ,
+                    (cmd) =>
+                    {
+                        cmd.CommandText = @"
+                            SELECT TOP (1000) * FROM [Person].[Person];
+                        ";
+                    }
+                )).Execute();
+
+            Assert.Equal(3, result.Item1.ToListAsync().Result.Count());
+            Assert.Equal(10, result.Item2.ToListAsync().Result.Count());
+            Assert.Equal(100, result.Item3.ToListAsync().Result.Count());
+            Assert.Equal(5, result.Item4.ToListAsync().Result.Count());
+            Assert.Equal(8, result.Item5.ToListAsync().Result.Count());
+            Assert.Equal(20, result.Item6.ToListAsync().Result.Count());
+            Assert.Equal(500, result.Item7.ToListAsync().Result.Count());
+            Assert.Equal(1000, result.Item8.ToListAsync().Result.Count());
+        }
     }
 }

@@ -28,6 +28,23 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadAsAsyncEnumerable_Typed()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable(typeof(Currency), (cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(3) * FROM [Sales].[Currency]";
+            }).Execute().ToListAsync().Result;
+
+            Assert.Equal(3, result.Count());
+
+            var values = result.Cast<Currency>().ToList();
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
         public void ReadFirst_Typed()
         {
             var result = _dbConnector.ReadFirst(typeof(Currency), (cmd) =>

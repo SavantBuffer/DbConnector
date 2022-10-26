@@ -44,35 +44,35 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     case 4:
                         d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     case 5:
                         d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T5>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
                         break;
                     case 6:
                         d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T6>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
                         break;
                     case 7:
                         d.Item7 = p.IsBuffered ? odr.ToList<T7>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T7>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T7>(p.Token, p.JobCommand);
                         break;
                     case 8:
                         d.Item8 = p.IsBuffered ? odr.ToList<T8>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T8>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T8>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -104,31 +104,31 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     case 4:
                         d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     case 5:
                         d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T5>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
                         break;
                     case 6:
                         d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T6>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
                         break;
                     case 7:
                         d.Item7 = p.IsBuffered ? odr.ToList<T7>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T7>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T7>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -160,27 +160,27 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     case 4:
                         d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     case 5:
                         d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T5>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
                         break;
                     case 6:
                         d.Item6 = p.IsBuffered ? odr.ToList<T6>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T6>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T6>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -212,23 +212,23 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     case 4:
                         d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     case 5:
                         d.Item5 = p.IsBuffered ? odr.ToList<T5>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T5>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T5>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -260,19 +260,19 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     case 4:
                         d.Item4 = p.IsBuffered ? odr.ToList<T4>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T4>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T4>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -304,15 +304,15 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     case 3:
                         d.Item3 = p.IsBuffered ? odr.ToList<T3>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T3>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T3>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT
@@ -344,11 +344,11 @@ namespace DbConnector.Core
                 {
                     case 1:
                         d.Item1 = p.IsBuffered ? odr.ToList<T1>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T1>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T1>(p.Token, p.JobCommand);
                         break;
                     case 2:
                         d.Item2 = p.IsBuffered ? odr.ToList<T2>(p.Token, p.JobCommand)
-                                : odr.ToEnumerable<T2>(p.Token, p.JobCommand);
+                                : odr.AsEnumerable<T2>(p.Token, p.JobCommand);
                         break;
                     default:
                         return d;//EXIT

@@ -34,6 +34,29 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadAsAsyncEnumerable_Dynamic()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable((cmd) =>
+            {
+                cmd.CommandText = "SELECT 10 as count FROM [Person].[Person]";
+            }).Execute();
+
+            Assert.Equal(10, result.FirstAsync().Result.count);
+        }
+
+        [Fact]
+        public void ReadAsAsyncEnumerable_Dynamic_WithData()
+        {
+            var result = _dbConnector.ReadAsAsyncEnumerable((cmd) =>
+            {
+                cmd.CommandText = "SELECT TOP(10) * FROM [Person].[Person] ORDER BY BusinessEntityID";
+            }).Execute().ToListAsync().Result;
+
+            Assert.Equal(10, result.Count);
+            Assert.Equal(1, result.First().BusinessEntityID);
+        }
+
+        [Fact]
         public void ReadFirst_Dynamic()
         {
             var result = _dbConnector.ReadFirst((cmd) =>

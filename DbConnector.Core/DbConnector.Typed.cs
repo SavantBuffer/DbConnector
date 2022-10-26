@@ -33,7 +33,15 @@ namespace DbConnector.Core
             p.DeferDisposable(odr);
 
             return p.IsBuffered ? odr.ToList(type, p.Token, p.JobCommand)
-                                : odr.ToEnumerable(type, p.Token, p.JobCommand);
+                                : odr.AsEnumerable(type, p.Token, p.JobCommand);
+        }
+
+        private static IAsyncEnumerable<object> OnExecuteReadAsAsyncEnumerable(Type type, IDbExecutionModel p)
+        {
+            DbDataReader odr = p.Command.ExecuteReader(ConfigureCommandBehavior(p, CommandBehavior.SingleResult));
+            p.DeferDisposable(odr);
+
+            return odr.AsAsyncEnumerable(type, p.Token, p.JobCommand);
         }
 
         private static object OnExecuteReadFirst(Type type, IDbExecutionModel p)
@@ -118,6 +126,45 @@ namespace DbConnector.Core
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteRead(type, p)
                 ).SetOnError((d, e) => Enumerable.Empty<object>());
+        }
+
+        /// <summary>
+        ///  <para>Creates an <see cref="IDbJob{IAsyncEnumerable{object}}"/> able to execute a reader, with an un-buffered (deferred/yielded) approach, based on the <paramref name="onInit"/> action.</para>
+        /// <para>Valid types: <see cref="DataSet"/>, <see cref="DataTable"/>, <see cref="Dictionary{string,object}"/>, any .NET built-in type, or any struct or class with a parameterless constructor not assignable from <see cref="System.Collections.IEnumerable"/> (Note: only properties will be mapped).</para>
+        ///  See also:
+        ///  <seealso cref="DbCommand.ExecuteReader()"/>
+        /// </summary>
+        /// <remarks>
+        /// <para>This will use the <see cref="CommandBehavior.SingleResult"/> behavior by default.</para>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="IAsyncEnumerable{T}"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="System.Linq.AsyncEnumerable.ToListAsync{TSource}(IAsyncEnumerable{TSource}, System.Threading.CancellationToken)"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="IAsyncEnumerable{T}"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <param name="type">The <see cref="Type"/> to use.</param>
+        /// <param name="onInit">Action that is used to configure the <see cref="IDbJobCommand"/>.</param>        
+        /// <returns>The <see cref="IDbJob{IAsyncEnumerable{object}}"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when onInit is null.</exception>
+        public IDbJob<IAsyncEnumerable<object>> ReadAsAsyncEnumerable(Type type, Action<IDbJobCommand> onInit)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type), "The type cannot be null!");
+            }
+
+            if (onInit == null)
+            {
+                throw new ArgumentNullException(nameof(onInit), "The onInit delegate cannot be null!");
+            }
+
+            return new DbJob<IAsyncEnumerable<object>, TDbConnection>
+                (
+                    setting: _jobSetting,
+                    state: new DbConnectorState { Flags = _flags, OnInit = onInit },
+                    onCommands: (conn, state) => BuildJobCommand(conn, state),
+                    onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(type, p)
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithBuffering(false);
         }
 
         /// <summary>

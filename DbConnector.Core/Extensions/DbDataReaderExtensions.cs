@@ -18,9 +18,13 @@ using System.Data;
 using System.Data.Common;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DbConnector.Core.Extensions
 {
+    /// <summary>
+    /// Extends <see cref="DbDataReader"/> with data mapping functions.
+    /// </summary>
     public static partial class DbDataReaderExtensions
     {
         /// <summary>
@@ -207,6 +211,73 @@ namespace DbConnector.Core.Extensions
         }
 
         /// <summary>
+        /// Reads data into a <see cref="DataTable"/> asynchronously.
+        /// </summary>
+        /// <param name="odr">The <see cref="DbDataReader"/> to use.</param>
+        /// <param name="isFirstResult">Set to true if only the first row should be loaded.</param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="settings">The <see cref="IColumnMapSetting"/> to use. (Optional)</param>
+        /// <returns>The <see cref="DataTable"/> inside a <see cref="Task"/>.</returns>
+        public async static Task<DataTable> ToDataTableAsync(this DbDataReader odr, bool isFirstResult, CancellationToken token, IColumnMapSetting settings)
+        {
+            var dt = new DataTable();
+
+            if (odr.HasRows)
+            {
+                if (isFirstResult || (settings != null && (settings.HasNamesToInclude || settings.HasNamesToExclude)))
+                {
+                    var ordinalColumnMap = odr.GetOrdinalColumnNamesLite(settings);
+
+                    if (ordinalColumnMap?.Length > 0)
+                    {
+                        foreach (var m in ordinalColumnMap)
+                        {
+                            dt.Columns.Add(m.Name);
+                        }
+
+                        if (isFirstResult)
+                        {
+                            if (await odr.ReadAsync(token))
+                            {
+                                DataRow row = dt.NewRow();
+
+                                for (int i = 0; i < ordinalColumnMap.Length; i++)
+                                {
+                                    row[i] = odr.GetValue(ordinalColumnMap[i].Ordinal);
+                                }
+
+                                dt.Rows.Add(row);
+                            }
+                        }
+                        else
+                        {
+                            while (await odr.ReadAsync(token))
+                            {
+                                if (token.IsCancellationRequested)
+                                    break;
+
+                                DataRow row = dt.NewRow();
+
+                                for (int i = 0; i < ordinalColumnMap.Length; i++)
+                                {
+                                    row[i] = odr.GetValue(ordinalColumnMap[i].Ordinal);
+                                }
+
+                                dt.Rows.Add(row);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    dt.Load(odr);
+                }
+            }
+
+            return dt;
+        }
+
+        /// <summary>
         /// Reads data into a <see cref="DataSet"/>.
         /// </summary>
         /// <param name="odr">The <see cref="DataSet"/> to use.</param>
@@ -228,6 +299,33 @@ namespace DbConnector.Core.Extensions
                 projectedDataSet.Tables.Add(odr.ToDataTable(isFirstResult, token, settings));
 
                 hasNext = odr.NextResult();
+            }
+
+            return projectedDataSet;
+        }
+
+        /// <summary>
+        /// Reads data into a <see cref="DataSet"/> asynchronously.
+        /// </summary>
+        /// <param name="odr">The <see cref="DataSet"/> to use.</param>
+        /// <param name="isFirstResult">Set to true if only the first item result should be loaded.</param>
+        /// <param name="token">The <see cref="CancellationToken"/> to use. (Optional)</param>
+        /// <param name="settings">The <see cref="IColumnMapSetting"/> to use. (Optional)</param>
+        /// <returns>The <see cref="DataSet"/> inside a <see cref="Task"/>.</returns>
+        public async static Task<DataSet> ToDataSetAsync(this DbDataReader odr, bool isFirstResult, CancellationToken token, IColumnMapSetting settings, DataSet projectedDataSet = null)
+        {
+            projectedDataSet = projectedDataSet ?? new DataSet();
+
+            bool hasNext = true;
+
+            while ((hasNext && odr.HasRows) || await odr.NextResultAsync(token))
+            {
+                if (token.IsCancellationRequested)
+                    return projectedDataSet;
+
+                projectedDataSet.Tables.Add(await odr.ToDataTableAsync(isFirstResult, token, settings));
+
+                hasNext = await odr.NextResultAsync(token);
             }
 
             return projectedDataSet;
