@@ -759,7 +759,7 @@ namespace DbConnector.Core
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(d, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithoutBuffering();
         }
 
         protected internal IDbJob<IEnumerable<T>> ReadByState<T, TStateParam>(Action<IDbJobCommand> onInit, TStateParam stateParam)
@@ -791,7 +791,7 @@ namespace DbConnector.Core
                     state: new DbConnectorState<TStateParam> { Flags = _flags, OnInit = onInit, StateParam = stateParam },
                     onCommands: (conn, state) => BuildJobCommand(conn, state), //https://github.com/dotnet/roslyn/issues/5835
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(d, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<T>()).WithoutBuffering();
         }
 
         /// <summary>

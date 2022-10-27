@@ -1630,6 +1630,25 @@ namespace DbConnector.Core
         }
 
         /// <summary>
+        /// <para>Use this function to disable buffered execution when reading data (this is enabled by default).</para>
+        /// <para>Note: Should only be called when initiating this <see cref="IDbJob{T}"/>.</para>
+        /// <para>Note: The use of deferred execution is only possible for <see cref="System.Collections.IEnumerable"/> types during individual transactions. Normal execution will be used when encountering non <see cref="System.Collections.IEnumerable"/> types or Batch-Reading implementations.</para>
+        /// </summary>
+        /// <remarks>
+        /// <para>Warning: Deferred execution leverages "yield statement" logic and postpones the disposal of database connections and related resources. 
+        /// Always perform an iteration of the returned <see cref="System.Collections.IEnumerable"/> by either implementing a "for-each" loop or a data projection (e.g. invoking the <see cref="Enumerable.ToList{TSource}(IEnumerable{TSource})"/> extension). You can also dispose the enumerator as an alternative.
+        /// Not doing so will internally leave disposable resources opened (e.g. database connections) consequently creating memory leak scenarios.
+        /// </para>
+        /// <para>Warning: Exceptions may occur while looping deferred <see cref="System.Collections.IEnumerable"/> types because of the implicit database connection dependency.</para>
+        /// </remarks>
+        /// <returns><see cref="DbJobBase{T}"/></returns>
+        protected internal virtual DbJobBase<T> WithoutBuffering()
+        {
+            _isDeferredExecution = true;
+            return this;
+        }
+
+        /// <summary>
         /// Use this to create an <see cref="IDbJobCacheable{T, TStateParamValue}"/>.
         /// <para>Note: This should only be used when wanting to cache the current <see cref="IDbJob{T}"/> (e.g. when caching in a static field).</para>
         /// </summary>

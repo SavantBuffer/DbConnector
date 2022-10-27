@@ -90,7 +90,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -495,7 +495,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace DbConnector.Core
                     OnBranchExecuted(ref d, job as IDbJob, data);
 
                     return d;
-                }).WithBuffering(false);
+                }).WithoutBuffering();
         }
     }
 }

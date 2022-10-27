@@ -1,3 +1,19 @@
+# [v1.6.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.6.0)  | Oct 27, 2022
+
+### Features
+ - New `IDbConnector.ReadAsAsyncEnumerable` functions. This great new feature can be used to build APIs (starting with ASP.NET Core 6.0) which can stream data from a database source. 
+ 
+### Performance Improvements 
+ - Faster execution for all `IDbConnector` reader functions.
+
+### Dependency Updates
+ - All
+
+### New Dependencies
+ - System.Linq.Async
+ - Microsoft.Bcl.AsyncInterfaces
+
+
 # [v1.5.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.5.0)  | Jul 20, 2021
 
 ### Bug Fixes
