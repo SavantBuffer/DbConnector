@@ -195,12 +195,6 @@ namespace DbConnector.Core
 
         protected virtual void ExecuteImplementation(ref T result, DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
-            if (_onInit != null)
-            {
-                result = _onInit();
-            }
-
-
             if (_isDeferredExecution && DbConnectorUtilities.IsEnumerableOrAsyncEnumerable(typeof(T), out bool isAsyncEnumerable))
             {
                 Type dbJobType = GetType();
@@ -222,6 +216,11 @@ namespace DbConnector.Core
             }
             else if (_isIsolatedConnections && _onBranch != null)
             {
+                if (_onInit != null)
+                {
+                    result = _onInit();
+                }
+
                 using (DbBranchResult<T> branchResult =
                     _onBranch(
                         new DbBranchResult<T> { Data = new DbDisposable<T>(_isLoggingEnabled, _settings.Logger) { Source = result } },
@@ -235,6 +234,11 @@ namespace DbConnector.Core
             }
             else
             {
+                if (_onInit != null)
+                {
+                    result = _onInit();
+                }
+
                 //Create and open the connection.
                 DbConnection conn = connection;
                 bool wasConnectionClosed = false;
@@ -375,7 +379,7 @@ namespace DbConnector.Core
 
         internal IEnumerable<TChild> ExecuteDeferred<TChild>(DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
-            T result = default;
+            T result = _onInit != null ? _onInit() : default;
             DbConnection conn = null;
             DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
@@ -530,7 +534,7 @@ namespace DbConnector.Core
 
         internal async IAsyncEnumerable<TChild> ExecuteDeferredAsync<TChild>(DbConnection connection, DbTransaction externalTransaction, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken, IDbJobState state)
         {
-            T result = default;
+            T result = _onInit != null ? _onInit() : default;
             DbConnection conn = null;
             DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
