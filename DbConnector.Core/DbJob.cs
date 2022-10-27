@@ -238,6 +238,9 @@ namespace DbConnector.Core
                 //Create and open the connection.
                 DbConnection conn = connection;
                 bool wasConnectionClosed = false;
+
+                IDbJobCommand[] dbJobCommands = null;
+                DbTransaction transaction = externalTransaction;
                 try
                 {
                     if (connection == null)
@@ -246,120 +249,112 @@ namespace DbConnector.Core
                         conn.ConnectionString = _settings.ConnectionString;
                     }
 
+                    //Set settings and commands.
+                    dbJobCommands = _isCreateDbCommand ? _onCommands(conn, state) : new IDbJobCommand[] { null };
 
-                    DbTransaction transaction = externalTransaction;
-                    IDbJobCommand[] dbJobCommands = null;
-                    try
+                    if (dbJobCommands == null)
                     {
-                        //Set settings and commands.
-                        dbJobCommands = _isCreateDbCommand ? _onCommands(conn, state) : new IDbJobCommand[] { null };
+                        //Safety blanket!
+                        dbJobCommands = new IDbJobCommand[] { _isCreateDbCommand ? CreateDbJobCommand(conn.CreateCommand(), state) : null };
+                    }
 
-                        if (dbJobCommands == null)
+
+                    if (connection == null || conn.State == ConnectionState.Closed)
+                    {
+                        wasConnectionClosed = true;
+                        conn.Open();
+                    }
+
+
+                    //Begin transaction.
+                    if (_isolationLevel.HasValue && externalTransaction == null)
+                    {
+                        transaction = conn.BeginTransaction(_isolationLevel.Value);
+                    }
+
+                    DbExecutionModel eParam = CreateDbExecutionModel(true, false, conn, transaction, state, cancellationToken);
+
+                    for (int i = 0; i < dbJobCommands.Length; i++)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
                         {
-                            //Safety blanket!
-                            dbJobCommands = new IDbJobCommand[] { _isCreateDbCommand ? CreateDbJobCommand(conn.CreateCommand(), state) : null };
-                        }
-
-
-                        if (connection == null || conn.State == ConnectionState.Closed)
-                        {
-                            wasConnectionClosed = true;
-                            conn.Open();
-                        }
-
-
-                        //Begin transaction.
-                        if (_isolationLevel.HasValue && externalTransaction == null)
-                        {
-                            transaction = conn.BeginTransaction(_isolationLevel.Value);
-                        }
-
-                        DbExecutionModel eParam = CreateDbExecutionModel(true, false, conn, transaction, state, cancellationToken);
-
-                        for (int i = 0; i < dbJobCommands.Length; i++)
-                        {
-                            if (cancellationToken.IsCancellationRequested)
+                            if (_isCreateDbCommand)
                             {
-                                if (_isCreateDbCommand)
+                                for (int x = i; x < dbJobCommands.Length; x++)
                                 {
-                                    for (int x = i; x < dbJobCommands.Length; x++)
-                                    {
-                                        dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                                    }
-                                }
-
-                                return;
-                            }
-
-                            DbCommand cmd = null;
-                            var jCommand = dbJobCommands[i];
-
-                            eParam.Index = i;
-                            eParam.Command = null;
-                            eParam.JobCommand = jCommand;
-
-                            try
-                            {
-                                if (_isCreateDbCommand)
-                                {
-                                    eParam.Command = cmd = jCommand.GetDbCommand();
-                                    cmd.Connection = conn;
-                                    cmd.Transaction = transaction;
-
-                                    if (!_isCacheEnabled)
-                                    {
-                                        jCommand.Flags |= DbJobCommandFlags.NoCache;
-                                    }
-                                }
-
-                                result = _onExecute(result, eParam);
-
-                                if (_onExecuted != null)
-                                {
-                                    eParam.Parameters = cmd?.Parameters;
-
-                                    result = _onExecuted(result, eParam.CreateExecutedModel());
+                                    dbJobCommands[x]?.GetDbCommand()?.Dispose();
                                 }
                             }
-                            finally
+
+                            return;
+                        }
+
+                        DbCommand cmd = null;
+                        var jCommand = dbJobCommands[i];
+
+                        eParam.Index = i;
+                        eParam.Command = null;
+                        eParam.JobCommand = jCommand;
+
+                        try
+                        {
+                            if (_isCreateDbCommand)
                             {
-                                eParam.DeferrableDisposable?.Dispose();
-                                cmd?.Dispose();
+                                eParam.Command = cmd = jCommand.GetDbCommand();
+                                cmd.Connection = conn;
+                                cmd.Transaction = transaction;
+
+                                if (!_isCacheEnabled)
+                                {
+                                    jCommand.Flags |= DbJobCommandFlags.NoCache;
+                                }
+                            }
+
+                            result = _onExecute(result, eParam);
+
+                            if (_onExecuted != null)
+                            {
+                                eParam.Parameters = cmd?.Parameters;
+
+                                result = _onExecuted(result, eParam.CreateExecutedModel());
                             }
                         }
-
-                        if (transaction != null && externalTransaction == null)
+                        finally
                         {
-                            transaction.Commit();
+                            eParam.DeferrableDisposable?.Dispose();
+                            cmd?.Dispose();
                         }
                     }
-                    catch (Exception)
+
+                    if (transaction != null && externalTransaction == null)
                     {
-                        if (_isCreateDbCommand && dbJobCommands != null)
-                        {
-                            for (int x = 0; x < dbJobCommands.Length; x++)
-                            {
-                                dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                            }
-                        }
-
-                        if (transaction != null && externalTransaction == null)
-                        {
-                            transaction.Rollback();
-                        }
-
-                        throw;
+                        transaction.Commit();
                     }
-                    finally
+                }
+                catch (Exception)
+                {
+                    if (_isCreateDbCommand && dbJobCommands != null)
                     {
-                        if (transaction != null && externalTransaction == null)
+                        for (int x = 0; x < dbJobCommands.Length; x++)
                         {
-                            transaction.Dispose();
+                            dbJobCommands[x]?.GetDbCommand()?.Dispose();
                         }
                     }
+
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Rollback();
+                    }
+
+                    throw;
                 }
                 finally
                 {
+                    if (transaction != null && externalTransaction == null)
+                    {
+                        transaction.Dispose();
+                    }
+
                     if (connection == null)
                     {
                         conn.Dispose();
@@ -380,7 +375,7 @@ namespace DbConnector.Core
 
         internal IEnumerable<TChild> ExecuteDeferred<TChild>(DbConnection connection, DbTransaction externalTransaction, CancellationToken cancellationToken, IDbJobState state)
         {
-            dynamic result = null;
+            T result = default;
             DbConnection conn = null;
             DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
@@ -464,7 +459,9 @@ namespace DbConnector.Core
 
                     if (result != null)
                     {
-                        foreach (var item in result)
+                        var resultAsEnumerable = result as IEnumerable<TChild>;
+
+                        foreach (var item in resultAsEnumerable)
                         {
                             yield return item;
                         }
@@ -484,58 +481,56 @@ namespace DbConnector.Core
                             commands.Dequeue()?.Dispose();
                         }
                     }
+
+                    try
+                    {
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Commit();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_isCreateDbCommand && dbJobCommands != null)
+                        {
+                            for (int x = 0; x < dbJobCommands.Length; x++)
+                            {
+                                dbJobCommands[x]?.GetDbCommand()?.Dispose();
+                            }
+                        }
+
+                        ex.Log(_settings.Logger, false);
+
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Rollback();
+                        }
+
+                        throw;
+                    }
                 }
             }
             finally
             {
-                try
+                if (transaction != null && externalTransaction == null)
                 {
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Commit();
-                    }
+                    transaction.Dispose();
                 }
-                catch (Exception ex)
+
+                if (connection == null && conn != null)
                 {
-                    if (_isCreateDbCommand && dbJobCommands != null)
-                    {
-                        for (int x = 0; x < dbJobCommands.Length; x++)
-                        {
-                            dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                        }
-                    }
-
-                    ex.Log(_settings.Logger, false);
-
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Rollback();
-                    }
-
-                    throw;
+                    conn.Dispose();
                 }
-                finally
+                else if (wasConnectionClosed && connection != null && conn != null)
                 {
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Dispose();
-                    }
-
-                    if (connection == null && conn != null)
-                    {
-                        conn.Dispose();
-                    }
-                    else if (wasConnectionClosed && connection != null && conn != null)
-                    {
-                        conn.Close();
-                    }
+                    conn.Close();
                 }
             }
         }
 
         internal async IAsyncEnumerable<TChild> ExecuteDeferredAsync<TChild>(DbConnection connection, DbTransaction externalTransaction, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken, IDbJobState state)
         {
-            dynamic result = null;
+            T result = default;
             DbConnection conn = null;
             DbTransaction transaction = externalTransaction;
             IDbJobCommand[] dbJobCommands = null;
@@ -641,51 +636,49 @@ namespace DbConnector.Core
                             commands.Dequeue()?.Dispose();
                         }
                     }
+
+                    try
+                    {
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Commit();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (_isCreateDbCommand && dbJobCommands != null)
+                        {
+                            for (int x = 0; x < dbJobCommands.Length; x++)
+                            {
+                                dbJobCommands[x]?.GetDbCommand()?.Dispose();
+                            }
+                        }
+
+                        ex.Log(_settings.Logger, false);
+
+                        if (transaction != null && externalTransaction == null)
+                        {
+                            transaction.Rollback();
+                        }
+
+                        throw;
+                    }
                 }
             }
             finally
             {
-                try
+                if (transaction != null && externalTransaction == null)
                 {
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Commit();
-                    }
+                    transaction.Dispose();
                 }
-                catch (Exception ex)
+
+                if (connection == null && conn != null)
                 {
-                    if (_isCreateDbCommand && dbJobCommands != null)
-                    {
-                        for (int x = 0; x < dbJobCommands.Length; x++)
-                        {
-                            dbJobCommands[x]?.GetDbCommand()?.Dispose();
-                        }
-                    }
-
-                    ex.Log(_settings.Logger, false);
-
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Rollback();
-                    }
-
-                    throw;
+                    conn.Dispose();
                 }
-                finally
+                else if (wasConnectionClosed && connection != null && conn != null)
                 {
-                    if (transaction != null && externalTransaction == null)
-                    {
-                        transaction.Dispose();
-                    }
-
-                    if (connection == null && conn != null)
-                    {
-                        conn.Dispose();
-                    }
-                    else if (wasConnectionClosed && connection != null && conn != null)
-                    {
-                        conn.Close();
-                    }
+                    conn.Close();
                 }
             }
         }
