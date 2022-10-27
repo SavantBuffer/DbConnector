@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DbConnector.Tests
@@ -31,6 +32,45 @@ namespace DbConnector.Tests
             Assert.Equal("AED", values[0].CurrencyCode);
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void Read_Cached2()
+        {
+            var result = _read_Cached.Execute(5);
+
+            Assert.Equal(5, result.Count());
+
+            var values = (result as List<Currency>);
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void Read_Cached_MultiThreaded()
+        {
+            var result1 = _read_Cached.ExecuteAsync(3);
+            var result2 = _read_Cached.ExecuteAsync(5);
+            
+            Task.WaitAll(result1, result2);
+
+            Assert.Equal(3, result1.Result.Count());
+
+            var values1 = (result1.Result as List<Currency>);
+
+            Assert.Equal("AED", values1[0].CurrencyCode);
+            Assert.Equal("AFA", values1[1].CurrencyCode);
+            Assert.Equal("ALL", values1[2].CurrencyCode);
+
+            Assert.Equal(5, result2.Result.Count());
+
+            var values2 = (result2.Result as List<Currency>);
+
+            Assert.Equal("AED", values2[0].CurrencyCode);
+            Assert.Equal("AFA", values2[1].CurrencyCode);
+            Assert.Equal("ALL", values2[2].CurrencyCode);
         }
 
         private static readonly IDbJobCacheable<(IEnumerable<Currency>, IEnumerable<Person>), (int, int)> _multiRead_2_Cached =
