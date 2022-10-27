@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DbConnector.Tests.Performance
 {
@@ -57,11 +58,11 @@ namespace DbConnector.Tests.Performance
         }
 
         [Benchmark(Description = "ReadAsAsyncEnumerable<T> (unbuffered)")]
-        public Post ReadAsAsyncEnumerable()
+        public async Task<Post> ReadAsAsyncEnumerable()
         {
             Step();
-            return _dbConnector.ReadAsAsyncEnumerable<Post>("select * from Post where Id = @Id", new { Id = i })
-                .Execute(_connection).FirstAsync().Result;
+            return await _dbConnector.ReadAsAsyncEnumerable<Post>("select * from Post where Id = @Id", new { Id = i })
+                .Execute(_connection).FirstAsync();
         }
 
         [Benchmark(Description = "ReadFirstOrDefault<T>")]

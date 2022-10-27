@@ -144,7 +144,7 @@ namespace DbConnector.Core
                     state: new DbConnectorSimpleState { Flags = _flags },
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(type, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithoutBuffering();
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace DbConnector.Core
                     state: new DbConnectorSimpleState { Flags = _flags },
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(type, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithoutBuffering();
         }
 
         /// <summary>

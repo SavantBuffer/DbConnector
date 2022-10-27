@@ -143,7 +143,7 @@ namespace DbConnector.Core
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerableDynamic(d, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<dynamic>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<dynamic>()).WithoutBuffering();
         }
 
         /// <summary>

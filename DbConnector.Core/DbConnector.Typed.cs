@@ -164,7 +164,7 @@ namespace DbConnector.Core
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadAsAsyncEnumerable(type, p)
-                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithBuffering(false);
+                ).SetOnError((d, e) => AsyncEnumerable.Empty<object>()).WithoutBuffering();
         }
 
         /// <summary>
