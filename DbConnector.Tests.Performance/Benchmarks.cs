@@ -5,8 +5,7 @@ using System;
 using System.Data.SqlClient;
 
 namespace DbConnector.Tests.Performance
-{
-    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+{    
     [BenchmarkCategory("ORM")]
     public abstract class BenchmarksBase : IDisposable
     {
