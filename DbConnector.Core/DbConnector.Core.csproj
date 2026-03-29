@@ -19,10 +19,11 @@
     <PackageReleaseNotes>Please visit https://www.savantbuffer.com for documentation!</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Copyright>Copyright 2019 Robert Orama</Copyright>
-    <AssemblyVersion>1.6.0.0</AssemblyVersion>
-    <FileVersion>1.6.0.0</FileVersion>
-    <Version>1.6.0</Version>
+    <AssemblyVersion>1.7.0.0</AssemblyVersion>
+    <FileVersion>1.7.0.0</FileVersion>
+    <Version>1.7.0</Version>
     <LangVersion>8</LangVersion>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   
   </PropertyGroup>
 
