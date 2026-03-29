@@ -168,7 +168,7 @@ namespace DbConnector.Core
         {
             if (!DbConnectorCache.DbConnectionBuilderCache.TryGetValue(_settings.DbConnectionType, out Func<DbConnection> onCreateInstance))
             {
-                return Activator.CreateInstance(_settings.DbConnectionType) as DbConnection;
+                return ILObjectFactory.CreateInstance(_settings.DbConnectionType) as DbConnection;
             }
             else
             {

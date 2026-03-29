@@ -62,7 +62,7 @@ namespace DbConnector.Core.Extensions
 
         public static T GetMappedObject<T>(this DbDataReader odr, IEnumerable<ColumnMap> columnMaps)
         {
-            T obj = Activator.CreateInstance<T>();
+            T obj = ILObjectFactory.CreateInstance<T>();
 
             foreach (var map in columnMaps)
             {
@@ -88,7 +88,7 @@ namespace DbConnector.Core.Extensions
 
         public static object GetMappedObject(this DbDataReader odr, Type objType, IEnumerable<ColumnMap> columnMaps)
         {
-            object obj = Activator.CreateInstance(objType);
+            object obj = ILObjectFactory.CreateInstance(objType);
 
             foreach (var map in columnMaps)
             {
@@ -132,7 +132,7 @@ namespace DbConnector.Core.Extensions
 
                 if (childObj == null)
                 {
-                    childObj = Activator.CreateInstance(pInfo.PropertyType);
+                    childObj = ILObjectFactory.CreateInstance(pInfo.PropertyType);
                 }
 
                 odr.GetMappedParentObject(childObj, childMap.Children);
@@ -333,32 +333,52 @@ namespace DbConnector.Core.Extensions
 
         internal static int GetOrdinalColumnNamesHash(this DbDataReader odr)
         {
-            int hash = 0;
+            int fieldCount = odr.FieldCount;
+            if (fieldCount == 0) return 0;
 
             unchecked
             {
-                for (int i = 0; i < odr.FieldCount; i++)
+                int hash = 17;
+                for (int i = 0; i < fieldCount; i++)
                 {
-                    hash += (i + (odr.GetName(i)?.GetHashCode() ?? 0) + (odr.GetFieldType(i)?.GetHashCode() ?? 0));
-                }
-            }
+                    // 1. GetName(i) usually allocates a string. 
+                    // We hash the string, but we use a multiplier to ensure 
+                    // that Column Order matters (Position-Sensitive Hashing).
+                    int nameHash = odr.GetName(i)?.GetHashCode() ?? 0;
+                    int typeHash = odr.GetFieldType(i)?.GetHashCode() ?? 0;
 
-            return hash;
+                    // 2. Use a prime multiplier (31) with bit-shifts for speed.
+                    // h * 31 is (h << 5) - h
+                    int columnHash = nameHash ^ typeHash;
+
+                    // Incorporate the index 'i' to ensure [ColA, ColB] != [ColB, ColA]
+                    hash = ((hash << 5) - hash) + columnHash + i;
+                }
+                return hash;
+            }
         }
 
         internal static int GetOrdinalColumnNamesHashLite(this DbDataReader odr)
         {
-            int hash = 0;
+            // 1. Cache the FieldCount to avoid a virtual method call on every loop iteration
+            int count = odr.FieldCount;
+            if (count == 0) return 0;
 
             unchecked
             {
-                for (int i = 0; i < odr.FieldCount; i++)
+                int hash = 17;
+                for (int i = 0; i < count; i++)
                 {
-                    hash += (i + (odr.GetName(i)?.GetHashCode() ?? 0));
-                }
-            }
+                    // 2. Extract the Name hash once into a local register
+                    // odr.GetName(i) is the most expensive part of this loop
+                    int nameHash = odr.GetName(i)?.GetHashCode() ?? 0;
 
-            return hash;
+                    // 3. Fast Multiply by 31: (h << 5) - h
+                    // We add the index 'i' to ensure column order matters
+                    hash = ((hash << 5) - hash) + nameHash + i;
+                }
+                return hash;
+            }
         }
 
         internal static OrdinalColumnMap[] GetOrdinalColumnNames(this DbDataReader odr, IColumnMapSetting settings = null)

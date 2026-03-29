@@ -1,7 +1,7 @@
 ﻿using DbConnector.Core;
 using DbConnector.Example.Entities;
 using DbConnector.Example.Repositories;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace DbConnector.Example

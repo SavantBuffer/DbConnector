@@ -15,6 +15,7 @@
 using DbConnector.Core.Extensions;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -105,7 +106,7 @@ namespace DbConnector.Core
 
         public static IDynamicColumnMapper CreateMapper(Type tType, OrdinalColumnMap[] ordinalColumnMap, IColumnMapSetting settings)
         {
-            return CreateMapper(Activator.CreateInstance(typeof(DynamicColumnMapper<>).MakeGenericType(tType)) as IDynamicColumnMapper, tType, ordinalColumnMap, settings);
+            return CreateMapper(ILObjectFactory.CreateInstance(typeof(DynamicColumnMapper<>).MakeGenericType(tType)) as IDynamicColumnMapper, tType, ordinalColumnMap, settings);
         }
 
         public static IDynamicColumnMapper CreateMapper<TResult>(OrdinalColumnMap[] ordinalColumnMap, IColumnMapSetting settings)
@@ -1165,7 +1166,7 @@ namespace DbConnector.Core
 
         public static DynamicDbConnectorMethodBuilder CreateBuilder(Type tType, MethodInfo mi, Type tspType)
         {
-            DynamicDbConnectorMethodBuilder builder = Activator.CreateInstance(typeof(DynamicDbConnectorMethodBuilder<>).MakeGenericType(tspType)) as DynamicDbConnectorMethodBuilder;
+            DynamicDbConnectorMethodBuilder builder = ILObjectFactory.CreateInstance(typeof(DynamicDbConnectorMethodBuilder<>).MakeGenericType(tspType)) as DynamicDbConnectorMethodBuilder;
 
 
             DynamicMethod method = new DynamicMethod("DynamicRead_" + Guid.NewGuid().ToString(), typeof(IDbJob),
@@ -1196,6 +1197,101 @@ namespace DbConnector.Core
         }
     }
 
+
+    internal static class ILObjectFactory
+    {
+        // Cache for the "Type" overload (Non-generic fallback)
+        private static readonly ConcurrentDictionary<Type, Func<object>> _untypedCache =
+            new ConcurrentDictionary<Type, Func<object>>();
+
+        /// <summary>
+        /// Creates an instance of T using the fastest possible IL-generated delegate.
+        /// </summary>
+        public static T CreateInstance<T>() => ILObjectFactory<T>.CreateInstance();
+
+        /// <summary>
+        /// Creates an instance of the specified type using a cached IL-generated delegate.
+        /// </summary>
+        public static object CreateInstance(Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+
+            // Get or create the IL delegate for this specific type
+            var resolver = _untypedCache.GetOrAdd(type, t => CreateResolver(t));
+            return resolver();
+        }
+
+        private static Func<object> CreateResolver(Type t)
+        {
+            // 1. Define the dynamic method (Returns 'object' for the non-generic version)
+            DynamicMethod method = new DynamicMethod(
+                "CreateInstance_" + t.FullName.Replace(".", "_"),
+                typeof(object),
+                null,
+                t.Module,
+                true);
+
+            ILGenerator il = method.GetILGenerator();
+
+            if (t.IsValueType)
+            {
+                // For structs: Allocate on stack, initialize, and box to object
+                il.DeclareLocal(t);
+                il.Emit(OpCodes.Ldloca_S, 0);
+                il.Emit(OpCodes.Initobj, t);
+                il.Emit(OpCodes.Ldloc_0);
+                il.Emit(OpCodes.Box, t);
+            }
+            else
+            {
+                // For classes: Find parameterless constructor
+                var constructor = t.GetConstructor(System.Reflection.BindingFlags.Public |
+                                                 System.Reflection.BindingFlags.NonPublic |
+                                                 System.Reflection.BindingFlags.Instance,
+                                                 null, Type.EmptyTypes, null);
+
+                if (constructor == null)
+                    throw new InvalidOperationException($"{t.Name} must have a parameterless constructor.");
+
+                il.Emit(OpCodes.Newobj, constructor);
+            }
+
+            il.Emit(OpCodes.Ret);
+
+            return (Func<object>)method.CreateDelegate(typeof(Func<object>));
+        }
+    }
+        
+    internal static class ILObjectFactory<T>
+    {
+        public static readonly Func<T> CreateInstance = CreateResolver();
+
+        private static Func<T> CreateResolver()
+        {
+            Type t = typeof(T);
+            DynamicMethod method = new DynamicMethod("Create_" + t.Name, t, null, t.Module, true);
+            ILGenerator il = method.GetILGenerator();
+
+            if (t.IsValueType)
+            {
+                il.DeclareLocal(t);
+                il.Emit(OpCodes.Ldloca_S, 0);
+                il.Emit(OpCodes.Initobj, t);
+                il.Emit(OpCodes.Ldloc_0);
+            }
+            else
+            {
+                var constructor = t.GetConstructor(System.Reflection.BindingFlags.Public |
+                                                 System.Reflection.BindingFlags.NonPublic |
+                                                 System.Reflection.BindingFlags.Instance,
+                                                 null, Type.EmptyTypes, null);
+                il.Emit(OpCodes.Newobj, constructor);
+            }
+
+            il.Emit(OpCodes.Ret);
+            return (Func<T>)method.CreateDelegate(typeof(Func<T>));
+        }
+    }
 
 
     internal static class ILGeneratorExtensions

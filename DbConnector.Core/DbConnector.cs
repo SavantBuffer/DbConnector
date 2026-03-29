@@ -182,8 +182,7 @@ namespace DbConnector.Core
            object param = null,
            CommandType commandType = CommandType.Text)
         {
-            var currentState = (state as DbConnectorSimpleState);
-            var cmd = currentState.CreateDbJobCommand(conn.CreateCommand());
+            var cmd = (state as DbConnectorSimpleState).CreateDbJobCommand(conn.CreateCommand());
 
             cmd.CommandType = commandType;
             cmd.CommandText = commandText;
@@ -204,8 +203,7 @@ namespace DbConnector.Core
             int? commandTimeout = null,
             DbJobCommandFlags flags = DbJobCommandFlags.None)
         {
-            var currentState = (state as DbConnectorSimpleState);
-            var cmd = currentState.CreateDbJobCommand(conn.CreateCommand(), mapSettings);
+            var cmd = (state as DbConnectorSimpleState).CreateDbJobCommand(conn.CreateCommand(), mapSettings);
 
             cmd.CommandType = commandType;
             cmd.CommandBehavior = commandBehavior;

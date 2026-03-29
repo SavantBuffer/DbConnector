@@ -197,7 +197,7 @@ namespace DbConnector.Core.Extensions
                 }
             }
 
-            return objType.IsValueType ? Activator.CreateInstance(objType) : null;
+            return objType.IsValueType ? ILObjectFactory.CreateInstance(objType) : null;
         }
 
         internal static dynamic ToFirst(this DbDataReader odr, IEnumerable<OrdinalColumnMapLite> ordinalColumnMap)
@@ -385,7 +385,7 @@ namespace DbConnector.Core.Extensions
             {
                 if (objType.IsValueType)
                 {
-                    return Activator.CreateInstance(objType);
+                    return ILObjectFactory.CreateInstance(objType);
                 }
                 else
                 {

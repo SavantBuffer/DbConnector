@@ -70,33 +70,36 @@
       <Version>0.11.1</Version>
     </PackageReference>
     <PackageReference Include="CommandLineParser">
-      <Version>2.7.82</Version>
+      <Version>2.9.1</Version>
     </PackageReference>
     <PackageReference Include="Dapper">
-      <Version>2.0.35</Version>
+      <Version>2.1.72</Version>
     </PackageReference>
     <PackageReference Include="Dapper.Contrib">
-      <Version>2.0.35</Version>
+      <Version>2.0.78</Version>
     </PackageReference>
     <PackageReference Include="EntityFramework">
-      <Version>6.4.0</Version>
+      <Version>6.5.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Bcl.Memory">
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
-      <Version>3.0.0</Version>
+      <Version>5.3.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Common">
-      <Version>3.5.0</Version>
+      <Version>5.3.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
-      <Version>3.5.0</Version>
+      <Version>5.3.0</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.DotNet.InternalAbstractions">
-      <Version>1.0.0</Version>
+    <PackageReference Include="Microsoft.Data.SqlClient">
+      <Version>7.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions">
-      <Version>3.1.3</Version>
+      <Version>3.1.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore">
       <Version>3.1.3</Version>
@@ -114,40 +117,43 @@
       <Version>3.1.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Primitives">
-      <Version>3.1.3</Version>
+      <Version>10.0.5</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens">
+      <Version>8.17.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Win32.Registry">
-      <Version>4.7.0</Version>
+      <Version>5.0.0</Version>
     </PackageReference>
     <PackageReference Include="Remotion.Linq">
       <Version>2.2.0</Version>
@@ -156,7 +162,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Buffers">
-      <Version>4.5.1</Version>
+      <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="System.Collections">
       <Version>4.3.0</Version>
@@ -165,22 +171,19 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Collections.Immutable">
-      <Version>1.7.0</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Annotations">
-      <Version>4.7.0</Version>
+      <Version>5.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Console">
       <Version>4.3.1</Version>
-    </PackageReference>
-    <PackageReference Include="System.Data.SqlClient">
-      <Version>4.8.1</Version>
     </PackageReference>
     <PackageReference Include="System.Diagnostics.Debug">
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Diagnostics.DiagnosticSource">
-      <Version>4.7.0</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.Diagnostics.FileVersionInfo">
       <Version>4.3.0</Version>
@@ -191,6 +194,9 @@
     <PackageReference Include="System.Diagnostics.Tools">
       <Version>4.3.0</Version>
     </PackageReference>
+    <PackageReference Include="System.Drawing.Common">
+      <Version>10.0.5</Version>
+    </PackageReference>
     <PackageReference Include="System.Dynamic.Runtime">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -198,7 +204,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Interactive.Async">
-      <Version>4.1.1</Version>
+      <Version>7.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.IO">
       <Version>4.3.0</Version>
@@ -219,13 +225,13 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Management">
-      <Version>4.7.0</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
-      <Version>4.5.4</Version>
+      <Version>4.6.3</Version>
     </PackageReference>
     <PackageReference Include="System.Numerics.Vectors">
-      <Version>4.5.0</Version>
+      <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="System.Reflection">
       <Version>4.3.0</Version>
@@ -237,7 +243,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reflection.Metadata">
-      <Version>1.8.0</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.Reflection.TypeExtensions">
       <Version>4.7.0</Version>
@@ -249,7 +255,7 @@
       <Version>4.3.1</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
-      <Version>4.7.1</Version>
+      <Version>6.1.2</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.Extensions">
       <Version>4.3.1</Version>
@@ -264,7 +270,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Security.AccessControl">
-      <Version>4.7.0</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Algorithms">
       <Version>4.3.1</Version>
@@ -279,13 +285,13 @@
       <Version>4.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.Security.Principal.Windows">
-      <Version>4.7.0</Version>
+      <Version>5.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encoding">
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encoding.CodePages">
-      <Version>4.7.0</Version>
+      <Version>10.0.5</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Encoding.Extensions">
       <Version>4.3.0</Version>
@@ -297,7 +303,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions">
-      <Version>4.5.4</Version>
+      <Version>4.6.3</Version>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Parallel">
       <Version>4.3.0</Version>
@@ -306,7 +312,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
-      <Version>4.5.0</Version>
+      <Version>4.6.2</Version>
     </PackageReference>
     <PackageReference Include="System.Xml.ReaderWriter">
       <Version>4.3.1</Version>
@@ -327,7 +333,7 @@
       <Version>4.3.0</Version>
     </PackageReference>
     <PackageReference Include="System.Xml.XPath.XmlDocument">
-      <Version>4.3.0</Version>
+      <Version>4.7.0</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -317,7 +317,7 @@ namespace DbConnector.Core
         /// <returns>The mapped object.</returns>
         public static T GetMappedObject<T>(IEnumerable<ColumnMap> columnMaps, Func<ColumnMap, object> onGetObjectValue)
         {
-            T obj = Activator.CreateInstance<T>();
+            T obj = ILObjectFactory.CreateInstance<T>();
 
             foreach (var map in columnMaps)
             {
@@ -343,7 +343,7 @@ namespace DbConnector.Core
         /// <returns>The mapped object.</returns>
         public static object GetMappedObject(Type objType, IEnumerable<ColumnMap> columnMaps, Func<ColumnMap, object> onGetObjectValue)
         {
-            object obj = Activator.CreateInstance(objType);
+            object obj = ILObjectFactory.CreateInstance(objType);
 
             foreach (var map in columnMaps)
             {
@@ -387,7 +387,7 @@ namespace DbConnector.Core
 
                 if (childObj == null)
                 {
-                    childObj = Activator.CreateInstance(pInfo.PropertyType);
+                    childObj = ILObjectFactory.CreateInstance(pInfo.PropertyType);
                 }
 
                 GetMappedParentObject(onGetObjectValue, childObj, childMap.Children);
@@ -518,7 +518,7 @@ namespace DbConnector.Core
                                     + " of type " + columnType + " to "
                                     + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
-                                    return Activator.CreateInstance(nonNullableObjType);
+                                    return ILObjectFactory.CreateInstance(nonNullableObjType);
                                 }
                             }
                             else
@@ -529,7 +529,7 @@ namespace DbConnector.Core
                                 + " of type " + columnType + " to "
                                 + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
-                                return Activator.CreateInstance(nonNullableObjType);
+                                return ILObjectFactory.CreateInstance(nonNullableObjType);
                             }
                         }
                         else
@@ -544,7 +544,7 @@ namespace DbConnector.Core
                                 + " of type " + columnType + " to "
                                 + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
-                                return Activator.CreateInstance(nonNullableObjType);
+                                return ILObjectFactory.CreateInstance(nonNullableObjType);
                             }
                             else
                             {
@@ -560,7 +560,7 @@ namespace DbConnector.Core
                         + " of type " + columnType + " to "
                         + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
-                        return Activator.CreateInstance(nonNullableObjType);
+                        return ILObjectFactory.CreateInstance(nonNullableObjType);
                     }
                 }
                 else if (!nonNullableObjType.IsEnum && (columnType.IsValidIndirectMatch(nonNullableObjType)))
@@ -577,7 +577,7 @@ namespace DbConnector.Core
                         + " of type " + columnType + " to "
                         + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
-                        return Activator.CreateInstance(nonNullableObjType);
+                        return ILObjectFactory.CreateInstance(nonNullableObjType);
                     }
                 }
                 else

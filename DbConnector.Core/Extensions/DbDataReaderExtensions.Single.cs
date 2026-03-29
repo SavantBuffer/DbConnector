@@ -178,7 +178,7 @@ namespace DbConnector.Core.Extensions
             {
                 if (objType.IsValueType)
                 {
-                    return Activator.CreateInstance(objType);
+                    return ILObjectFactory.CreateInstance(objType);
                 }
                 else
                 {

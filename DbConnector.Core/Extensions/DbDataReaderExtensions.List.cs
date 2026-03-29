@@ -243,7 +243,7 @@ namespace DbConnector.Core.Extensions
                         }
                         else if (objType.IsValueType)
                         {
-                            projectedData.Add(Activator.CreateInstance(objType));
+                            projectedData.Add(ILObjectFactory.CreateInstance(objType));
                         }
                         else
                         {

@@ -198,7 +198,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadFirst(type, p)
                 );
@@ -234,7 +234,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadFirstOrDefault(type, p)
                 );
@@ -272,7 +272,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadSingle(type, p)
                 );
@@ -309,7 +309,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorState { Flags = _flags, OnInit = onInit },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommand(conn, state),
                     onExecute: (d, p) => OnExecuteReadSingleOrDefault(type, p)
                 );

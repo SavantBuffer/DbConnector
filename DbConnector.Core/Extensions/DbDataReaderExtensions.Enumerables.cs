@@ -267,7 +267,7 @@ namespace DbConnector.Core.Extensions
                         }
                         else if (objType.IsValueType)
                         {
-                            yield return Activator.CreateInstance(objType);
+                            yield return ILObjectFactory.CreateInstance(objType);
                         }
                         else
                         {

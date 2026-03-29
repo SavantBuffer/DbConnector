@@ -225,7 +225,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadFirst(type, p)
                 );
@@ -262,7 +262,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
                     onExecute: (d, p) => OnExecuteReadFirst(type, p)
                 );
@@ -306,7 +306,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadFirstOrDefault(type, p)
                 );
@@ -342,7 +342,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
                     onExecute: (d, p) => OnExecuteReadFirstOrDefault(type, p)
                 );
@@ -388,7 +388,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadSingle(type, p)
                 );
@@ -426,7 +426,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
                     onExecute: (d, p) => OnExecuteReadSingle(type, p)
                 );
@@ -471,7 +471,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, mapSettings, sql, param, commandType, commandBehavior, commandTimeout, flags),
                     onExecute: (d, p) => OnExecuteReadSingleOrDefault(type, p)
                 );
@@ -508,7 +508,7 @@ namespace DbConnector.Core
                 (
                     setting: _jobSetting,
                     state: new DbConnectorSimpleState { Flags = _flags },
-                    onInit: () => type.IsValueType ? Activator.CreateInstance(type) : null,
+                    onInit: () => type.IsValueType ? ILObjectFactory.CreateInstance(type) : null,
                     onCommands: (conn, state) => BuildJobCommandForSimpleState(conn, state, sql, param, commandType),
                     onExecute: (d, p) => OnExecuteReadSingleOrDefault(type, p)
                 );
