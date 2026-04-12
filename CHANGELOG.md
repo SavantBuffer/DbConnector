@@ -1,3 +1,14 @@
+# [v1.7.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.7.0)  | Mar 29, 2026
+
+### Performance Improvements 
+ - Replaced Activator.CreateInstance with ILObjectFactory for high-performance, allocation-free object instantiation throughout the codebase.
+ - Refactored cache models in DbConnectorCache for robust, efficient hashing and equality, improving cache hit rates and concurrency.
+ - Enhanced column map cache to capture more details and prevent collisions. Optimized ordinal column hash methods for speed and order sensitivity.
+
+### Dependency Updates
+ - Upgraded project dependencies (Dapper, EF Core, etc.), switched to Microsoft.Data.SqlClient, and updated target frameworks.
+
+
 # [v1.6.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.6.0)  | Oct 27, 2022
 
 ### Features
