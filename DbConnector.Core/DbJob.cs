@@ -562,7 +562,7 @@ namespace DbConnector.Core
                 if (connection == null || conn.State == ConnectionState.Closed)
                 {
                     wasConnectionClosed = true;
-                    await conn.OpenAsync(cancellationToken);
+                    await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
                 }
 
 
@@ -620,7 +620,7 @@ namespace DbConnector.Core
                     {
                         var resultAsAsyncEnumerable = result as IAsyncEnumerable<TChild>;
 
-                        await foreach (var item in resultAsAsyncEnumerable)
+                        await foreach (var item in resultAsAsyncEnumerable.ConfigureAwait(false))
                         {
                             yield return item;
                         }

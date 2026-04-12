@@ -1,12 +1,13 @@
-using DbConnector.Tests.Entities;
 using DbConnector.Core;
+using DbConnector.Tests.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using Xunit;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
+using Xunit;
 
 namespace DbConnector.Tests
 {
@@ -21,6 +22,17 @@ namespace DbConnector.Tests
 
             var values = (result as List<Currency>);
 
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void Read_Tuple()
+        {
+            var result = _dbConnector.Read<(string CurrencyCode, string Name)>("SELECT TOP(3) * FROM [Sales].[Currency]").Execute();
+
+            var values = (result as List<(string CurrencyCode, string Name)>);
             Assert.Equal("AED", values[0].CurrencyCode);
             Assert.Equal("AFA", values[1].CurrencyCode);
             Assert.Equal("ALL", values[2].CurrencyCode);
@@ -291,6 +303,59 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void ReadFirst_Tuple()
+        {
+            var result = _dbConnector.ReadFirst<(string CurrencyCode, string Name)>("SELECT TOP(3) * FROM [Sales].[Currency]")
+            .OnExecuted((d, e) =>
+            {
+                d.Name = "TestingOnExecuted";
+                return d;
+            })
+            .Execute();
+
+            //Assert.NotNull(result);
+            Assert.Equal("AED", result.CurrencyCode);
+            Assert.Equal("TestingOnExecuted", result.Name);
+        }
+
+        [Fact]
+        public void ReadFirst_Tuple_NotCached()
+        {
+            var result = _dbConnector.ReadFirst<(string CurrencyCode, string Name)>("SELECT TOP(3) * FROM [Sales].[Currency]").WithCache(false)
+            .OnExecuted((d, e) =>
+            {
+                d.Name = "TestingOnExecuted";
+                return d;
+            })
+            .Execute();
+
+            //Assert.NotNull(result);
+            Assert.Equal("AED", result.CurrencyCode);
+            Assert.Equal("TestingOnExecuted", result.Name);
+        }
+
+        [Fact]
+        public void ReadFirst_ClassicTuple()
+        {
+            var result = _dbConnector.ReadFirst<Tuple<string, string>>("SELECT TOP(3) * FROM [Sales].[Currency]")
+            .Execute();
+
+            //Assert.NotNull(result);
+            Assert.Equal("AED", result.Item1);
+            Assert.Equal("Emirati Dirham", result.Item2);
+        }
+
+        [Fact]
+        public void ReadFirst_Tuple_Exception()
+        {
+            Assert.Throws<InvalidCastException>(() =>
+            {
+                _dbConnector.ReadFirst<(string CurrencyCode, string Name)>("SELECT '1' FROM [Sales].[Currency]").Execute();
+
+            });
+        }
+
+        [Fact]
         public void ReadFirst_Exception()
         {
             Assert.Throws<InvalidOperationException>(() =>
@@ -496,6 +561,22 @@ namespace DbConnector.Tests
         }
 
         [Fact]
+        public void Scalar_Tuple()
+        {
+            var result = _dbConnector.Scalar<ValueTuple<int>>("SELECT 20, 30;").Execute();
+
+            Assert.Equal(20, result.Item1);
+        }
+
+        [Fact]
+        public void Scalar_ClassicTuple()
+        {
+            var result = _dbConnector.Scalar<Tuple<int>>("SELECT 20, 30;").Execute();
+
+            Assert.Equal(20, result.Item1);
+        }
+
+        [Fact]
         public void Read_NoBuffer()
         {
             var result = _dbConnector.Read<Currency>(
@@ -698,6 +779,37 @@ namespace DbConnector.Tests
             Assert.Equal(10, result.Count());
 
             Assert.Contains("AED", result);
+        }
+
+        [Fact]
+        public void ReadToList_Tuple()
+        {
+            var values = _dbConnector.ReadToList<(string CurrencyCode, string Name)>("SELECT TOP(3) * FROM [Sales].[Currency]").Execute();
+
+            Assert.Equal("AED", values[0].CurrencyCode);
+            Assert.Equal("AFA", values[1].CurrencyCode);
+            Assert.Equal("ALL", values[2].CurrencyCode);
+        }
+
+        [Fact]
+        public void ReadToListObject_Tuple()
+        {
+            Type t = typeof((string CurrencyCode, string Name));
+            var values = _dbConnector.ReadToList(t, "SELECT TOP(3) * FROM [Sales].[Currency]").Execute();
+
+            Assert.Equal("AED", ((ValueTuple<string, string>)values[0]).Item1);
+            Assert.Equal("AFA", ((ValueTuple<string, string>)values[1]).Item1);
+            Assert.Equal("ALL", ((ValueTuple<string, string>)values[2]).Item1);
+        }
+
+        [Fact]
+        public void ReadToList_Tuple_Exception()
+        {
+            Assert.Throws<InvalidCastException>(() =>
+            {
+                _dbConnector.ReadToList<(string CurrencyCode, string Name, DateTime, int, int)>("SELECT TOP(3) * FROM [Sales].[Currency]").Execute();
+
+            });
         }
     }
 }

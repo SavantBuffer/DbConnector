@@ -26,6 +26,9 @@ using System.Reflection.Emit;
 
 namespace DbConnector.Core
 {
+    /// <summary>
+    /// Utilities for the DbConnector library.
+    /// </summary>
     public static class DbConnectorUtilities
     {
         internal static readonly MethodInfo _enumTryParse = typeof(Enum).GetMethods(BindingFlags.Public | BindingFlags.Static).FirstOrDefault(mi => mi.Name == nameof(Enum.TryParse) && mi.GetParameters().Length == 3 && mi.IsGenericMethod);
@@ -75,6 +78,26 @@ namespace DbConnector.Core
             typeof(DataTable),
             typeof(DataSet)
         };
+
+        internal static Action<object, object> GetCachedSetter(MethodInfo setMethod)
+        {
+            if (!DbConnectorCache.SetterCache.TryGetValue(setMethod, out Action<object, object> setter))
+            {
+                setter = DynamicSetterMethodBuilder.BuildSetterDelagate(setMethod);
+                DbConnectorCache.SetterCache.TryAdd(setMethod, setter);
+            }
+            return setter;
+        }
+
+        private static MethodInfo GetEnumTryParseMethod(Type enumType)
+        {
+            if (!DbConnectorCache.EnumTryParseCache.TryGetValue(enumType, out MethodInfo method))
+            {
+                method = _enumTryParse.MakeGenericMethod(enumType);
+                DbConnectorCache.EnumTryParseCache.TryAdd(enumType, method);
+            }
+            return method;
+        }
 
         internal static bool IsEnumerableOrAsyncEnumerable(Type tType, out bool isAsyncEnumerable)
         {
@@ -392,7 +415,7 @@ namespace DbConnector.Core
 
                 GetMappedParentObject(onGetObjectValue, childObj, childMap.Children);
 
-                childMap.SetMethod.Invoke(obj, new object[] { childObj });
+                GetCachedSetter(childMap.SetMethod)(obj, childObj);
             }
         }
 
@@ -419,7 +442,7 @@ namespace DbConnector.Core
                             {
                                 var parameters = new object[] { (string)value, true, null };
 
-                                object isParsedObj = _enumTryParse.MakeGenericMethod(nonNullableObjType).Invoke(null, parameters);
+                                object isParsedObj = GetEnumTryParseMethod(nonNullableObjType).Invoke(null, parameters);
 
                                 if ((bool)isParsedObj)
                                 {
@@ -482,7 +505,7 @@ namespace DbConnector.Core
                     }
                 }
 
-                map.SetMethod.Invoke(obj, new object[] { value });
+                GetCachedSetter(map.SetMethod)(obj, value);
             }
         }
 
@@ -504,7 +527,7 @@ namespace DbConnector.Core
                         {
                             var parameters = new object[] { (string)value, true, null };
 
-                            object isParsedObj = _enumTryParse.MakeGenericMethod(nonNullableObjType).Invoke(null, parameters);
+                            object isParsedObj = GetEnumTryParseMethod(nonNullableObjType).Invoke(null, parameters);
 
                             if ((bool)isParsedObj)
                             {
@@ -578,6 +601,39 @@ namespace DbConnector.Core
                         + (onGetPropertyName == null ? ("object of type " + objType) : ("property " + onGetPropertyName() + " of type " + objType)));
 #endif
                         return ILObjectFactory.CreateInstance(nonNullableObjType);
+                    }
+                }
+                else if (objType.IsAnyTuple())
+                {
+                    Type[] genericArgs = objType.GetGenericArguments();
+
+                    // Only guard against insufficient data
+                    if (genericArgs.Length != 1)
+                    {
+                        throw new ArgumentException(
+                            $"Tuple requires at least {genericArgs.Length} items, but only 1 column was found.");
+                    }
+
+                    Type tType = genericArgs[0];
+
+                    if (tType.IsAnyTuple())
+                    {
+                        throw new InvalidCastException($@"Failed to map {(onGetColumnName == null ? "value" : "column " + onGetColumnName())} of type {columnType} to nested tuple element of type {tType}. Mapping to tuple elements is not supported. Consider mapping to a class instead.");
+                    }
+
+                    if (value != DBNull.Value)
+                    {
+                        return Activator.CreateInstance(objType, ThrowIfFailedToMatchColumnType(tType, tType.IsValueType ? (Nullable.GetUnderlyingType(tType) ?? tType) : tType, value, onGetColumnName));
+                    }
+                    else if (objType.IsValueType)
+                    {
+                        // For value tuples, we can only return the default value if the column value is null, since value tuples cannot be null.
+                        return Activator.CreateInstance(objType);
+                    }
+                    else
+                    {
+                        // For reference tuples, we can return null if the column value is null, since reference tuples can be null.
+                        return null;
                     }
                 }
                 else

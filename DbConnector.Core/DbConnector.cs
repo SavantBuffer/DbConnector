@@ -1811,12 +1811,7 @@ namespace DbConnector.Core
         {
             int numberOfRowsAffected = p.Command.ExecuteNonQuery();
 
-            if (!p.NumberOfRowsAffected.HasValue)
-            {
-                p.NumberOfRowsAffected = 0;
-            }
-
-            p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
+            p.NumberOfRowsAffected = (p.NumberOfRowsAffected ?? 0) + numberOfRowsAffected;
 
             return p.NumberOfRowsAffected;
         }
@@ -1825,12 +1820,7 @@ namespace DbConnector.Core
         {
             int numberOfRowsAffected = p.Command.ExecuteNonQuery();
 
-            if (!p.NumberOfRowsAffected.HasValue)
-            {
-                p.NumberOfRowsAffected = 0;
-            }
-
-            p.NumberOfRowsAffected = p.NumberOfRowsAffected.Value + numberOfRowsAffected;
+            p.NumberOfRowsAffected = (p.NumberOfRowsAffected ?? 0) + numberOfRowsAffected;
 
             return d;
         }

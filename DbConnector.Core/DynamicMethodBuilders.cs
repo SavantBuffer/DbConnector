@@ -123,7 +123,7 @@ namespace DbConnector.Core
             {
                 throw new InvalidCastException("The type " + tType + " is not supported");
             }
-            else if (tType.IsClass && (ctorInfo = tType.GetConstructor(Type.EmptyTypes)) == null)
+            else if (tType.IsClass && (ctorInfo = tType.GetConstructor(Type.EmptyTypes)) == null && !tType.IsClassicTuple())
             {
                 throw new InvalidCastException("The type " + tType + " is missing a parameterless constructor");
             }
@@ -133,7 +133,30 @@ namespace DbConnector.Core
                     new Type[] { typeof(IDataRecord) }, tType, true);
             ILGenerator il = method.GetILGenerator();
 
+            if (!tType.IsAnyTuple())
+            {
+                // Emit default creation of value and reference types based on the column mappings and settings.
+                EmitCreation(il, tType, ordinalColumnMap, ctorInfo, settings);
+            }
+            else
+            {
+                // Emit creation of tuples based on the column mappings.
+                int localDbNull = il.DeclareLocal(typeof(DBNull)).LocalIndex;
 
+                il.Emit(OpCodes.Ldsfld, _DBNullValue);//DbNull
+                il.StoreLocal(localDbNull);//
+
+                EmitTupleCreation(il, tType, ordinalColumnMap, localDbNull, 0);
+            }
+
+            il.Emit(OpCodes.Ret);//
+
+            mapper.CreateDelegate(method);
+            return mapper;
+        }
+
+        private static void EmitCreation(ILGenerator il, Type tType, OrdinalColumnMap[] ordinalColumnMap, ConstructorInfo ctorInfo, IColumnMapSetting settings)
+        {
             //Init target
             Type nullUnderlyingType = Nullable.GetUnderlyingType(tType);
             Type nonNullUnderlyingType = (nullUnderlyingType ?? tType);
@@ -196,10 +219,6 @@ namespace DbConnector.Core
                     il.Emit(OpCodes.Newobj, tType.GetConstructor(new[] { nullUnderlyingType })); //nullable_target
                 }
             }
-            il.Emit(OpCodes.Ret);//
-
-            mapper.CreateDelegate(method);
-            return mapper;
         }
 
         private static IEnumerable<DynamicMethodMap> BuildDynamicMethodMaps(Type tType, OrdinalColumnMap[] keys, DynamicMethodMapBuilderState state, IColumnMapSetting settings)
@@ -544,6 +563,235 @@ namespace DbConnector.Core
                     }
 #endif
                 }
+            }
+        }
+
+        private static void EmitTupleCreation(ILGenerator il, Type currentType, OrdinalColumnMap[] keys, int localDbNull, int arrayIndexOffset)
+        {
+            // Get the generic arguments of the current Tuple level
+            Type[] args = currentType.GetGenericArguments();
+            ConstructorInfo ctor = currentType.GetConstructor(args) ?? throw new ArgumentException($"Type {currentType.Name} is not a valid tuple.");
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                Type t = args[i];
+
+                // If we are at the 8th argument (index 7), it's the 'Rest' property
+                if (i == 7)
+                {
+                    // Recursively create the inner Tuple
+                    EmitTupleCreation(il, t, keys, localDbNull, arrayIndexOffset + 7);
+                }
+                else
+                {
+                    OrdinalColumnMap ordinalMap = arrayIndexOffset + i < keys.Length ? keys[i] : null;
+
+                    if (t.IsAnyTuple())
+                    {
+                        if (ordinalMap != null)
+                        {
+                            throw new InvalidCastException($@"Failed to map column {ordinalMap.Name} of type {ordinalMap.FieldType} to nested tuple element of type {t}. Mapping to tuple elements is not supported. Consider mapping to a class instead.");
+                        }
+                        else
+                        {
+                            throw new InvalidCastException($@"Failed to map nested tuple element of type {t}. Mapping to tuple elements is not supported. Consider mapping to a class instead.");
+                        }
+                    }
+
+                    if (ordinalMap == null)
+                    {
+                        throw new InvalidCastException(
+                            $"Tuple requires at least {arrayIndexOffset + args.Length} items, but only {keys.Length} column(s) were found.");
+                    }
+
+                    // Get the unboxed type if it's nullable and validate the match
+                    Type nullUnderlyingType = Nullable.GetUnderlyingType(t);
+                    Type unboxType = (nullUnderlyingType ?? t);
+
+                    // Verify if the column type can be assigned to the tuple element type and get the opcode for value types if needed
+                    DbConnectorUtilities.ThrowIfFailedToMatchColumnTypeByNames(ordinalMap.FieldType, unboxType, ordinalMap.Name, null, out OpCode opCode);
+
+                    //Set label
+                    Label lblSkip = il.DefineLabel();
+                    Label lblDone = il.DefineLabel();
+                    Label lblSkipEmpty = il.DefineLabel();
+
+                    // incoming stack: Any values in the order of the tuple elements
+                    il.Emit(OpCodes.Ldarg_0);//reader
+                    il.LoadInt(ordinalMap.Ordinal);//reader/ordinal
+                    il.Emit(OpCodes.Callvirt, _getValueMethod);//object
+                    il.Emit(OpCodes.Dup);//object/object
+                    il.LoadLocal(localDbNull);//object/DbNull
+                    il.Emit(OpCodes.Beq_S, lblSkip);//object
+
+                    if (unboxType == typeof(Guid) && ordinalMap.FieldType == typeof(string))
+                    {
+                        int localGuid = il.DeclareLocal(typeof(Guid)).LocalIndex;
+
+                        il.LoadLocal(localGuid);//string/guid
+                        il.Emit(OpCodes.Call, _guidTryParseMethod);//true or false
+                        il.Emit(OpCodes.Brfalse_S, lblSkipEmpty);//
+
+                        //Set property
+                        il.LoadLocal(localGuid);//guid
+
+                        if (nullUnderlyingType != null)
+                            il.Emit(OpCodes.Newobj, t.GetConstructor(new[] { nullUnderlyingType })); //nullable_guid
+
+                        il.Emit(OpCodes.Br_S, lblDone);//nullable_guid
+                    }
+                    else if (unboxType.IsEnum)
+                    {
+                        //If trying to match strings
+                        if (ordinalMap.FieldType == typeof(string))
+                        {
+                            il.Emit(OpCodes.Ldc_I4_1);//string/true                                    
+
+                            //Init local enum value
+                            int localEnum = il.DeclareLocal(unboxType).LocalIndex;
+                            il.LoadLocalAddress(localEnum);//string/true/enum_address
+                            il.Emit(OpCodes.Dup);//string/true/enum_address/enum_address
+                            il.Emit(OpCodes.Initobj, unboxType);//string/true/enum_address
+
+                            //Try Parse
+                            il.Emit(OpCodes.Call, DbConnectorUtilities._enumTryParse.MakeGenericMethod(unboxType));//true or false
+                            il.Emit(OpCodes.Brfalse_S, lblSkipEmpty);//
+
+                            //Check if it's defined Enum
+                            il.Emit(OpCodes.Ldtoken, unboxType); //enum_type_token
+                            il.Emit(OpCodes.Call, DbConnectorUtilities._typeGetTypeFromHandle); //enum_type
+                            il.LoadLocal(localEnum);//enum_type/enum_value
+                            il.Emit(OpCodes.Box, unboxType);//enum_type/enum_value_boxed
+                            il.Emit(OpCodes.Call, _enumIsDefined);//true or false
+                            il.Emit(OpCodes.Brfalse_S, lblSkipEmpty);//
+
+                            //Set property
+                            il.LoadLocal(localEnum);//enum_value
+
+                            if (nullUnderlyingType != null)
+                                il.Emit(OpCodes.Newobj, t.GetConstructor(new[] { nullUnderlyingType })); //nullable_enum_value
+
+                            il.Emit(OpCodes.Br_S, lblDone);//enum_value || nullable_enum_value
+                        }
+                        else
+                        {
+                            //Cast
+                            Type enumUnderlyingType = Enum.GetUnderlyingType(unboxType);
+                            int localIndex = il.DeclareLocal(enumUnderlyingType).LocalIndex;
+                            il.Emit(OpCodes.Unbox_Any, ordinalMap.FieldType); //col_typed_value
+                            il.Emit(opCode); //typed_value
+                            il.StoreLocal(localIndex);//
+
+                            //Check if it's defined Enum
+                            il.Emit(OpCodes.Ldtoken, unboxType); //enum_type_token
+                            il.Emit(OpCodes.Call, DbConnectorUtilities._typeGetTypeFromHandle); //enum_type
+                            il.LoadLocal(localIndex);//enum_type/typed_value
+                            il.Emit(OpCodes.Box, enumUnderlyingType);//enum_type/typed_value_boxed
+                            il.Emit(OpCodes.Call, _enumIsDefined);//true or false
+                            il.Emit(OpCodes.Brfalse_S, lblSkipEmpty);//
+
+                            //Set property
+                            il.LoadLocal(localIndex);//typed-value
+
+                            if (nullUnderlyingType != null)
+                                il.Emit(OpCodes.Newobj, t.GetConstructor(new[] { nullUnderlyingType })); //nullable_value
+
+                            il.Emit(OpCodes.Br_S, lblDone);//typed-value || nullable_value
+                        }
+                    }
+                    else if (opCode != default)
+                    {
+                        //Indirect match and cast
+                        il.Emit(OpCodes.Unbox_Any, ordinalMap.FieldType); //col_typed_value
+                        il.Emit(opCode); //typed_value
+
+                        if (unboxType == typeof(bool))
+                        {
+                            il.Emit(OpCodes.Ldc_I4_0);//typed_value/0
+                            il.Emit(OpCodes.Ceq);//0 or 1
+                            il.Emit(OpCodes.Ldc_I4_0);//0 or 1/0
+                            il.Emit(OpCodes.Ceq);//0 or 1
+                        }
+
+                        if (nullUnderlyingType != null)
+                        {
+                            il.Emit(OpCodes.Newobj, t.GetConstructor(new[] { nullUnderlyingType })); //nullable_value
+                        }
+
+                        il.Emit(OpCodes.Br_S, lblDone);//value || nullable_value
+                    }
+                    else
+                    {
+                        //Set property
+                        if (unboxType.IsValueType)
+                        {
+                            il.Emit(OpCodes.Unbox_Any, unboxType);//value
+
+                            if (nullUnderlyingType != null)
+                                il.Emit(OpCodes.Newobj, t.GetConstructor(new[] { nullUnderlyingType })); //nullable_value
+                        }
+
+                        il.Emit(OpCodes.Br_S, lblDone);//value || nullable_value
+                    }
+
+
+                    //Skip-DbNull branch incoming stack: object
+                    il.MarkLabel(lblSkip);
+                    il.Emit(OpCodes.Pop);//
+
+                    //Skip-Empty branch incoming stack: //
+                    il.MarkLabel(lblSkipEmpty);
+
+                    // Load the default value when DBNull is encountered or parse was unsuccessful.
+                    EmitDefaultValue(il, t);//default(t)
+
+                    // Done branch
+                    // The stack will have either the unboxed value from the data reader or the default value for the type, both of which are valid for the tuple constructor
+                    il.MarkLabel(lblDone);
+                }
+
+            }
+
+            // Call the constructor with the arguments now on the stack
+            il.Emit(OpCodes.Newobj, ctor);
+        }
+
+        private static void EmitDefaultValue(ILGenerator il, Type type)
+        {
+            // 1. Reference Types (Classes, Strings, Classic Tuples)
+            if (!type.IsValueType)
+            {
+                il.Emit(OpCodes.Ldnull);
+            }
+            // 2. Primitive Value Types
+            else if (type.IsPrimitive || type.IsEnum)
+            {
+                if (type == typeof(long) || type == typeof(ulong))
+                {
+                    il.Emit(OpCodes.Ldc_I8, (long)0);
+                }
+                else if (type == typeof(float))
+                {
+                    il.Emit(OpCodes.Ldc_R4, (float)0);
+                }
+                else if (type == typeof(double))
+                {
+                    il.Emit(OpCodes.Ldc_R8, (double)0);
+                }
+                else
+                {
+                    // Handles int, bool, char, short, byte, and Enums
+                    il.Emit(OpCodes.Ldc_I4_0);
+                }
+            }
+            // 3. Custom Structs (Nullables, DateTime, ValueTuple, etc.)
+            else
+            {
+                // We need a local variable to initialize the struct
+                LocalBuilder local = il.DeclareLocal(type);
+                il.Emit(OpCodes.Ldloca, local); // Load address of the local
+                il.Emit(OpCodes.Initobj, type); // Initialize the memory at that address
+                il.Emit(OpCodes.Ldloc, local);  // Push the initialized value onto the stack
             }
         }
 
@@ -1125,6 +1373,42 @@ namespace DbConnector.Core
         }
     }
 
+    internal class DynamicSetterMethodBuilder
+    {
+        /// <summary>
+        /// Builds a setter delegate for the given set method.        
+        /// </summary>
+        /// <param name="setMethod">The set method for which to build the delegate.</param>
+        /// <returns>A delegate that sets the value on the target object.</returns>
+        public static Action<object, object> BuildSetterDelagate(MethodInfo setMethod)
+        {
+            var dm = new DynamicMethod("Set_" + setMethod.Name + "_" + Guid.NewGuid().ToString(), typeof(void),
+                        new[] { typeof(object), typeof(object) }, setMethod.DeclaringType, true);
+            var il = dm.GetILGenerator();
+
+            il.Emit(OpCodes.Ldarg_0);
+            if (setMethod.DeclaringType.IsValueType)
+                il.Emit(OpCodes.Unbox, setMethod.DeclaringType);
+            else
+                il.Emit(OpCodes.Castclass, setMethod.DeclaringType);
+
+            il.Emit(OpCodes.Ldarg_1);
+            var paramType = setMethod.GetParameters()[0].ParameterType;
+            if (paramType.IsValueType)
+                // Handles null -> default(Nullable<T>) correctly via Unbox_Any.
+                // For non-nullable value types, null will still throw
+                // NullReferenceException (same as MethodInfo.Invoke behavior).
+                il.Emit(OpCodes.Unbox_Any, paramType);
+            else
+                il.Emit(OpCodes.Castclass, paramType);
+
+            il.Emit(setMethod.DeclaringType.IsValueType ? OpCodes.Call : OpCodes.Callvirt, setMethod);
+            il.Emit(OpCodes.Ret);
+
+
+            return (Action<object, object>)dm.CreateDelegate(typeof(Action<object, object>));
+        }
+    }
 
 
     internal interface IDynamicDbConnectorMethodBuilder
@@ -1261,7 +1545,7 @@ namespace DbConnector.Core
             return (Func<object>)method.CreateDelegate(typeof(Func<object>));
         }
     }
-        
+
     internal static class ILObjectFactory<T>
     {
         public static readonly Func<T> CreateInstance = CreateResolver();
@@ -1281,10 +1565,15 @@ namespace DbConnector.Core
             }
             else
             {
+                // For classes: Find parameterless constructor
                 var constructor = t.GetConstructor(System.Reflection.BindingFlags.Public |
                                                  System.Reflection.BindingFlags.NonPublic |
                                                  System.Reflection.BindingFlags.Instance,
                                                  null, Type.EmptyTypes, null);
+
+                if (constructor == null)
+                    throw new InvalidOperationException($"{t.Name} must have a parameterless constructor.");
+
                 il.Emit(OpCodes.Newobj, constructor);
             }
 

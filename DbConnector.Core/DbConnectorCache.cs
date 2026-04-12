@@ -17,6 +17,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Reflection;
 using System.Threading;
 
 namespace DbConnector.Core
@@ -65,6 +66,11 @@ namespace DbConnector.Core
 
         internal static readonly ConcurrentDictionary<Type, Func<DbConnection>> DbConnectionBuilderCache = new ConcurrentDictionary<Type, Func<DbConnection>>();
 
+        internal static readonly ConcurrentDictionary<Type, MethodInfo> EnumTryParseCache =
+            new ConcurrentDictionary<Type, MethodInfo>();
+
+        internal static readonly ConcurrentDictionary<MethodInfo, Action<object, object>> SetterCache =
+            new ConcurrentDictionary<MethodInfo, Action<object, object>>();
 
         /// <summary>
         /// Clears all the cache.
@@ -76,6 +82,8 @@ namespace DbConnector.Core
             MultiReaderBranchCache.Clear();
             DbJobCache.Clear();
             ColumnMapCache.Clear();
+            EnumTryParseCache.Clear();
+            SetterCache.Clear();
         }
 
         /// <summary>

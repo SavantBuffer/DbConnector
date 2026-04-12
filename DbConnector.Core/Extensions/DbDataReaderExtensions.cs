@@ -492,5 +492,87 @@ namespace DbConnector.Core.Extensions
                 yield return odr.GetFieldType(i);
             }
         }
+
+
+        internal static object ToTuple(this DbDataReader odr, Type tupleType)
+        {
+            return ToTuple(tupleType, odr, 0);
+        }
+
+        internal static T ToTuple<T>(this DbDataReader odr)
+        {
+            return (T)ToTuple(odr, typeof(T));
+        }
+
+        private static object ToTuple(Type tupleType, DbDataReader odr, int offset)
+        {
+            Type[] genericArgs = tupleType.GetGenericArguments();
+
+            if (genericArgs.Length == 8)
+            {
+                object[] constructorArgs = new object[8];
+                for (int i = 0; i < 7; i++)
+                {
+                    int ordinal = offset + i;
+
+                    if (ordinal < odr.FieldCount)
+                    {
+                        constructorArgs[i] = GetTupleElementValue(genericArgs[i], odr.GetValue(ordinal), ordinal, odr);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException(
+                            $"Tuple requires at least {offset + 8} items, but only {odr.FieldCount} columns were found.");
+                    }
+                }
+
+                // The 8th item is the nested Rest ValueTuple
+                constructorArgs[7] = ToTuple(genericArgs[7], odr, offset + 7);
+
+                return Activator.CreateInstance(tupleType, constructorArgs);
+            }
+            else
+            {
+                object[] constructorArgs = new object[genericArgs.Length];
+                for (int i = 0; i < genericArgs.Length; i++)
+                {
+                    int ordinal = offset + i;
+
+                    if (ordinal < odr.FieldCount)
+                    {
+                        constructorArgs[i] = GetTupleElementValue(genericArgs[i], odr.GetValue(ordinal), ordinal, odr);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException(
+                           $"Tuple requires at least {offset + genericArgs.Length} items, but only {odr.FieldCount} columns were found.");
+                    }
+                }
+
+                return Activator.CreateInstance(tupleType, constructorArgs);
+            }
+        }
+
+        private static object GetTupleElementValue(Type tType, object value, int ordinal, DbDataReader odr)
+        {
+            if (tType.IsAnyTuple())
+            {
+                throw new InvalidCastException($@"Failed to map column {odr.GetName(ordinal)} of type {odr.GetFieldType(ordinal)} to nested tuple element of type {tType}. Mapping to tuple elements is not supported. Consider mapping to a class instead.");
+            }
+
+            if (value != DBNull.Value)
+            {
+                Type nonNullableObjType = tType.IsValueType ? (Nullable.GetUnderlyingType(tType) ?? tType) : tType;
+                return DbConnectorUtilities.ThrowIfFailedToMatchColumnType(tType, nonNullableObjType, value, () => odr.GetName(ordinal));
+            }
+            else if (tType.IsValueType)
+            {
+                return Activator.CreateInstance(tType);
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

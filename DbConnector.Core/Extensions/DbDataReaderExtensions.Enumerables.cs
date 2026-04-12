@@ -41,7 +41,7 @@ namespace DbConnector.Core.Extensions
             {
                 Type tType = typeof(T);
 
-                if (!DbConnectorUtilities._directTypeMap.Contains(tType) && !(tType.IsValueType && (tType.IsEnum || (Nullable.GetUnderlyingType(tType)?.IsEnum ?? false))) && !tType.IsArray)
+                if (!DbConnectorUtilities._directTypeMap.Contains(tType) && !(Nullable.GetUnderlyingType(tType) ?? tType).IsEnum && !tType.IsArray)
                 {
                     //Dynamic MSIL cached version is around 30% faster and uses up to 57% less memory.
                     if (cmd != null && (cmd.Flags & DbJobCommandFlags.NoCache) == DbJobCommandFlags.None)
@@ -63,6 +63,16 @@ namespace DbConnector.Core.Extensions
                                 yield break;
 
                             yield return genericMapper.OnBuild(odr);
+                        }
+                    }
+                    else if (tType.IsAnyTuple())
+                    {
+                        while (odr.Read())
+                        {
+                            if (token.IsCancellationRequested)
+                                yield break;
+
+                            yield return odr.ToTuple<T>();
                         }
                     }
                     else
@@ -198,6 +208,16 @@ namespace DbConnector.Core.Extensions
                                 yield break;
 
                             yield return mapper.Build(odr);
+                        }
+                    }
+                    else if (objType.IsAnyTuple())
+                    {
+                        while (odr.Read())
+                        {
+                            if (token.IsCancellationRequested)
+                                yield break;
+
+                            yield return odr.ToTuple(objType);
                         }
                     }
                     else

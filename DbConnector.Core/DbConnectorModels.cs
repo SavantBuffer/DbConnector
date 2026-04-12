@@ -236,6 +236,14 @@ namespace DbConnector.Core
             _collection = dbCommand.Parameters;
         }
 
+        /// <summary>
+        /// Adds a new parameter with the specified name and database type to the collection.
+        /// </summary>
+        /// <remarks>The returned parameter is added to the underlying collection and can be further
+        /// configured before executing the command.</remarks>
+        /// <param name="parameterName">The name of the parameter to add. Cannot be null or empty.</param>
+        /// <param name="dbType">The database type of the parameter to add.</param>
+        /// <returns>A <see cref="DbParameter"/> instance representing the newly added parameter.</returns>
         public DbParameter Add(string parameterName, DbType dbType)
         {
             var toAdd = _dbCommand.CreateParameter();
@@ -249,6 +257,18 @@ namespace DbConnector.Core
             return toAdd;
         }
 
+        /// <summary>
+        /// Adds a new parameter with the specified name, database type, and size to the underlying parameter
+        /// collection.
+        /// </summary>
+        /// <remarks>The returned parameter is added to the collection and can be further configured
+        /// before executing the associated command. The size parameter is especially relevant for variable-length data
+        /// types such as strings or binary data.</remarks>
+        /// <param name="parameterName">The name of the parameter to add. Cannot be null or empty.</param>
+        /// <param name="dbType">The database type of the parameter to add.</param>
+        /// <param name="size">The maximum size, in bytes, of the parameter value. Must be greater than zero for variable-length data
+        /// types.</param>
+        /// <returns>A reference to the newly created and added parameter.</returns>
         public DbParameter Add(string parameterName, DbType dbType, int size)
         {
             var toAdd = _dbCommand.CreateParameter();
@@ -263,6 +283,16 @@ namespace DbConnector.Core
             return toAdd;
         }
 
+        /// <summary>
+        /// Adds a new parameter to the collection with the specified name, data type, size, and source column.
+        /// </summary>
+        /// <remarks>The returned parameter is added to the underlying collection and can be further
+        /// configured before executing the command.</remarks>
+        /// <param name="parameterName">The name of the parameter to add. Cannot be null or empty.</param>
+        /// <param name="dbType">The database type of the parameter. Specifies how the value is interpreted by the data provider.</param>
+        /// <param name="size">The maximum size, in bytes, of the parameter value. Must be greater than or equal to zero.</param>
+        /// <param name="sourceColumn">The name of the source column mapped to the parameter. Can be null or empty if not mapped.</param>
+        /// <returns>A <see cref="DbParameter"/> instance representing the newly added parameter.</returns>
         public DbParameter Add(string parameterName, DbType dbType, int size, string sourceColumn)
         {
             var toAdd = _dbCommand.CreateParameter();
@@ -278,6 +308,14 @@ namespace DbConnector.Core
             return toAdd;
         }
 
+        /// <summary>
+        /// Adds a parameter with the specified name and value. The parameter type will be inferred from the value. Null values will be added as <see cref="DBNull.Value"/>.
+        /// </summary>
+        /// <remarks>The returned parameter is added to the underlying collection and can be further
+        /// configured before executing the command.</remarks>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value of the parameter.</param>
+        /// <returns>The created <see cref="DbParameter"/>.</returns>
         public DbParameter AddWithValue(string parameterName, object value)
         {
             var toAdd = _dbCommand.CreateParameter();
@@ -369,268 +407,186 @@ namespace DbConnector.Core
             }
         }
 
-        //
-        // Summary:
-        //     Specifies whether the collection is synchronized.
-        //
-        // Returns:
-        //     true if the collection is synchronized; otherwise false.
+        /// <summary>
+        /// Specifies whether the collection is synchronized.
+        /// </summary>
+        /// <returns><see langword="true"/> if the collection is synchronized; otherwise <see langword="false"/>.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool IsSynchronized { get { return _collection.IsSynchronized; } }
 
-        //
-        // Summary:
-        //     Specifies whether the collection is read-only.
-        //
-        // Returns:
-        //     true if the collection is read-only; otherwise false.
+        /// <summary>
+        /// Specifies whether the collection is read-only.
+        /// </summary>
+        /// <returns><see langword="true"/> if the collection is read-only; otherwise <see langword="false"/>.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool IsReadOnly { get { return _collection.IsReadOnly; } }
 
-        //
-        // Summary:
-        //     Specifies whether the collection is a fixed size.
-        //
-        // Returns:
-        //     true if the collection is a fixed size; otherwise false.
+        /// <summary>
+        /// Specifies whether the collection is a fixed size.
+        /// </summary>
+        /// <returns><see langword="true"/> if the collection is a fixed size; otherwise <see langword="false"/>.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool IsFixedSize { get { return _collection.IsFixedSize; } }
 
-        //
-        // Summary:
-        //     Specifies the number of items in the collection.
-        //
-        // Returns:
-        //     The number of items in the collection.
+        /// <summary>
+        /// Specifies the number of items in the collection.
+        /// </summary>
+        /// <returns>The number of items in the collection.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override int Count { get { return _collection.Count; } }
 
-        //
-        // Summary:
-        //     Specifies the System.Object to be used to synchronize access to the collection.
-        //
-        // Returns:
-        //     A System.Object to be used to synchronize access to the System.Data.Common.DbParameterCollection.
+        /// <summary>
+        /// Specifies the <see cref="object"/> to be used to synchronize access to the collection.
+        /// </summary>
+        /// <returns>An <see cref="object"/> to be used to synchronize access to the <see cref="DbParameterCollection"/>.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override object SyncRoot { get { return _collection.SyncRoot; } }
 
-        //
-        // Summary:
-        //     Gets and sets the System.Data.Common.DbParameter at the specified index.
-        //
-        // Parameters:
-        //   index:
-        //     The zero-based index of the parameter.
-        //
-        // Returns:
-        //     The System.Data.Common.DbParameter at the specified index.
-        //
-        // Exceptions:
-        //   T:System.IndexOutOfRangeException:
-        //     The specified index does not exist.
+        /// <summary>
+        /// Gets and sets the <see cref="DbParameter"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the parameter.</param>
+        /// <returns>The <see cref="DbParameter"/> at the specified index.</returns>
+        /// <exception cref="IndexOutOfRangeException">The specified index does not exist.</exception>
         public new DbParameter this[int index] { get { return _collection[index]; } set { _collection[index] = value; } }
 
-        //
-        // Summary:
-        //     Gets and sets the System.Data.Common.DbParameter with the specified name.
-        //
-        // Parameters:
-        //   parameterName:
-        //     The name of the parameter.
-        //
-        // Returns:
-        //     The System.Data.Common.DbParameter with the specified name.
-        //
-        // Exceptions:
-        //   T:System.IndexOutOfRangeException:
-        //     The specified index does not exist.
+        /// <summary>
+        /// Gets and sets the <see cref="DbParameter"/> with the specified name.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <returns>The <see cref="DbParameter"/> with the specified name.</returns>
+        /// <exception cref="IndexOutOfRangeException">The specified index does not exist.</exception>
         public new DbParameter this[string parameterName] { get { return _collection[parameterName]; } set { _collection[parameterName] = value; } }
 
 
-        //
-        // Summary:
-        //     Adds the specified System.Data.Common.DbParameter object to the System.Data.Common.DbParameterCollection.
-        //
-        // Parameters:
-        //   value:
-        //     The System.Data.Common.DbParameter.Value of the System.Data.Common.DbParameter
-        //     to add to the collection.
-        //
-        // Returns:
-        //     The index of the System.Data.Common.DbParameter object in the collection.
+        /// <summary>
+        /// Adds the specified <see cref="DbParameter"/> object to the <see cref="DbParameterCollection"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="DbParameter.Value"/> of the <see cref="DbParameter"/> to add to the collection.</param>
+        /// <returns>The index of the <see cref="DbParameter"/> object in the collection.</returns>
         public override int Add(object value)
         {
             return _collection.Add(value);
         }
 
-        //
-        // Summary:
-        //     Adds an array of items with the specified values to the System.Data.Common.DbParameterCollection.
-        //
-        // Parameters:
-        //   values:
-        //     An array of values of type System.Data.Common.DbParameter to add to the collection.
+        /// <summary>
+        /// Adds an array of items with the specified values to the <see cref="DbParameterCollection"/>.
+        /// </summary>
+        /// <param name="values">An array of values of type <see cref="DbParameter"/> to add to the collection.</param>
         public override void AddRange(Array values)
         {
             _collection.AddRange(values);
         }
 
-        //
-        // Summary:
-        //     Removes all System.Data.Common.DbParameter values from the System.Data.Common.DbParameterCollection.
+        /// <summary>
+        /// Removes all <see cref="DbParameter"/> values from the <see cref="DbParameterCollection"/>.
+        /// </summary>
         public override void Clear()
         {
             _collection.Clear();
         }
 
-        //
-        // Summary:
-        //     Indicates whether a System.Data.Common.DbParameter with the specified name exists
-        //     in the collection.
-        //
-        // Parameters:
-        //   value:
-        //     The name of the System.Data.Common.DbParameter to look for in the collection.
-        //
-        // Returns:
-        //     true if the System.Data.Common.DbParameter is in the collection; otherwise false.
+        /// <summary>
+        /// Indicates whether a <see cref="DbParameter"/> with the specified name exists in the collection.
+        /// </summary>
+        /// <param name="value">The name of the <see cref="DbParameter"/> to look for in the collection.</param>
+        /// <returns><see langword="true"/> if the <see cref="DbParameter"/> is in the collection; otherwise <see langword="false"/>.</returns>
         public override bool Contains(object value)
         {
             return _collection.Contains(value);
         }
 
-        //
-        // Summary:
-        //     Indicates whether a System.Data.Common.DbParameter with the specified System.Data.Common.DbParameter.Value
-        //     is contained in the collection.
-        //
-        // Parameters:
-        //   value:
-        //     The System.Data.Common.DbParameter.Value of the System.Data.Common.DbParameter
-        //     to look for in the collection.
-        //
-        // Returns:
-        //     true if the System.Data.Common.DbParameter is in the collection; otherwise false.
+        /// <summary>
+        /// Indicates whether a <see cref="DbParameter"/> with the specified <see cref="DbParameter.Value"/> is contained in the collection.
+        /// </summary>
+        /// <param name="parameterName">The <see cref="DbParameter.Value"/> of the <see cref="DbParameter"/> to look for in the collection.</param>
+        /// <returns><see langword="true"/> if the <see cref="DbParameter"/> is in the collection; otherwise <see langword="false"/>.</returns>
         public override bool Contains(string parameterName)
         {
             return _collection.Contains(parameterName);
         }
 
-        //
-        // Summary:
-        //     Copies an array of items to the collection starting at the specified index.
-        //
-        // Parameters:
-        //   array:
-        //     The array of items to copy to the collection.
-        //
-        //   index:
-        //     The index in the collection to copy the items.
+        /// <summary>
+        /// Copies an array of items to the collection starting at the specified index.
+        /// </summary>
+        /// <param name="array">The array of items to copy to the collection.</param>
+        /// <param name="index">The index in the collection to copy the items.</param>
         public override void CopyTo(Array array, int index)
         {
             _collection.CopyTo(array, index);
         }
 
-        //
-        // Summary:
-        //     Exposes the System.Collections.IEnumerable.GetEnumerator method, which supports
-        //     a simple iteration over a collection by a .NET Framework data provider.
-        //
-        // Returns:
-        //     An System.Collections.IEnumerator that can be used to iterate through the collection.
+        /// <summary>
+        /// Exposes the <see cref="IEnumerable.GetEnumerator"/> method, which supports a simple iteration over a collection by a .NET data provider.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerator"/> that can be used to iterate through the collection.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override IEnumerator GetEnumerator()
         {
             return _collection.GetEnumerator();
         }
 
-        //
-        // Summary:
-        //     Returns the index of the specified System.Data.Common.DbParameter object.
-        //
-        // Parameters:
-        //   value:
-        //     The System.Data.Common.DbParameter object in the collection.
-        //
-        // Returns:
-        //     The index of the specified System.Data.Common.DbParameter object.
+        /// <summary>
+        /// Returns the index of the specified <see cref="DbParameter"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="DbParameter"/> object in the collection.</param>
+        /// <returns>The index of the specified <see cref="DbParameter"/> object.</returns>
         public override int IndexOf(object value)
         {
             return _collection.IndexOf(value);
         }
 
-        //
-        // Summary:
-        //     Returns the index of the System.Data.Common.DbParameter object with the specified
-        //     name.
-        //
-        // Parameters:
-        //   parameterName:
-        //     The name of the System.Data.Common.DbParameter object in the collection.
-        //
-        // Returns:
-        //     The index of the System.Data.Common.DbParameter object with the specified name.
+        /// <summary>
+        /// Returns the index of the <see cref="DbParameter"/> object with the specified name.
+        /// </summary>
+        /// <param name="parameterName">The name of the <see cref="DbParameter"/> object in the collection.</param>
+        /// <returns>The index of the <see cref="DbParameter"/> object with the specified name.</returns>
         public override int IndexOf(string parameterName)
         {
             return _collection.IndexOf(parameterName);
         }
 
-        //
-        // Summary:
-        //     Inserts the specified index of the System.Data.Common.DbParameter object with
-        //     the specified name into the collection at the specified index.
-        //
-        // Parameters:
-        //   index:
-        //     The index at which to insert the System.Data.Common.DbParameter object.
-        //
-        //   value:
-        //     The System.Data.Common.DbParameter object to insert into the collection.
+        /// <summary>
+        /// Inserts the specified index of the <see cref="DbParameter"/> object with the specified name into the collection at the specified index.
+        /// </summary>
+        /// <param name="index">The index at which to insert the <see cref="DbParameter"/> object.</param>
+        /// <param name="value">The <see cref="DbParameter"/> object to insert into the collection.</param>
         public override void Insert(int index, object value)
         {
             _collection.Insert(index, value);
         }
 
-        //
-        // Summary:
-        //     Removes the specified System.Data.Common.DbParameter object from the collection.
-        //
-        // Parameters:
-        //   value:
-        //     The System.Data.Common.DbParameter object to remove.
+        /// <summary>
+        /// Removes the specified <see cref="DbParameter"/> object from the collection.
+        /// </summary>
+        /// <param name="value">The <see cref="DbParameter"/> object to remove.</param>
         public override void Remove(object value)
         {
             _collection.Remove(value);
         }
 
-        //
-        // Summary:
-        //     Removes the System.Data.Common.DbParameter object at the specified from the collection.
-        //
-        // Parameters:
-        //   index:
-        //     The index where the System.Data.Common.DbParameter object is located.
+        /// <summary>
+        /// Removes the <see cref="DbParameter"/> object at the specified from the collection.
+        /// </summary>
+        /// <param name="index">The index where the <see cref="DbParameter"/> object is located.</param>
         public override void RemoveAt(int index)
         {
             _collection.RemoveAt(index);
         }
 
-        // Summary:
-        //     Removes the System.Data.Common.DbParameter object with the specified name from
-        //     the collection.
-        //
-        // Parameters:
-        //   parameterName:
-        //     The name of the System.Data.Common.DbParameter object to remove.
+        /// <summary>
+        /// Removes the <see cref="DbParameter"/> object with the specified name from the collection.
+        /// </summary>
+        /// <param name="parameterName">The name of the <see cref="DbParameter"/> object to remove.</param>
         public override void RemoveAt(string parameterName)
         {
             _collection.RemoveAt(parameterName);
