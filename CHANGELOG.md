@@ -1,3 +1,15 @@
+# [v1.8.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.8.0)  | Apr 12, 2026
+
+### Features
+ - New support for mapping database query results directly to `ValueTuple` and classic `Tuple` types, enabling lightweight, class-free projections from query columns to strongly-typed tuple elements by ordinal position.
+ - Integration of tuple mapping into Read, ReadToList, ReadFirst, Scalar, and their async/enumerable variants. These enhancements make it easier to work with ad-hoc result sets without defining custom classes, improving developer productivity and flexibility.
+ - Additional XML documentation and code comments for tuple-related logic.
+
+### Performance Improvements 
+ - Minor logic optimizations for list and enumerable functions, improving performance when working with large result sets.
+ - Caching for dynamic setter delegates and Enum.TryParse methods to improve performance.
+
+
 # [v1.7.0](https://github.com/SavantBuffer/DbConnector/releases/tag/v1.7.0)  | Mar 29, 2026
 
 ### Performance Improvements 
